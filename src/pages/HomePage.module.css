@@ -24,77 +24,139 @@
   overflow: hidden;
 }
 
-/* 등대 & 방파제 실루엣 (고정 배경) */
+/* 구름 레이어 (느리게 흐르는 겹겹 구름) */
+.heroClouds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% + 1800px);
+  height: 200px;
+  pointer-events: none;
+  z-index: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1800 200'%3E%3Cellipse cx='250' cy='55' rx='140' ry='38' fill='%230B5E66' fill-opacity='0.035'/%3E%3Cellipse cx='300' cy='45' rx='90' ry='30' fill='%230B5E66' fill-opacity='0.03'/%3E%3Cellipse cx='200' cy='50' rx='70' ry='26' fill='%230B5E66' fill-opacity='0.025'/%3E%3Cellipse cx='750' cy='35' rx='110' ry='32' fill='%230B5E66' fill-opacity='0.03'/%3E%3Cellipse cx='800' cy='28' rx='70' ry='24' fill='%230B5E66' fill-opacity='0.025'/%3E%3Cellipse cx='700' cy='40' rx='55' ry='20' fill='%230B5E66' fill-opacity='0.02'/%3E%3Cellipse cx='1250' cy='60' rx='120' ry='34' fill='%230B5E66' fill-opacity='0.03'/%3E%3Cellipse cx='1300' cy='52' rx='75' ry='26' fill='%230B5E66' fill-opacity='0.025'/%3E%3Cellipse cx='1550' cy='42' rx='90' ry='28' fill='%230B5E66' fill-opacity='0.028'/%3E%3Cellipse cx='1600' cy='36' rx='55' ry='20' fill='%230B5E66' fill-opacity='0.022'/%3E%3Cellipse cx='450' cy='90' rx='80' ry='24' fill='%230B5E66' fill-opacity='0.02'/%3E%3Cellipse cx='1050' cy='80' rx='95' ry='27' fill='%230B5E66' fill-opacity='0.025'/%3E%3C/svg%3E") repeat-x;
+  background-size: 1800px 200px;
+  animation: clouds 60s linear infinite;
+}
+
+.heroClouds2 {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  width: calc(100% + 2200px);
+  height: 180px;
+  pointer-events: none;
+  z-index: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2200 180'%3E%3Cellipse cx='400' cy='50' rx='160' ry='40' fill='%231565A0' fill-opacity='0.025'/%3E%3Cellipse cx='460' cy='40' rx='100' ry='32' fill='%231565A0' fill-opacity='0.02'/%3E%3Cellipse cx='350' cy='48' rx='80' ry='28' fill='%231565A0' fill-opacity='0.018'/%3E%3Cellipse cx='1100' cy='55' rx='130' ry='36' fill='%231565A0' fill-opacity='0.022'/%3E%3Cellipse cx='1150' cy='46' rx='80' ry='28' fill='%231565A0' fill-opacity='0.018'/%3E%3Cellipse cx='1800' cy='45' rx='110' ry='32' fill='%231565A0' fill-opacity='0.02'/%3E%3Cellipse cx='1850' cy='38' rx='65' ry='24' fill='%231565A0' fill-opacity='0.016'/%3E%3Cellipse cx='650' cy='85' rx='90' ry='26' fill='%231565A0' fill-opacity='0.018'/%3E%3Cellipse cx='1500' cy='75' rx='100' ry='28' fill='%231565A0' fill-opacity='0.02'/%3E%3C/svg%3E") repeat-x;
+  background-size: 2200px 180px;
+  animation: clouds2 90s linear infinite;
+}
+
+@keyframes clouds {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-1800px); }
+}
+
+@keyframes clouds2 {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-2200px); }
+}
+
+/* 등대 & 방파제 & 먼 산 실루엣 (큰 사이즈) */
 .heroScenery {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 220px;
+  height: 400px;
   pointer-events: none;
   z-index: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 220'%3E%3C!-- 방파제 (뒤쪽) --%3E%3Cpath fill='%230B5E66' fill-opacity='0.08' d='M0,180 L100,175 L200,178 L350,170 L500,168 L600,172 L700,165 L850,160 L950,164 L1050,158 L1150,162 L1250,155 L1350,160 L1440,156 L1440,220 L0,220 Z'/%3E%3C!-- 방파제 (앞쪽) --%3E%3Cpath fill='%230B5E66' fill-opacity='0.06' d='M0,195 L150,190 L300,193 L450,186 L600,190 L750,184 L900,188 L1050,182 L1200,186 L1350,180 L1440,184 L1440,220 L0,220 Z'/%3E%3C!-- 등대 (오른쪽) --%3E%3Crect x='1180' y='80' width='16' height='100' rx='2' fill='%230B5E66' fill-opacity='0.12'/%3E%3Crect x='1172' y='75' width='32' height='10' rx='3' fill='%230B5E66' fill-opacity='0.12'/%3E%3Ccircle cx='1188' cy='68' r='8' fill='%230B5E66' fill-opacity='0.1'/%3E%3Cpath d='M1188,58 L1183,65 L1193,65 Z' fill='%230B5E66' fill-opacity='0.12'/%3E%3C!-- 등대 불빛 --%3E%3Ccircle cx='1188' cy='68' r='4' fill='%23E8B060' fill-opacity='0.25'/%3E%3Ccircle cx='1188' cy='68' r='12' fill='%23E8B060' fill-opacity='0.06'/%3E%3C!-- 등대 (왼쪽 작은) --%3E%3Crect x='180' y='120' width='10' height='60' rx='2' fill='%230B5E66' fill-opacity='0.07'/%3E%3Crect x='175' y='116' width='20' height='7' rx='2' fill='%230B5E66' fill-opacity='0.07'/%3E%3Ccircle cx='185' cy='112' r='5' fill='%230B5E66' fill-opacity='0.06'/%3E%3Ccircle cx='185' cy='112' r='3' fill='%23E8B060' fill-opacity='0.15'/%3E%3C/svg%3E") no-repeat center bottom;
-  background-size: 100% 220px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400'%3E%3C!-- 먼 산/섬 --%3E%3Cpath fill='%230B5E66' fill-opacity='0.04' d='M0,320 C120,290 240,300 360,270 C480,250 560,265 680,245 C800,230 880,250 1000,235 C1120,225 1200,240 1320,220 C1380,215 1420,225 1440,222 L1440,400 L0,400 Z'/%3E%3Cpath fill='%230B5E66' fill-opacity='0.03' d='M0,340 C180,320 300,330 480,310 C660,295 780,315 960,295 C1100,282 1260,305 1440,285 L1440,400 L0,400 Z'/%3E%3C!-- 오른쪽 등대 (큰) --%3E%3Cpath fill='%230B5E66' fill-opacity='0.18' d='M1150,400 L1162,155 C1164,148 1172,143 1180,143 L1200,143 C1208,143 1216,148 1218,155 L1230,400 Z'/%3E%3Crect x='1148' y='135' width='84' height='14' rx='4' fill='%230B5E66' fill-opacity='0.18'/%3E%3Crect x='1158' y='100' width='64' height='38' rx='5' fill='%230B5E66' fill-opacity='0.16'/%3E%3Cpath fill='%230B5E66' fill-opacity='0.18' d='M1190,72 L1150,100 L1230,100 Z'/%3E%3Ccircle cx='1190' cy='119' r='12' fill='%23E8B060' fill-opacity='0.5'/%3E%3Ccircle cx='1190' cy='119' r='28' fill='%23E8B060' fill-opacity='0.1'/%3E%3Ccircle cx='1190' cy='119' r='50' fill='%23E8B060' fill-opacity='0.04'/%3E%3Crect x='1170' y='200' width='40' height='20' rx='0' fill='%23C0453A' fill-opacity='0.08'/%3E%3Crect x='1173' y='260' width='34' height='18' rx='0' fill='%23C0453A' fill-opacity='0.06'/%3E%3Crect x='1176' y='320' width='28' height='16' rx='0' fill='%23C0453A' fill-opacity='0.05'/%3E%3C!-- 왼쪽 등대 (중간) --%3E%3Cpath fill='%230B5E66' fill-opacity='0.1' d='M200,400 L208,230 C209,226 213,223 218,223 L234,223 C239,223 243,226 244,230 L252,400 Z'/%3E%3Crect x='196' y='217' width='60' height='10' rx='3' fill='%230B5E66' fill-opacity='0.1'/%3E%3Crect x='204' y='192' width='44' height='28' rx='4' fill='%230B5E66' fill-opacity='0.09'/%3E%3Cpath fill='%230B5E66' fill-opacity='0.1' d='M226,172 L198,192 L254,192 Z'/%3E%3Ccircle cx='226' cy='206' r='7' fill='%23E8B060' fill-opacity='0.3'/%3E%3Ccircle cx='226' cy='206' r='18' fill='%23E8B060' fill-opacity='0.06'/%3E%3Crect x='214' y='270' width='24' height='14' rx='0' fill='%23C0453A' fill-opacity='0.05'/%3E%3Crect x='216' y='320' width='20' height='12' rx='0' fill='%23C0453A' fill-opacity='0.04'/%3E%3C!-- 방파제 뒤쪽 (높은, 돌 느낌) --%3E%3Cpath fill='%230B5E66' fill-opacity='0.1' d='M0,355 C80,348 160,352 280,342 C400,334 500,345 640,332 C780,322 880,338 1020,325 C1120,318 1240,332 1340,320 C1400,316 1440,322 1440,320 L1440,400 L0,400 Z'/%3E%3C!-- 방파제 앞쪽 --%3E%3Cpath fill='%230B5E66' fill-opacity='0.07' d='M0,375 C120,368 250,372 400,365 C550,360 680,370 830,362 C980,356 1100,366 1250,358 C1350,354 1400,360 1440,357 L1440,400 L0,400 Z'/%3E%3C!-- 갈매기 --%3E%3Cpath fill='none' stroke='%230B5E66' stroke-opacity='0.15' stroke-width='2' stroke-linecap='round' d='M420,150 Q428,140 436,147 Q444,140 452,150'/%3E%3Cpath fill='none' stroke='%230B5E66' stroke-opacity='0.1' stroke-width='1.5' stroke-linecap='round' d='M480,125 Q486,118 492,123 Q498,118 504,125'/%3E%3Cpath fill='none' stroke='%230B5E66' stroke-opacity='0.08' stroke-width='1.2' stroke-linecap='round' d='M540,165 Q544,160 548,163 Q552,160 556,165'/%3E%3Cpath fill='none' stroke='%230B5E66' stroke-opacity='0.12' stroke-width='1.8' stroke-linecap='round' d='M870,115 Q878,106 886,113 Q894,106 902,115'/%3E%3Cpath fill='none' stroke='%230B5E66' stroke-opacity='0.09' stroke-width='1.3' stroke-linecap='round' d='M930,140 Q935,134 940,138 Q945,134 950,140'/%3E%3Cpath fill='none' stroke='%230B5E66' stroke-opacity='0.07' stroke-width='1' stroke-linecap='round' d='M700,180 Q704,176 708,179 Q712,176 716,180'/%3E%3C/svg%3E") no-repeat center bottom;
+  background-size: 100% 400px;
 }
 
-/* 파도 애니메이션 — 3중 부드러운 곡선 */
+/* 바다 바닥 (고정 색상) */
+.heroOcean {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 5%;
+  background: linear-gradient(180deg, #0B5E66, #084D54);
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* 넘실거리는 파도 — 수평이동 + 수직출렁임(swell) */
 .heroBg::before {
   content: '';
   position: absolute;
-  bottom: 50px;
+  bottom: 4%;
   left: 0;
-  width: calc(100% + 1440px);
-  height: 100px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100'%3E%3Cpath fill='%231565A0' fill-opacity='0.07' d='M0,50 C240,75 480,25 720,50 C960,75 1200,25 1440,50 L1440,100 L0,100 Z'/%3E%3C/svg%3E") repeat-x;
-  background-size: 1440px 100px;
-  animation: wave-slow 14s linear infinite;
-  z-index: 1;
+  width: 6400px;
+  height: 180px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 180'%3E%3Cpath fill='%230B5E66' fill-opacity='0.25' d='M0,90 C200,130 400,50 600,90 C800,130 1000,50 1200,90 C1400,130 1500,110 1600,90 L1600,180 L0,180 Z'/%3E%3C/svg%3E") repeat-x;
+  background-size: 1600px 180px;
+  animation: wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+  transform: translate3d(0, 0, 0);
+  z-index: 4;
 }
 
 .heroBg::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: 3%;
   left: 0;
-  width: calc(100% + 1440px);
-  height: 120px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120'%3E%3Cpath fill='%23EEF4FA' fill-opacity='0.9' d='M0,60 C180,90 360,30 540,60 C720,90 900,30 1080,60 C1260,90 1350,75 1440,60 L1440,120 L0,120 Z'/%3E%3C/svg%3E") repeat-x;
-  background-size: 1440px 120px;
-  animation: wave 9s linear infinite;
-  z-index: 3;
+  width: 6400px;
+  height: 160px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 160'%3E%3Cpath fill='%23EEF4FA' fill-opacity='0.7' d='M0,80 C200,120 400,40 600,80 C800,120 1000,40 1200,80 C1400,120 1500,100 1600,80 L1600,160 L0,160 Z'/%3E%3C/svg%3E") repeat-x;
+  background-size: 1600px 160px;
+  animation:
+    wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) -0.125s infinite,
+    swell 7s ease -1.25s infinite;
+  transform: translate3d(0, 0, 0);
+  z-index: 5;
 }
 
 .heroWaveMid {
   position: absolute;
-  bottom: 20px;
+  bottom: 2%;
   left: 0;
-  width: calc(100% + 1440px);
-  height: 80px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80'%3E%3Cpath fill='%231A8E9C' fill-opacity='0.1' d='M0,40 C200,60 400,20 600,40 C800,60 1000,20 1200,40 C1320,50 1380,45 1440,40 L1440,80 L0,80 Z'/%3E%3C/svg%3E") repeat-x;
-  background-size: 1440px 80px;
-  animation: wave-mid 11s linear infinite;
+  width: 6400px;
+  height: 140px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 140'%3E%3Cpath fill='%231A8E9C' fill-opacity='0.18' d='M0,70 C160,100 360,40 560,70 C760,100 960,40 1160,70 C1360,100 1500,80 1600,70 L1600,140 L0,140 Z'/%3E%3C/svg%3E") repeat-x;
+  background-size: 1600px 140px;
+  animation:
+    wave-mid 9s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite,
+    swell-mid 6s ease -0.5s infinite;
+  transform: translate3d(0, 0, 0);
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
 }
 
 @keyframes wave {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-1440px); }
+  0% { margin-left: 0; }
+  100% { margin-left: -1600px; }
 }
 
 @keyframes wave-mid {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-1440px); }
+  0% { margin-left: 0; }
+  100% { margin-left: -1600px; }
 }
 
-@keyframes wave-slow {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-1440px); }
+@keyframes swell {
+  0%, 100% { transform: translate3d(0, -15px, 0); }
+  50% { transform: translate3d(0, 5px, 0); }
+}
+
+@keyframes swell-mid {
+  0%, 100% { transform: translate3d(0, -10px, 0); }
+  50% { transform: translate3d(0, 8px, 0); }
 }
 
 .heroContent {
   position: relative;
   max-width: 600px;
+  z-index: 5;
 }
 
 .heroLogo {
@@ -134,6 +196,7 @@
   color: var(--text-muted);
   font-size: 0.75rem;
   animation: bounce 2s infinite;
+  z-index: 5;
 }
 
 .scrollHint svg {

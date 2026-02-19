@@ -23,8 +23,11 @@ export default function HomePage() {
       {/* 히어로 섹션 */}
       <section className={styles.hero}>
         <div className={styles.heroBg} />
+        <div className={styles.heroClouds} />
+        <div className={styles.heroClouds2} />
         <div className={styles.heroScenery} />
         <div className={styles.heroWaveMid} />
+        <div className={styles.heroOcean} />
         <motion.div
           className={styles.heroContent}
           initial={{ opacity: 0, y: 30 }}
