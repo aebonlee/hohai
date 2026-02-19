@@ -74,6 +74,35 @@
 - [ ] 프로필 사진 업로드
 - [ ] 추후 성능 최적화 (code-splitting, lazy loading)
 
+---
+
+## 2026-02-20 (Day 1, 2차) — 커밋/푸시 확인 & 빌드 검증
+
+### Git 상태
+- 커밋 `ce72cf3`: 57개 파일, 6,469줄 추가 → `origin/main` 푸시 완료
+- 워킹 트리 clean 상태 확인
+
+### 빌드 재검증
+- `npx vite build` 성공 (8.61s)
+- 출력: index.html 0.85kB, CSS 26.51kB, JS 570.09kB (gzip 172.46kB)
+
+### Vercel 배포 상태
+- Vercel CLI 토큰 만료 → CLI 배포 불가
+- **해결 방안**: Vercel 대시보드에서 GitHub 레포 연결하여 자동 배포 설정 필요
+  1. vercel.com → New Project → Import `aebonlee/hohai`
+  2. Framework Preset: Vite
+  3. 환경변수: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` 추가
+  4. Deploy → 도메인 `hohai.dreamitbiz.com` 연결
+
+### 이슈: 메인 페이지 빈 화면
+- `hohai.dreamitbiz.com`에서 아무것도 안 보이는 문제 보고됨
+- **원인 추정**: Vercel에 아직 React 앱이 배포되지 않았거나, 환경변수 미설정
+- **확인 사항**:
+  1. Vercel에 새 프로젝트가 정상 배포되었는지 확인
+  2. `.env.local` (또는 Vercel 환경변수)에 Supabase 키가 설정되었는지 확인
+
+---
+
 ### 기술적 결정 사항
 1. **CSS Modules 채택**: 컴포넌트별 스타일 격리 + CSS 변수로 글로벌 테마 유지
 2. **lite-youtube 패턴**: YouTube iframe을 썸네일 클릭 시에만 로드하여 초기 로딩 성능 개선
