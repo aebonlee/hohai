@@ -9,21 +9,21 @@
   --bg-secondary: #E4EEF5;
   --bg-warm: #E8F1F8;
 
-  /* 텍스트 — 깊은 바다 */
-  --text-primary: #1B3A5C;
-  --text-secondary: #3D6B8A;
-  --text-muted: #7FA3B8;
+  /* 텍스트 — 깊은 바다 (선명하게) */
+  --text-primary: #0F2B47;
+  --text-secondary: #2B5578;
+  --text-muted: #5E8BA6;
 
-  /* 포인트 — 파도, 노을, 모래 */
-  --accent-gold: #2C8E96;
-  --accent-sage: #5ABAC4;
-  --accent-sky: #4A90B8;
-  --accent-plum: #D4847A;
+  /* 포인트 — 파도, 노을, 산호 (채도 강화) */
+  --accent-gold: #1A7A82;
+  --accent-sage: #38A8B5;
+  --accent-sky: #2E7BAD;
+  --accent-plum: #C96B5F;
 
-  /* 그림자 — 바다 그림자 */
-  --shadow-sm: 0 2px 8px rgba(27, 58, 92, 0.06);
-  --shadow-md: 0 4px 16px rgba(27, 58, 92, 0.08);
-  --shadow-lg: 0 12px 32px rgba(27, 58, 92, 0.12);
+  /* 그림자 — 바다 그림자 (더 진하게) */
+  --shadow-sm: 0 2px 8px rgba(15, 43, 71, 0.08);
+  --shadow-md: 0 4px 16px rgba(15, 43, 71, 0.12);
+  --shadow-lg: 0 12px 32px rgba(15, 43, 71, 0.16);
 
   /* 레이아웃 */
   --max-width: 1100px;
@@ -75,9 +75,24 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.03;
+  opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.015' numOctaves='3' seed='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
+}
+
+/* 전체 페이지 하단 물결 장식 */
+body::after {
+  content: '';
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.15;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 60'%3E%3Cpath fill='%231A7A82' d='M0,30L60,32C120,34,240,38,360,36C480,34,600,26,720,24C840,22,960,26,1080,30C1200,34,1320,38,1380,36L1440,34L1440,60L0,60Z'/%3E%3C/svg%3E") repeat-x;
+  background-size: 1440px 60px;
 }
 
 img {

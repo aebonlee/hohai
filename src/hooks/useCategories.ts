@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { SAMPLE_CATEGORIES } from '../lib/sampleData';
 import type { Category } from '../types/category';
 
 export function useCategories() {
@@ -13,7 +14,11 @@ export function useCategories() {
         .select('*')
         .order('display_order', { ascending: true });
 
-      setCategories((data as Category[]) || []);
+      if (data && data.length > 0) {
+        setCategories(data as Category[]);
+      } else {
+        setCategories(SAMPLE_CATEGORIES as Category[]);
+      }
       setLoading(false);
     };
     fetch();

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+import { SAMPLE_POEMS } from '../lib/sampleData';
 import type { Poem, PoemInsert, PoemUpdate } from '../types/poem';
 
 export function usePoems(categorySlug?: string) {
@@ -24,8 +25,13 @@ export function usePoems(categorySlug?: string) {
 
     const { data, error: err } = await query;
 
-    if (err) {
-      setError(err.message);
+    if (err || !data || data.length === 0) {
+      // Supabase 미연결이거나 데이터 없을 때 샘플 데이터 사용
+      const filtered = categorySlug
+        ? SAMPLE_POEMS.filter((p) => p.category === categorySlug)
+        : SAMPLE_POEMS;
+      setPoems(filtered);
+      setError(null);
     } else {
       setPoems((data as Poem[]) || []);
     }
@@ -69,11 +75,29 @@ export function usePoemDetail(id: string | undefined) {
           .order('display_order', { ascending: true })
           .order('created_at', { ascending: false });
 
-        if (allPoems) {
+        if (allPoems && allPoems.length > 0) {
           const idx = allPoems.findIndex((p) => p.id === id);
           setAdjacentPoems({
             prev: idx > 0 ? { id: allPoems[idx - 1].id, title: allPoems[idx - 1].title } : null,
             next: idx < allPoems.length - 1 ? { id: allPoems[idx + 1].id, title: allPoems[idx + 1].title } : null,
+          });
+        } else {
+          // 샘플 데이터에서 이전/다음 찾기
+          const idx = SAMPLE_POEMS.findIndex((p) => p.id === id);
+          setAdjacentPoems({
+            prev: idx > 0 ? { id: SAMPLE_POEMS[idx - 1].id, title: SAMPLE_POEMS[idx - 1].title } : null,
+            next: idx < SAMPLE_POEMS.length - 1 ? { id: SAMPLE_POEMS[idx + 1].id, title: SAMPLE_POEMS[idx + 1].title } : null,
+          });
+        }
+      } else {
+        // 샘플 데이터에서 찾기
+        const samplePoem = SAMPLE_POEMS.find((p) => p.id === id);
+        if (samplePoem) {
+          setPoem(samplePoem);
+          const idx = SAMPLE_POEMS.findIndex((p) => p.id === id);
+          setAdjacentPoems({
+            prev: idx > 0 ? { id: SAMPLE_POEMS[idx - 1].id, title: SAMPLE_POEMS[idx - 1].title } : null,
+            next: idx < SAMPLE_POEMS.length - 1 ? { id: SAMPLE_POEMS[idx + 1].id, title: SAMPLE_POEMS[idx + 1].title } : null,
           });
         }
       }
@@ -99,7 +123,12 @@ export function useFeaturedPoems() {
         .order('created_at', { ascending: false })
         .limit(3);
 
-      setPoems((data as Poem[]) || []);
+      if (data && data.length > 0) {
+        setPoems(data as Poem[]);
+      } else {
+        // 샘플 데이터 중 featured 3편
+        setPoems(SAMPLE_POEMS.filter((p) => p.is_featured).slice(0, 3));
+      }
       setLoading(false);
     };
     fetch();

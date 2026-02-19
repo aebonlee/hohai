@@ -23,6 +23,7 @@ export default function HomePage() {
       {/* 히어로 섹션 */}
       <section className={styles.hero}>
         <div className={styles.heroBg} />
+        <div className={styles.heroWaveMid} />
         <motion.div
           className={styles.heroContent}
           initial={{ opacity: 0, y: 30 }}

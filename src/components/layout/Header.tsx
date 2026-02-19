@@ -3,10 +3,10 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import styles from './Header.module.css';
 
 const NAV_ITEMS = [
-  { to: '/', label: '홈' },
-  { to: '/poems', label: '시(詩)' },
-  { to: '/songs', label: '노래' },
-  { to: '/about', label: '시인 소개' },
+  { to: '/', label: '홈', icon: '🏠' },
+  { to: '/poems', label: '시(詩)', icon: '📝' },
+  { to: '/songs', label: '노래', icon: '🎵' },
+  { to: '/about', label: '시인 소개', icon: '👤' },
 ];
 
 export default function Header() {
@@ -35,7 +35,7 @@ export default function Header() {
           </Link>
 
           <nav className={styles.nav}>
-            {NAV_ITEMS.map((item) => (
+            {NAV_ITEMS.map((item, i) => (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -44,7 +44,9 @@ export default function Header() {
                   `${styles.navLink} ${isActive ? styles.active : ''}`
                 }
               >
+                <span className={styles.navIcon}>{item.icon}</span>
                 {item.label}
+                {i < NAV_ITEMS.length - 1 && <span className={styles.navDivider} />}
               </NavLink>
             ))}
           </nav>
@@ -72,6 +74,7 @@ export default function Header() {
             }
             onClick={() => setMenuOpen(false)}
           >
+            <span className={styles.mobileIcon}>{item.icon}</span>
             {item.label}
           </NavLink>
         ))}

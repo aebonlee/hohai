@@ -4,16 +4,17 @@
   left: 0;
   right: 0;
   height: var(--header-height);
-  background: rgba(240, 246, 250, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(27, 58, 92, 0.08);
+  background: linear-gradient(180deg, rgba(240, 246, 250, 0.97), rgba(228, 238, 245, 0.92));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(27, 58, 92, 0.1);
   z-index: 100;
-  transition: box-shadow var(--transition);
+  transition: box-shadow var(--transition), background var(--transition);
 }
 
 .header.scrolled {
-  box-shadow: 0 2px 20px rgba(27, 58, 92, 0.06);
+  box-shadow: 0 2px 20px rgba(27, 58, 92, 0.1);
+  background: linear-gradient(180deg, rgba(240, 246, 250, 0.98), rgba(228, 238, 245, 0.96));
 }
 
 .inner {
@@ -52,37 +53,43 @@
 .nav {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 8px;
+  background: rgba(15, 43, 71, 0.04);
+  border-radius: 12px;
+  padding: 4px 6px;
 }
 
 .navLink {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-secondary);
-  transition: color var(--transition);
+  transition: all var(--transition);
   position: relative;
-  padding: 4px 0;
+  padding: 6px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.navLink::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--accent-gold);
-  transition: width var(--transition);
+.navIcon {
+  font-size: 0.85rem;
+  display: inline-block;
 }
 
-.navLink:hover,
-.navLink.active {
+.navDivider {
+  display: none;
+}
+
+.navLink:hover {
   color: var(--text-primary);
+  background: rgba(26, 122, 130, 0.08);
 }
 
-.navLink:hover::after,
-.navLink.active::after {
-  width: 100%;
+.navLink.active {
+  color: var(--accent-gold);
+  background: rgba(26, 122, 130, 0.12);
+  font-weight: 600;
 }
 
 .hamburger {
@@ -142,12 +149,20 @@
   color: var(--text-secondary);
   padding: 16px 0;
   border-bottom: 1px solid rgba(27, 58, 92, 0.08);
-  transition: color var(--transition);
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobileIcon {
+  font-size: 1.3rem;
 }
 
 .mobileLink:hover,
 .mobileLink.active {
   color: var(--accent-gold);
+  padding-left: 8px;
 }
 
 @media (max-width: 768px) {

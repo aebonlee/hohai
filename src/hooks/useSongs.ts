@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+import { SAMPLE_SONGS } from '../lib/sampleData';
 import type { Song, SongInsert, SongUpdate } from '../types/song';
 
 export function useSongs() {
@@ -15,7 +16,11 @@ export function useSongs() {
       .order('display_order', { ascending: true })
       .order('created_at', { ascending: false });
 
-    setSongs((data as Song[]) || []);
+    if (data && data.length > 0) {
+      setSongs(data as Song[]);
+    } else {
+      setSongs(SAMPLE_SONGS);
+    }
     setLoading(false);
   }, []);
 
@@ -40,7 +45,13 @@ export function useFeaturedSong() {
         .limit(1)
         .single();
 
-      setSong(data as Song | null);
+      if (data) {
+        setSong(data as Song);
+      } else {
+        // 샘플 데이터 중 featured 노래
+        const featured = SAMPLE_SONGS.find((s) => s.is_featured) || SAMPLE_SONGS[0];
+        setSong(featured);
+      }
       setLoading(false);
     };
     fetch();
