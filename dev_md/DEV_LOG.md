@@ -182,10 +182,33 @@
 
 ---
 
+---
+
+## 2026-02-20 (Day 1, 5차) — 배포 문제 해결: gh-pages 브랜치 방식
+
+### 문제
+- `hohai.dreamitbiz.com`에서 빈 페이지만 표시됨
+- **원인**: GitHub Pages가 `main` 브랜치를 소스로 사용 중 → 빌드된 JS/CSS 에셋이 없는 소스코드가 서빙됨
+- `dist/assets/index-*.js` 요청 시 404 반환 확인
+
+### 해결
+- `actions/deploy-pages` (GitHub Actions 소스) → `peaceiris/actions-gh-pages` (gh-pages 브랜치 소스)로 변경
+- `gh-pages` npm 패키지 설치, `npm run deploy` 스크립트 추가
+- `npx gh-pages -d dist`로 로컬에서 즉시 배포 실행
+- GitHub 레포 Settings → Pages → Source를 `gh-pages` 브랜치로 변경 필요
+
+### 워크플로우 변경
+```
+기존: actions/upload-pages-artifact + actions/deploy-pages (Actions 소스 필요)
+변경: peaceiris/actions-gh-pages@v4 (gh-pages 브랜치에 push, 전통적 방식)
+```
+
+---
+
 ### 기술적 결정 사항
 1. **CSS Modules 채택**: 컴포넌트별 스타일 격리 + CSS 변수로 글로벌 테마 유지
 2. **lite-youtube 패턴**: YouTube iframe을 썸네일 클릭 시에만 로드하여 초기 로딩 성능 개선
 3. **수동 프로젝트 설정**: create-vite CLI가 비대화형 환경에서 동작하지 않아 package.json부터 수동 작성
 4. **--legacy-peer-deps**: react-helmet-async가 아직 React 19 peer dep을 선언하지 않음
-5. **GitHub Pages 배포**: Vercel 대신 GitHub Pages + GitHub Actions 사용 (www.dreamitbiz.com과 동일 방식)
+5. **GitHub Pages 배포**: gh-pages 브랜치 방식 (peaceiris/actions-gh-pages)
 6. **바다/파도 테마**: 호해(好海)의 의미에 맞춰 전체 색상/분위기를 바다 컨셉으로 전환
