@@ -1,17 +1,19 @@
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { motion } from 'framer-motion';
 import PageTransition from '../components/layout/PageTransition';
-import SongCard from '../components/ui/SongCard';
-import { useSongs } from '../hooks/useSongs';
+import { useSongSeries } from '../hooks/useSeries';
+import { CARD_GRADIENTS } from '../lib/constants';
 import styles from './SongsPage.module.css';
 
 export default function SongsPage() {
-  const { songs, loading } = useSongs();
+  const { series, loading } = useSongSeries();
 
   return (
     <PageTransition>
       <Helmet>
-        <title>노래 — 호해</title>
-        <meta name="description" content="호해 이성헌 시인의 노래 모음" />
+        <title>노래 — 好海</title>
+        <meta name="description" content="好海 이성헌 시인의 노래 모음" />
       </Helmet>
 
       <div className={styles.page}>
@@ -23,16 +25,32 @@ export default function SongsPage() {
 
           {loading ? (
             <p className={styles.empty}>불러오는 중...</p>
-          ) : songs.length > 0 ? (
-            <div className={styles.grid}>
-              {songs.map((song, i) => (
-                <SongCard key={song.id} song={song} index={i} />
+          ) : series.length > 0 ? (
+            <div className={styles.seriesGrid}>
+              {series.map((s, i) => (
+                <motion.div
+                  key={s.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                >
+                  <Link to={`/songs/series/${s.slug}`} className={styles.seriesCard}>
+                    <div
+                      className={styles.seriesCardBg}
+                      style={{ background: CARD_GRADIENTS[(i + 3) % CARD_GRADIENTS.length] }}
+                    />
+                    <div className={styles.seriesCardContent}>
+                      <span className={styles.seriesOrder}>{`${i + 1}집`}</span>
+                      <h3 className={styles.seriesName}>{s.name}</h3>
+                      {s.description && <p className={styles.seriesDesc}>{s.description}</p>}
+                      <span className={styles.seriesArrow}>노래 듣기 →</span>
+                    </div>
+                  </Link>
+                </motion.div>
               ))}
             </div>
           ) : (
-            <p className={styles.empty}>
-              아직 등록된 노래가 없습니다. 곧 아름다운 노래를 들려드리겠습니다.
-            </p>
+            <p className={styles.empty}>아직 등록된 앨범이 없습니다.</p>
           )}
         </div>
       </div>

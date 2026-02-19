@@ -57,7 +57,7 @@
 }
 
 .card:hover .playBtn {
-  background: rgba(11, 94, 102, 0.9);
+  background: rgba(10, 61, 122, 0.9);
   transform: translate(-50%, -50%) scale(1.1);
 }
 

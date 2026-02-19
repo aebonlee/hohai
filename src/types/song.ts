@@ -4,6 +4,7 @@ export interface Song {
   description: string | null;
   youtube_id: string;
   lyrics: string | null;
+  series_id: string | null;
   display_order: number;
   is_featured: boolean;
   is_published: boolean;
@@ -17,6 +18,7 @@ export interface SongInsert {
   youtube_id: string;
   description?: string | null;
   lyrics?: string | null;
+  series_id?: string | null;
   display_order?: number;
   is_featured?: boolean;
   is_published?: boolean;

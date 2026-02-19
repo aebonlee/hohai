@@ -4,6 +4,7 @@ export interface Poem {
   content: string;
   excerpt: string | null;
   category: string;
+  series_id: string | null;
   tags: string[];
   bg_theme: number;
   display_order: number;
@@ -19,6 +20,7 @@ export interface PoemInsert {
   content: string;
   excerpt?: string | null;
   category?: string;
+  series_id?: string | null;
   tags?: string[];
   bg_theme?: number;
   display_order?: number;

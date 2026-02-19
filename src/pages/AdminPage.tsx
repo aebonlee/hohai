@@ -4,11 +4,13 @@ import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../hooks/useAuth';
 import { useAllPoems } from '../hooks/usePoems';
 import { useAllSongs } from '../hooks/useSongs';
+import { useAllSeries } from '../hooks/useSeries';
 import type { PoemInsert } from '../types/poem';
 import type { SongInsert } from '../types/song';
+import type { SeriesInsert } from '../types/series';
 import styles from './AdminPage.module.css';
 
-type Tab = 'poems' | 'songs';
+type Tab = 'poems' | 'songs' | 'series';
 
 export default function AdminPage() {
   const { signOut } = useAuth();
@@ -17,14 +19,14 @@ export default function AdminPage() {
   return (
     <>
       <Helmet>
-        <title>관리자 — 호해</title>
+        <title>관리자 — 好海</title>
       </Helmet>
 
       <div className={styles.page}>
         <div className={styles.topBar}>
           <div className={styles.topLeft}>
             <Link to="/" className={styles.homeLink}>← 홈</Link>
-            <span className={styles.logo}>호해 관리</span>
+            <span className={styles.logo}>好海 관리</span>
             <span className={styles.badge}>Admin</span>
           </div>
           <button className={styles.logoutBtn} onClick={signOut}>로그아웃</button>
@@ -44,10 +46,17 @@ export default function AdminPage() {
             >
               노래 관리
             </button>
+            <button
+              className={`${styles.tab} ${activeTab === 'series' ? styles.active : ''}`}
+              onClick={() => setActiveTab('series')}
+            >
+              시리즈 관리
+            </button>
           </div>
 
           {activeTab === 'poems' && <PoemsAdmin />}
           {activeTab === 'songs' && <SongsAdmin />}
+          {activeTab === 'series' && <SeriesAdmin />}
         </div>
       </div>
     </>
@@ -59,6 +68,8 @@ export default function AdminPage() {
    ======================================== */
 function PoemsAdmin() {
   const { poems, loading, createPoem, updatePoem, deletePoem } = useAllPoems();
+  const { series } = useAllSeries();
+  const poemSeries = series.filter(s => s.type === 'poem');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<PoemInsert>({
@@ -66,6 +77,7 @@ function PoemsAdmin() {
     content: '',
     excerpt: '',
     category: '기타',
+    series_id: null,
     tags: [],
     bg_theme: 0,
     display_order: 0,
@@ -77,7 +89,7 @@ function PoemsAdmin() {
   const resetForm = () => {
     setForm({
       title: '', content: '', excerpt: '', category: '기타',
-      tags: [], bg_theme: 0, display_order: 0,
+      series_id: null, tags: [], bg_theme: 0, display_order: 0,
       is_featured: false, is_published: true, written_date: null,
     });
     setEditingId(null);
@@ -96,6 +108,7 @@ function PoemsAdmin() {
       content: poem.content,
       excerpt: poem.excerpt || '',
       category: poem.category,
+      series_id: poem.series_id,
       tags: poem.tags,
       bg_theme: poem.bg_theme,
       display_order: poem.display_order,
@@ -138,6 +151,7 @@ function PoemsAdmin() {
           <thead>
             <tr>
               <th>제목</th>
+              <th>시집</th>
               <th>카테고리</th>
               <th>상태</th>
               <th>순서</th>
@@ -148,6 +162,7 @@ function PoemsAdmin() {
             {poems.map((poem) => (
               <tr key={poem.id}>
                 <td className={styles.titleCell}>{poem.title}</td>
+                <td>{poemSeries.find(s => s.id === poem.series_id)?.name || '-'}</td>
                 <td>{poem.category}</td>
                 <td>
                   <span className={`${styles.statusBadge} ${poem.is_published ? styles.published : styles.draft}`}>
@@ -201,6 +216,19 @@ function PoemsAdmin() {
               </div>
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>시집 (시리즈)</label>
+                  <select
+                    className={styles.formInput}
+                    value={form.series_id || ''}
+                    onChange={(e) => setForm({ ...form, series_id: e.target.value || null })}
+                  >
+                    <option value="">미분류</option>
+                    {poemSeries.map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className={styles.formGroup}>
                   <label className={styles.formLabel}>카테고리</label>
                   <input
                     className={styles.formInput}
@@ -208,6 +236,8 @@ function PoemsAdmin() {
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
                   />
                 </div>
+              </div>
+              <div className={styles.formRow}>
                 <div className={styles.formGroup}>
                   <label className={styles.formLabel}>작성일</label>
                   <input
@@ -217,8 +247,6 @@ function PoemsAdmin() {
                     onChange={(e) => setForm({ ...form, written_date: e.target.value || null })}
                   />
                 </div>
-              </div>
-              <div className={styles.formRow}>
                 <div className={styles.formGroup}>
                   <label className={styles.formLabel}>카드 테마 (0-7)</label>
                   <input
@@ -230,15 +258,15 @@ function PoemsAdmin() {
                     onChange={(e) => setForm({ ...form, bg_theme: Number(e.target.value) })}
                   />
                 </div>
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>표시 순서</label>
-                  <input
-                    type="number"
-                    className={styles.formInput}
-                    value={form.display_order}
-                    onChange={(e) => setForm({ ...form, display_order: Number(e.target.value) })}
-                  />
-                </div>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>표시 순서</label>
+                <input
+                  type="number"
+                  className={styles.formInput}
+                  value={form.display_order}
+                  onChange={(e) => setForm({ ...form, display_order: Number(e.target.value) })}
+                />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>태그 (쉼표 구분)</label>
@@ -289,6 +317,8 @@ function PoemsAdmin() {
    ======================================== */
 function SongsAdmin() {
   const { songs, loading, createSong, updateSong, deleteSong } = useAllSongs();
+  const { series } = useAllSeries();
+  const songSeries = series.filter(s => s.type === 'song');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<SongInsert>({
@@ -296,6 +326,7 @@ function SongsAdmin() {
     youtube_id: '',
     description: '',
     lyrics: '',
+    series_id: null,
     display_order: 0,
     is_featured: false,
     is_published: true,
@@ -305,7 +336,7 @@ function SongsAdmin() {
   const resetForm = () => {
     setForm({
       title: '', youtube_id: '', description: '', lyrics: '',
-      display_order: 0, is_featured: false, is_published: true, recorded_date: null,
+      series_id: null, display_order: 0, is_featured: false, is_published: true, recorded_date: null,
     });
     setEditingId(null);
   };
@@ -323,6 +354,7 @@ function SongsAdmin() {
       youtube_id: song.youtube_id,
       description: song.description || '',
       lyrics: song.lyrics || '',
+      series_id: song.series_id,
       display_order: song.display_order,
       is_featured: song.is_featured,
       is_published: song.is_published,
@@ -363,6 +395,7 @@ function SongsAdmin() {
           <thead>
             <tr>
               <th>제목</th>
+              <th>앨범</th>
               <th>YouTube ID</th>
               <th>상태</th>
               <th>순서</th>
@@ -373,7 +406,8 @@ function SongsAdmin() {
             {songs.map((song) => (
               <tr key={song.id}>
                 <td className={styles.titleCell}>{song.title}</td>
-                <td style={{ fontFamily: 'var(--mono)', fontSize: '0.8rem' }}>{song.youtube_id}</td>
+                <td>{songSeries.find(s => s.id === song.series_id)?.name || '-'}</td>
+                <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{song.youtube_id}</td>
                 <td>
                   <span className={`${styles.statusBadge} ${song.is_published ? styles.published : styles.draft}`}>
                     {song.is_published ? '공개' : '비공개'}
@@ -413,6 +447,19 @@ function SongsAdmin() {
                   required
                   placeholder="예: dQw4w9WgXcQ"
                 />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>앨범 (시리즈)</label>
+                <select
+                  className={styles.formInput}
+                  value={form.series_id || ''}
+                  onChange={(e) => setForm({ ...form, series_id: e.target.value || null })}
+                >
+                  <option value="">미분류</option>
+                  {songSeries.map(s => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </select>
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>설명</label>
@@ -469,6 +516,193 @@ function SongsAdmin() {
                   />
                   대표곡
                 </label>
+              </div>
+              <div className={styles.modalActions}>
+                <button type="button" className={styles.cancelBtn} onClick={() => setShowModal(false)}>취소</button>
+                <button type="submit" className={styles.saveBtn}>{editingId ? '수정' : '저장'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ========================================
+   시리즈 관리 컴포넌트
+   ======================================== */
+function SeriesAdmin() {
+  const { series, loading, createSeries, updateSeries, deleteSeries } = useAllSeries();
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<SeriesInsert>({
+    name: '',
+    slug: '',
+    type: 'poem',
+    description: '',
+    display_order: 0,
+    is_published: true,
+  });
+
+  const resetForm = () => {
+    setForm({
+      name: '', slug: '', type: 'poem', description: '', display_order: 0, is_published: true,
+    });
+    setEditingId(null);
+  };
+
+  const openCreate = () => {
+    resetForm();
+    setShowModal(true);
+  };
+
+  const openEdit = (id: string) => {
+    const item = series.find((s) => s.id === id);
+    if (!item) return;
+    setForm({
+      name: item.name,
+      slug: item.slug,
+      type: item.type,
+      description: item.description || '',
+      display_order: item.display_order,
+      is_published: item.is_published,
+    });
+    setEditingId(id);
+    setShowModal(true);
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (editingId) {
+      await updateSeries(editingId, form);
+    } else {
+      await createSeries(form);
+    }
+    setShowModal(false);
+    resetForm();
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('정말 삭제하시겠습니까? 연결된 시/노래의 시리즈가 해제됩니다.')) {
+      await deleteSeries(id);
+    }
+  };
+
+  const poemSeries = series.filter(s => s.type === 'poem');
+  const songSeries = series.filter(s => s.type === 'song');
+
+  return (
+    <>
+      <div className={styles.header}>
+        <h2>시리즈 관리 (시집 {poemSeries.length}개 / 앨범 {songSeries.length}개)</h2>
+        <button className={styles.addBtn} onClick={openCreate}>+ 새 시리즈 추가</button>
+      </div>
+
+      {loading ? (
+        <p style={{ color: 'var(--text-muted)' }}>불러오는 중...</p>
+      ) : (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>이름</th>
+              <th>유형</th>
+              <th>슬러그</th>
+              <th>상태</th>
+              <th>순서</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            {series.map((item) => (
+              <tr key={item.id}>
+                <td className={styles.titleCell}>{item.name}</td>
+                <td>{item.type === 'poem' ? '시집' : '앨범'}</td>
+                <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{item.slug}</td>
+                <td>
+                  <span className={`${styles.statusBadge} ${item.is_published ? styles.published : styles.draft}`}>
+                    {item.is_published ? '공개' : '비공개'}
+                  </span>
+                </td>
+                <td>{item.display_order}</td>
+                <td className={styles.actions}>
+                  <button className={styles.editBtn} onClick={() => openEdit(item.id)}>수정</button>
+                  <button className={styles.deleteBtn} onClick={() => handleDelete(item.id)}>삭제</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {showModal && (
+        <div className={styles.overlay} onClick={() => setShowModal(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>{editingId ? '시리즈 수정' : '새 시리즈 추가'}</h3>
+            <form onSubmit={handleSubmit}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>이름 *</label>
+                <input
+                  className={styles.formInput}
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  required
+                  placeholder="예: 파도의 시, 바다 노래 1집"
+                />
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>슬러그 (URL) *</label>
+                  <input
+                    className={styles.formInput}
+                    value={form.slug}
+                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                    required
+                    placeholder="예: wave-poems"
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>유형 *</label>
+                  <select
+                    className={styles.formInput}
+                    value={form.type}
+                    onChange={(e) => setForm({ ...form, type: e.target.value as 'poem' | 'song' })}
+                  >
+                    <option value="poem">시집</option>
+                    <option value="song">앨범</option>
+                  </select>
+                </div>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>설명</label>
+                <textarea
+                  className={styles.formInput}
+                  style={{ minHeight: 60 }}
+                  value={form.description || ''}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                />
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>표시 순서</label>
+                  <input
+                    type="number"
+                    className={styles.formInput}
+                    value={form.display_order}
+                    onChange={(e) => setForm({ ...form, display_order: Number(e.target.value) })}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>&nbsp;</label>
+                  <label className={styles.checkLabel} style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+                    <input
+                      type="checkbox"
+                      checked={form.is_published}
+                      onChange={(e) => setForm({ ...form, is_published: e.target.checked })}
+                    />
+                    공개
+                  </label>
+                </div>
               </div>
               <div className={styles.modalActions}>
                 <button type="button" className={styles.cancelBtn} onClick={() => setShowModal(false)}>취소</button>

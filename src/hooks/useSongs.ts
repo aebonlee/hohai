@@ -3,26 +3,36 @@ import { supabase } from '../lib/supabase';
 import { SAMPLE_SONGS } from '../lib/sampleData';
 import type { Song, SongInsert, SongUpdate } from '../types/song';
 
-export function useSongs() {
+export function useSongs(seriesId?: string) {
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchSongs = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase
+
+    let query = supabase
       .from('hohai_songs')
       .select('*')
       .eq('is_published', true)
       .order('display_order', { ascending: true })
       .order('created_at', { ascending: false });
 
+    if (seriesId) {
+      query = query.eq('series_id', seriesId);
+    }
+
+    const { data } = await query;
+
     if (data && data.length > 0) {
       setSongs(data as Song[]);
     } else {
-      setSongs(SAMPLE_SONGS);
+      const filtered = seriesId
+        ? SAMPLE_SONGS.filter(s => s.series_id === seriesId)
+        : SAMPLE_SONGS;
+      setSongs(filtered);
     }
     setLoading(false);
-  }, []);
+  }, [seriesId]);
 
   useEffect(() => {
     fetchSongs();
@@ -48,7 +58,6 @@ export function useFeaturedSong() {
       if (data) {
         setSong(data as Song);
       } else {
-        // 샘플 데이터 중 featured 노래
         const featured = SAMPLE_SONGS.find((s) => s.is_featured) || SAMPLE_SONGS[0];
         setSong(featured);
       }
@@ -73,7 +82,11 @@ export function useAllSongs() {
       .order('display_order', { ascending: true })
       .order('created_at', { ascending: false });
 
-    setSongs((data as Song[]) || []);
+    if (data && data.length > 0) {
+      setSongs(data as Song[]);
+    } else {
+      setSongs(SAMPLE_SONGS);
+    }
     setLoading(false);
   }, []);
 

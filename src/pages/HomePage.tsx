@@ -34,8 +34,8 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          <h1 className={styles.heroLogo}>호해</h1>
-          <p className={styles.heroSubLogo} style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginBottom: 24, letterSpacing: '0.15em' }}>好海 — 바다를 사랑하다</p>
+          <h1 className={styles.heroLogo}>好海</h1>
+          <p className={styles.heroSubLogo} style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginBottom: 24, letterSpacing: '0.15em' }}>호해 — 바다를 사랑하다</p>
           <p className={styles.heroQuote}>
             {`파도가 밀려오듯\n시가 가슴에 닿고\n바다가 노래합니다`}
           </p>
@@ -99,7 +99,7 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
           >
             <div className={styles.aboutPhotoPlaceholder}>
-              호
+              海
             </div>
             <div className={styles.aboutText}>
               <h3>호해 이성헌</h3>

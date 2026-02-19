@@ -1,51 +1,56 @@
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { motion } from 'framer-motion';
 import PageTransition from '../components/layout/PageTransition';
-import PoemCard from '../components/ui/PoemCard';
-import CategoryFilter from '../components/ui/CategoryFilter';
-import { usePoems } from '../hooks/usePoems';
-import { useCategories } from '../hooks/useCategories';
+import { usePoemSeries } from '../hooks/useSeries';
+import { CARD_GRADIENTS } from '../lib/constants';
 import styles from './PoemsPage.module.css';
 
 export default function PoemsPage() {
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const { categories } = useCategories();
-  const { poems, loading } = usePoems(selectedCategory || undefined);
+  const { series, loading } = usePoemSeries();
 
   return (
     <PageTransition>
       <Helmet>
-        <title>시(詩) — 호해</title>
-        <meta name="description" content="호해 이성헌 시인의 시 모음" />
+        <title>시(詩) — 好海</title>
+        <meta name="description" content="好海 이성헌 시인의 시집 모음" />
       </Helmet>
 
       <div className={styles.page}>
         <div className="container">
           <div className={styles.header}>
             <h1 className="section-title" style={{ display: 'inline-block' }}>시(詩)</h1>
-            <p className={styles.subtitle}>마음을 담아 쓴 시를 만나보세요</p>
+            <p className={styles.subtitle}>시집별로 마음을 담아 쓴 시를 만나보세요</p>
           </div>
-
-          <CategoryFilter
-            categories={categories}
-            selected={selectedCategory}
-            onSelect={setSelectedCategory}
-          />
 
           {loading ? (
             <p className={styles.empty}>불러오는 중...</p>
-          ) : poems.length > 0 ? (
-            <div className={styles.grid}>
-              {poems.map((poem, i) => (
-                <PoemCard key={poem.id} poem={poem} index={i} />
+          ) : series.length > 0 ? (
+            <div className={styles.seriesGrid}>
+              {series.map((s, i) => (
+                <motion.div
+                  key={s.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                >
+                  <Link to={`/poems/series/${s.slug}`} className={styles.seriesCard}>
+                    <div
+                      className={styles.seriesCardBg}
+                      style={{ background: CARD_GRADIENTS[i % CARD_GRADIENTS.length] }}
+                    />
+                    <div className={styles.seriesCardContent}>
+                      <span className={styles.seriesOrder}>{`제${i + 1}시집`}</span>
+                      <h3 className={styles.seriesName}>{s.name}</h3>
+                      {s.description && <p className={styles.seriesDesc}>{s.description}</p>}
+                      <span className={styles.seriesArrow}>시 보기 →</span>
+                    </div>
+                  </Link>
+                </motion.div>
               ))}
             </div>
           ) : (
-            <p className={styles.empty}>
-              {selectedCategory
-                ? '이 카테고리에 등록된 시가 없습니다.'
-                : '아직 등록된 시가 없습니다.'}
-            </p>
+            <p className={styles.empty}>아직 등록된 시집이 없습니다.</p>
           )}
         </div>
       </div>

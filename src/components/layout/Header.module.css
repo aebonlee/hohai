@@ -54,7 +54,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(15, 43, 71, 0.04);
+  background: rgba(7, 26, 51, 0.04);
   border-radius: 12px;
   padding: 4px 6px;
 }
@@ -83,12 +83,12 @@
 
 .navLink:hover {
   color: var(--text-primary);
-  background: rgba(11, 94, 102, 0.08);
+  background: rgba(10, 61, 122, 0.08);
 }
 
 .navLink.active {
   color: var(--accent-gold);
-  background: rgba(11, 94, 102, 0.12);
+  background: rgba(10, 61, 122, 0.12);
   font-weight: 600;
 }
 

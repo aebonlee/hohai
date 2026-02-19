@@ -4,26 +4,26 @@
    CSS Variables — 호해(好海): 바다와 파도의 시
    ======================================== */
 :root {
-  /* 배경 — 밝고 깨끗한 흰색 계열 (텍스트 대비 극대화) */
-  --bg-primary: #F8FBFE;
-  --bg-secondary: #EEF4FA;
-  --bg-warm: #F2F7FC;
+  /* 배경 — 딥블루 톤의 밝은 배경 */
+  --bg-primary: #F3F7FD;
+  --bg-secondary: #E5EDF8;
+  --bg-warm: #EAF0FA;
 
-  /* 텍스트 — 거의 검정에 가까운 짙은 남색 */
-  --text-primary: #0A1929;
-  --text-secondary: #1A3A54;
-  --text-muted: #3D6E8C;
+  /* 텍스트 — 딥 네이비 */
+  --text-primary: #071A33;
+  --text-secondary: #12334E;
+  --text-muted: #2E5C80;
 
-  /* 포인트 — 선명하고 진한 색상 */
-  --accent-gold: #0B5E66;
-  --accent-sage: #1A8E9C;
-  --accent-sky: #1565A0;
-  --accent-plum: #C0453A;
+  /* 포인트 — 딥블루 계열 */
+  --accent-gold: #0A3D7A;
+  --accent-sage: #1466A8;
+  --accent-sky: #0D5699;
+  --accent-plum: #B83B30;
 
-  /* 그림자 — 뚜렷한 그림자 */
-  --shadow-sm: 0 2px 8px rgba(10, 25, 41, 0.1);
-  --shadow-md: 0 4px 16px rgba(10, 25, 41, 0.15);
-  --shadow-lg: 0 12px 32px rgba(10, 25, 41, 0.2);
+  /* 그림자 — 딥블루 그림자 */
+  --shadow-sm: 0 2px 8px rgba(7, 26, 51, 0.1);
+  --shadow-md: 0 4px 16px rgba(7, 26, 51, 0.15);
+  --shadow-lg: 0 12px 32px rgba(7, 26, 51, 0.2);
 
   /* 레이아웃 */
   --max-width: 1100px;
@@ -80,19 +80,17 @@ body::before {
   mix-blend-mode: multiply;
 }
 
-/* 전체 페이지 하단 물결 장식 — 부드러운 곡선 */
+/* 전체 페이지 하단 은은한 딥블루 그라데이션 */
 body::after {
   content: '';
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 80px;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.12;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 60'%3E%3Cpath fill='%230B5E66' d='M0,35 C360,50 720,20 1080,35 C1260,42 1350,45 1440,35 L1440,60 L0,60 Z'/%3E%3C/svg%3E") repeat-x;
-  background-size: 1440px 60px;
+  background: linear-gradient(180deg, transparent 0%, rgba(10, 30, 60, 0.06) 100%);
 }
 
 img {

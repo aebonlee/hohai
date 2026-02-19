@@ -30,7 +30,7 @@ export default function Header() {
       <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
         <div className={styles.inner}>
           <Link to="/" className={styles.logo}>
-            호해
+            好海
             <span className={styles.logoSub}>시인 이성헌</span>
           </Link>
 

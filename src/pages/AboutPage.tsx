@@ -23,10 +23,10 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
           >
             <div className={styles.photoWrapper}>
-              <div className={styles.photoPlaceholder}>호</div>
+              <div className={styles.photoPlaceholder}>海</div>
             </div>
             <div className={styles.info}>
-              <h2 className={styles.name}>호해</h2>
+              <h2 className={styles.name}>好海</h2>
               <p className={styles.realName}>호(號): 호해(好海) — 바다를 사랑하다 / 본명: 이성헌</p>
               <p className={styles.bio}>
                 바다를 사랑하는 시인. 파도 소리에 귀 기울이며

@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { SAMPLE_POEMS } from '../lib/sampleData';
 import type { Poem, PoemInsert, PoemUpdate } from '../types/poem';
 
-export function usePoems(categorySlug?: string) {
+export function usePoems(categorySlug?: string, seriesId?: string) {
   const [poems, setPoems] = useState<Poem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,21 +22,27 @@ export function usePoems(categorySlug?: string) {
     if (categorySlug) {
       query = query.eq('category', categorySlug);
     }
+    if (seriesId) {
+      query = query.eq('series_id', seriesId);
+    }
 
     const { data, error: err } = await query;
 
     if (err || !data || data.length === 0) {
-      // Supabase 미연결이거나 데이터 없을 때 샘플 데이터 사용
-      const filtered = categorySlug
-        ? SAMPLE_POEMS.filter((p) => p.category === categorySlug)
-        : SAMPLE_POEMS;
+      let filtered = SAMPLE_POEMS as Poem[];
+      if (categorySlug) {
+        filtered = filtered.filter((p) => p.category === categorySlug);
+      }
+      if (seriesId) {
+        filtered = filtered.filter((p) => p.series_id === seriesId);
+      }
       setPoems(filtered);
       setError(null);
     } else {
       setPoems((data as Poem[]) || []);
     }
     setLoading(false);
-  }, [categorySlug]);
+  }, [categorySlug, seriesId]);
 
   useEffect(() => {
     fetchPoems();
@@ -67,13 +73,19 @@ export function usePoemDetail(id: string | undefined) {
       if (!error && data) {
         setPoem(data as Poem);
 
-        // 이전/다음 시 가져오기
-        const { data: allPoems } = await supabase
+        const seriesId = (data as Poem).series_id;
+        let adjacentQuery = supabase
           .from('hohai_poems')
           .select('id, title, display_order')
           .eq('is_published', true)
           .order('display_order', { ascending: true })
           .order('created_at', { ascending: false });
+
+        if (seriesId) {
+          adjacentQuery = adjacentQuery.eq('series_id', seriesId);
+        }
+
+        const { data: allPoems } = await adjacentQuery;
 
         if (allPoems && allPoems.length > 0) {
           const idx = allPoems.findIndex((p) => p.id === id);
@@ -82,26 +94,27 @@ export function usePoemDetail(id: string | undefined) {
             next: idx < allPoems.length - 1 ? { id: allPoems[idx + 1].id, title: allPoems[idx + 1].title } : null,
           });
         } else {
-          // 샘플 데이터에서 이전/다음 찾기
-          const idx = SAMPLE_POEMS.findIndex((p) => p.id === id);
-          setAdjacentPoems({
-            prev: idx > 0 ? { id: SAMPLE_POEMS[idx - 1].id, title: SAMPLE_POEMS[idx - 1].title } : null,
-            next: idx < SAMPLE_POEMS.length - 1 ? { id: SAMPLE_POEMS[idx + 1].id, title: SAMPLE_POEMS[idx + 1].title } : null,
-          });
+          setSampleAdjacent(id, seriesId);
         }
       } else {
-        // 샘플 데이터에서 찾기
         const samplePoem = SAMPLE_POEMS.find((p) => p.id === id);
         if (samplePoem) {
           setPoem(samplePoem);
-          const idx = SAMPLE_POEMS.findIndex((p) => p.id === id);
-          setAdjacentPoems({
-            prev: idx > 0 ? { id: SAMPLE_POEMS[idx - 1].id, title: SAMPLE_POEMS[idx - 1].title } : null,
-            next: idx < SAMPLE_POEMS.length - 1 ? { id: SAMPLE_POEMS[idx + 1].id, title: SAMPLE_POEMS[idx + 1].title } : null,
-          });
+          setSampleAdjacent(id, samplePoem.series_id);
         }
       }
       setLoading(false);
+    };
+
+    const setSampleAdjacent = (poemId: string, seriesId: string | null) => {
+      const filtered = seriesId
+        ? SAMPLE_POEMS.filter(p => p.series_id === seriesId)
+        : SAMPLE_POEMS;
+      const idx = filtered.findIndex((p) => p.id === poemId);
+      setAdjacentPoems({
+        prev: idx > 0 ? { id: filtered[idx - 1].id, title: filtered[idx - 1].title } : null,
+        next: idx < filtered.length - 1 ? { id: filtered[idx + 1].id, title: filtered[idx + 1].title } : null,
+      });
     };
 
     fetchPoem();
@@ -126,7 +139,6 @@ export function useFeaturedPoems() {
       if (data && data.length > 0) {
         setPoems(data as Poem[]);
       } else {
-        // 샘플 데이터 중 featured 3편
         setPoems(SAMPLE_POEMS.filter((p) => p.is_featured).slice(0, 3));
       }
       setLoading(false);
@@ -150,7 +162,11 @@ export function useAllPoems() {
       .order('display_order', { ascending: true })
       .order('created_at', { ascending: false });
 
-    setPoems((data as Poem[]) || []);
+    if (data && data.length > 0) {
+      setPoems(data as Poem[]);
+    } else {
+      setPoems(SAMPLE_POEMS);
+    }
     setLoading(false);
   }, []);
 
