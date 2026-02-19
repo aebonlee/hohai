@@ -1,13 +1,13 @@
-/** 카드 배경 그라데이션 프리셋 (8가지 바다/파도 수채화) */
+/** 카드 배경 그라데이션 프리셋 (8가지, 진하고 선명한 바다 계열) */
 export const CARD_GRADIENTS = [
-  'linear-gradient(135deg, #c8e6c9, #80cbc4)', // 얕은 바다
-  'linear-gradient(135deg, #bbdefb, #90caf9)', // 푸른 하늘
-  'linear-gradient(135deg, #b2ebf2, #80deea)', // 청록 파도
-  'linear-gradient(135deg, #c5cae9, #9fa8da)', // 깊은 바다
-  'linear-gradient(135deg, #b3e5fc, #81d4fa)', // 수평선
-  'linear-gradient(135deg, #f8bbd0, #ce93d8)', // 노을빛 바다
-  'linear-gradient(135deg, #ffe0b2, #ffcc80)', // 해변 모래
-  'linear-gradient(135deg, #b2dfdb, #b3e5fc)', // 파도 거품
+  'linear-gradient(135deg, #D4ECD6, #8AC4BC)', // 얕은 바다
+  'linear-gradient(135deg, #C2D9F5, #7AADE8)', // 푸른 하늘
+  'linear-gradient(135deg, #B8E8F0, #6CCCD6)', // 청록 파도
+  'linear-gradient(135deg, #C0C8E4, #8B96CC)', // 깊은 바다
+  'linear-gradient(135deg, #BAE0F7, #6DB8E8)', // 수평선
+  'linear-gradient(135deg, #F2A8BC, #C07CC0)', // 노을빛 바다
+  'linear-gradient(135deg, #F5D49A, #E8B060)', // 해변 모래
+  'linear-gradient(135deg, #A0D4CC, #88C4E8)', // 파도 거품
 ] as const;
 
 /** 카테고리별 기본 포인트 색상 */

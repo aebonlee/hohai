@@ -50,7 +50,7 @@
   line-height: 2;
   white-space: pre-line;
   padding: 16px 20px;
-  background: rgba(250, 246, 240, 0.5);
+  background: rgba(238, 244, 250, 0.6);
   border-radius: var(--radius-sm);
   margin-top: 12px;
 }

@@ -16,27 +16,39 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 120% 60% at 50% -10%, rgba(26, 122, 130, 0.18), transparent 70%),
-    radial-gradient(ellipse 80% 60% at 10% 100%, rgba(46, 123, 173, 0.2), transparent 60%),
-    radial-gradient(ellipse 70% 50% at 90% 60%, rgba(56, 168, 181, 0.15), transparent 60%),
-    radial-gradient(ellipse 50% 30% at 60% 30%, rgba(201, 107, 95, 0.06), transparent 60%),
-    linear-gradient(180deg, rgba(240, 246, 250, 0.3) 0%, rgba(228, 238, 245, 0.6) 50%, rgba(26, 122, 130, 0.1) 100%);
+    radial-gradient(ellipse 120% 60% at 50% -10%, rgba(11, 94, 102, 0.15), transparent 70%),
+    radial-gradient(ellipse 80% 60% at 10% 100%, rgba(21, 101, 160, 0.16), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 90% 60%, rgba(26, 142, 156, 0.12), transparent 60%),
+    linear-gradient(180deg, rgba(248, 251, 254, 0.5) 0%, rgba(238, 244, 250, 0.8) 40%, rgba(11, 94, 102, 0.08) 100%);
   pointer-events: none;
   overflow: hidden;
 }
 
-/* 파도 애니메이션 — 3중 레이어 */
+/* 등대 & 방파제 실루엣 (고정 배경) */
+.heroScenery {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  pointer-events: none;
+  z-index: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 220'%3E%3C!-- 방파제 (뒤쪽) --%3E%3Cpath fill='%230B5E66' fill-opacity='0.08' d='M0,180 L100,175 L200,178 L350,170 L500,168 L600,172 L700,165 L850,160 L950,164 L1050,158 L1150,162 L1250,155 L1350,160 L1440,156 L1440,220 L0,220 Z'/%3E%3C!-- 방파제 (앞쪽) --%3E%3Cpath fill='%230B5E66' fill-opacity='0.06' d='M0,195 L150,190 L300,193 L450,186 L600,190 L750,184 L900,188 L1050,182 L1200,186 L1350,180 L1440,184 L1440,220 L0,220 Z'/%3E%3C!-- 등대 (오른쪽) --%3E%3Crect x='1180' y='80' width='16' height='100' rx='2' fill='%230B5E66' fill-opacity='0.12'/%3E%3Crect x='1172' y='75' width='32' height='10' rx='3' fill='%230B5E66' fill-opacity='0.12'/%3E%3Ccircle cx='1188' cy='68' r='8' fill='%230B5E66' fill-opacity='0.1'/%3E%3Cpath d='M1188,58 L1183,65 L1193,65 Z' fill='%230B5E66' fill-opacity='0.12'/%3E%3C!-- 등대 불빛 --%3E%3Ccircle cx='1188' cy='68' r='4' fill='%23E8B060' fill-opacity='0.25'/%3E%3Ccircle cx='1188' cy='68' r='12' fill='%23E8B060' fill-opacity='0.06'/%3E%3C!-- 등대 (왼쪽 작은) --%3E%3Crect x='180' y='120' width='10' height='60' rx='2' fill='%230B5E66' fill-opacity='0.07'/%3E%3Crect x='175' y='116' width='20' height='7' rx='2' fill='%230B5E66' fill-opacity='0.07'/%3E%3Ccircle cx='185' cy='112' r='5' fill='%230B5E66' fill-opacity='0.06'/%3E%3Ccircle cx='185' cy='112' r='3' fill='%23E8B060' fill-opacity='0.15'/%3E%3C/svg%3E") no-repeat center bottom;
+  background-size: 100% 220px;
+}
+
+/* 파도 애니메이션 — 3중 부드러운 곡선 */
 .heroBg::before {
   content: '';
   position: absolute;
-  bottom: 40px;
+  bottom: 50px;
   left: 0;
   width: calc(100% + 1440px);
   height: 100px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100'%3E%3Cpath fill='%232E7BAD' fill-opacity='0.08' d='M0,50L60,55C120,60,240,70,360,65C480,60,600,40,720,35C840,30,960,40,1080,50C1200,60,1320,70,1380,65L1440,60L1440,100L0,100Z'/%3E%3C/svg%3E") repeat-x;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100'%3E%3Cpath fill='%231565A0' fill-opacity='0.07' d='M0,50 C240,75 480,25 720,50 C960,75 1200,25 1440,50 L1440,100 L0,100 Z'/%3E%3C/svg%3E") repeat-x;
   background-size: 1440px 100px;
-  animation: wave-slow 12s linear infinite;
-  z-index: 0;
+  animation: wave-slow 14s linear infinite;
+  z-index: 1;
 }
 
 .heroBg::after {
@@ -46,21 +58,21 @@
   left: 0;
   width: calc(100% + 1440px);
   height: 120px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120'%3E%3Cpath fill='%23E4EEF5' fill-opacity='0.8' d='M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L0,120Z'/%3E%3C/svg%3E") repeat-x;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120'%3E%3Cpath fill='%23EEF4FA' fill-opacity='0.9' d='M0,60 C180,90 360,30 540,60 C720,90 900,30 1080,60 C1260,90 1350,75 1440,60 L1440,120 L0,120 Z'/%3E%3C/svg%3E") repeat-x;
   background-size: 1440px 120px;
-  animation: wave 8s linear infinite;
-  z-index: 1;
+  animation: wave 9s linear infinite;
+  z-index: 3;
 }
 
 .heroWaveMid {
   position: absolute;
-  bottom: 15px;
+  bottom: 20px;
   left: 0;
   width: calc(100% + 1440px);
   height: 80px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80'%3E%3Cpath fill='%2338A8B5' fill-opacity='0.12' d='M0,40L80,35C160,30,320,20,480,25C640,30,800,50,960,55C1120,60,1280,50,1360,45L1440,40L1440,80L0,80Z'/%3E%3C/svg%3E") repeat-x;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80'%3E%3Cpath fill='%231A8E9C' fill-opacity='0.1' d='M0,40 C200,60 400,20 600,40 C800,60 1000,20 1200,40 C1320,50 1380,45 1440,40 L1440,80 L0,80 Z'/%3E%3C/svg%3E") repeat-x;
   background-size: 1440px 80px;
-  animation: wave-mid 10s linear infinite;
+  animation: wave-mid 11s linear infinite;
   pointer-events: none;
   z-index: 2;
 }
@@ -242,7 +254,7 @@
   object-fit: cover;
   flex-shrink: 0;
   background: var(--bg-secondary);
-  border: 3px solid rgba(27, 58, 92, 0.12);
+  border: 3px solid rgba(10, 25, 41, 0.12);
 }
 
 .aboutPhotoPlaceholder {
@@ -251,7 +263,7 @@
   border-radius: 50%;
   flex-shrink: 0;
   background: linear-gradient(135deg, var(--bg-secondary), var(--bg-warm));
-  border: 3px solid rgba(27, 58, 92, 0.12);
+  border: 3px solid rgba(10, 25, 41, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -37,7 +37,7 @@
   transform: translate(-50%, -50%);
   width: 56px;
   height: 56px;
-  background: rgba(44, 36, 32, 0.7);
+  background: rgba(10, 25, 41, 0.7);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -57,7 +57,7 @@
 }
 
 .card:hover .playBtn {
-  background: rgba(196, 149, 106, 0.9);
+  background: rgba(11, 94, 102, 0.9);
   transform: translate(-50%, -50%) scale(1.1);
 }
 

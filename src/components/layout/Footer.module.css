@@ -1,6 +1,6 @@
 .footer {
   background: var(--bg-secondary);
-  border-top: 1px solid rgba(27, 58, 92, 0.08);
+  border-top: 1px solid rgba(10, 25, 41, 0.08);
   padding: 48px 0 32px;
   margin-top: 80px;
 }
@@ -50,7 +50,7 @@
   max-width: var(--max-width);
   margin: 24px auto 0;
   padding: 16px 24px 0;
-  border-top: 1px solid rgba(27, 58, 92, 0.06);
+  border-top: 1px solid rgba(10, 25, 41, 0.06);
   text-align: center;
   color: var(--text-muted);
   font-size: 0.8rem;

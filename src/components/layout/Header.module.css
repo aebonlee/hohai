@@ -4,17 +4,17 @@
   left: 0;
   right: 0;
   height: var(--header-height);
-  background: linear-gradient(180deg, rgba(240, 246, 250, 0.97), rgba(228, 238, 245, 0.92));
+  background: linear-gradient(180deg, rgba(248, 251, 254, 0.97), rgba(238, 244, 250, 0.92));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(27, 58, 92, 0.1);
+  border-bottom: 1px solid rgba(10, 25, 41, 0.1);
   z-index: 100;
   transition: box-shadow var(--transition), background var(--transition);
 }
 
 .header.scrolled {
-  box-shadow: 0 2px 20px rgba(27, 58, 92, 0.1);
-  background: linear-gradient(180deg, rgba(240, 246, 250, 0.98), rgba(228, 238, 245, 0.96));
+  box-shadow: 0 2px 20px rgba(10, 25, 41, 0.1);
+  background: linear-gradient(180deg, rgba(248, 251, 254, 0.98), rgba(238, 244, 250, 0.96));
 }
 
 .inner {
@@ -83,12 +83,12 @@
 
 .navLink:hover {
   color: var(--text-primary);
-  background: rgba(26, 122, 130, 0.08);
+  background: rgba(11, 94, 102, 0.08);
 }
 
 .navLink.active {
   color: var(--accent-gold);
-  background: rgba(26, 122, 130, 0.12);
+  background: rgba(11, 94, 102, 0.12);
   font-weight: 600;
 }
 
@@ -129,7 +129,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(240, 246, 250, 0.98);
+  background: rgba(248, 251, 254, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 99;
@@ -148,7 +148,7 @@
   font-weight: 700;
   color: var(--text-secondary);
   padding: 16px 0;
-  border-bottom: 1px solid rgba(27, 58, 92, 0.08);
+  border-bottom: 1px solid rgba(10, 25, 41, 0.08);
   transition: all var(--transition);
   display: flex;
   align-items: center;
