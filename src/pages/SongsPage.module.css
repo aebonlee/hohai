@@ -1,0 +1,67 @@
+.page {
+  padding: 48px 0 80px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.subtitle {
+  font-family: var(--font-serif);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.empty {
+  text-align: center;
+  padding: 80px 0;
+  color: var(--text-muted);
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+}
+
+/* 가사 섹션 */
+.lyricsToggle {
+  font-size: 0.85rem;
+  color: var(--accent-gold);
+  font-weight: 500;
+  padding: 8px 16px;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.lyricsToggle:hover {
+  opacity: 0.7;
+}
+
+.lyrics {
+  font-family: var(--font-serif);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 2;
+  white-space: pre-line;
+  padding: 16px 20px;
+  background: rgba(250, 246, 240, 0.5);
+  border-radius: var(--radius-sm);
+  margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 32px 0 48px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}

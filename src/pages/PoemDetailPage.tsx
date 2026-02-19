@@ -1,0 +1,83 @@
+import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import PageTransition from '../components/layout/PageTransition';
+import { usePoemDetail } from '../hooks/usePoems';
+import styles from './PoemDetailPage.module.css';
+
+export default function PoemDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const { poem, loading, adjacentPoems } = usePoemDetail(id);
+
+  if (loading) {
+    return <div className={styles.loading}>불러오는 중...</div>;
+  }
+
+  if (!poem) {
+    return (
+      <div className={styles.loading}>
+        시를 찾을 수 없습니다.
+        <br />
+        <Link to="/poems" style={{ color: 'var(--accent-gold)', marginTop: 16, display: 'inline-block' }}>
+          시 목록으로 돌아가기
+        </Link>
+      </div>
+    );
+  }
+
+  // 연(stanza) 단위로 분리
+  const stanzas = poem.content.split(/\n\s*\n/).filter(Boolean);
+
+  return (
+    <PageTransition>
+      <Helmet>
+        <title>{poem.title} — 호해</title>
+        <meta name="description" content={poem.excerpt || poem.content.slice(0, 120)} />
+      </Helmet>
+
+      <div className={styles.page}>
+        <div className={styles.inner}>
+          <Link to="/poems" className={styles.backLink}>
+            ← 시 목록으로
+          </Link>
+
+          <div className={styles.category}>{poem.category}</div>
+          <h1 className={styles.title}>{poem.title}</h1>
+          {poem.written_date && (
+            <p className={styles.meta}>{poem.written_date}</p>
+          )}
+
+          <div className={styles.content}>
+            {stanzas.map((stanza, i) => (
+              <div key={i} className={styles.stanza}>
+                {stanza}
+              </div>
+            ))}
+          </div>
+
+          {poem.tags && poem.tags.length > 0 && (
+            <div className={styles.tags}>
+              {poem.tags.map((tag) => (
+                <span key={tag} className={styles.tag}>#{tag}</span>
+              ))}
+            </div>
+          )}
+
+          <nav className={styles.nav}>
+            {adjacentPoems.prev ? (
+              <Link to={`/poems/${adjacentPoems.prev.id}`} className={styles.navItem}>
+                <span className={styles.navLabel}>← 이전 시</span>
+                <span className={styles.navTitle}>{adjacentPoems.prev.title}</span>
+              </Link>
+            ) : <div />}
+            {adjacentPoems.next ? (
+              <Link to={`/poems/${adjacentPoems.next.id}`} className={`${styles.navItem} ${styles.navRight}`}>
+                <span className={styles.navLabel}>다음 시 →</span>
+                <span className={styles.navTitle}>{adjacentPoems.next.title}</span>
+              </Link>
+            ) : <div />}
+          </nav>
+        </div>
+      </div>
+    </PageTransition>
+  );
+}

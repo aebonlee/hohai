@@ -1,0 +1,195 @@
+.page {
+  padding: 48px 0 80px;
+}
+
+.profile {
+  display: flex;
+  align-items: flex-start;
+  gap: 48px;
+  margin-bottom: 64px;
+}
+
+.photoWrapper {
+  flex-shrink: 0;
+}
+
+.photo {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(163, 148, 133, 0.15);
+}
+
+.photoPlaceholder {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-warm));
+  border: 3px solid rgba(163, 148, 133, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-logo);
+  font-size: 3.5rem;
+  color: var(--text-muted);
+}
+
+.info {
+  flex: 1;
+}
+
+.name {
+  font-family: var(--font-logo);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.realName {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.bio {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+/* 시인의 말 */
+.quoteSection {
+  margin-bottom: 64px;
+}
+
+.quote {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  line-height: 2;
+  color: var(--text-secondary);
+  padding: 32px 40px;
+  background: var(--bg-secondary);
+  border-left: 3px solid var(--accent-gold);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  white-space: pre-line;
+  position: relative;
+}
+
+.quote::before {
+  content: '\201C';
+  font-family: var(--font-serif);
+  font-size: 4rem;
+  color: var(--accent-gold);
+  opacity: 0.3;
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  line-height: 1;
+}
+
+.quoteAuthor {
+  text-align: right;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 12px;
+  font-style: italic;
+}
+
+/* 약력 */
+.historySection {
+  margin-bottom: 64px;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 28px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent-gold), transparent);
+}
+
+.timelineItem {
+  position: relative;
+  margin-bottom: 24px;
+  padding-left: 16px;
+}
+
+.timelineItem::before {
+  content: '';
+  position: absolute;
+  left: -33px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+}
+
+.timelineYear {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-bottom: 4px;
+}
+
+.timelineText {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* 연락처 */
+.contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.contactItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  transition: all var(--transition);
+}
+
+.contactItem:hover {
+  background: var(--bg-warm);
+  color: var(--accent-gold);
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 32px 0 48px;
+  }
+
+  .profile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 24px;
+  }
+
+  .photo,
+  .photoPlaceholder {
+    width: 150px;
+    height: 150px;
+  }
+
+  .quote {
+    padding: 24px 24px 24px 32px;
+    font-size: 1rem;
+  }
+}

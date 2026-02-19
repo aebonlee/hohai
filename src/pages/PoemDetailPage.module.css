@@ -1,0 +1,171 @@
+.page {
+  padding: 48px 0 80px;
+  min-height: 60vh;
+}
+
+.inner {
+  max-width: var(--poem-max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+}
+
+/* 좌측 세로 장식선 */
+.inner::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--accent-gold),
+    transparent
+  );
+  opacity: 0.3;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 32px;
+  transition: color var(--transition);
+}
+
+.backLink:hover {
+  color: var(--text-primary);
+}
+
+.category {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.meta {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 40px;
+}
+
+.content {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 2.2;
+  color: var(--text-primary);
+  white-space: pre-line;
+}
+
+/* 연(stanza) 구분: 빈 줄은 큰 간격 */
+.stanza {
+  margin-bottom: 2em;
+}
+
+.stanza:last-child {
+  margin-bottom: 0;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(163, 148, 133, 0.1);
+}
+
+.tag {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+/* 이전/다음 네비게이션 */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(163, 148, 133, 0.1);
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 45%;
+  transition: color var(--transition);
+}
+
+.navItem:hover {
+  color: var(--accent-gold);
+}
+
+.navLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.navTitle {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navRight {
+  text-align: right;
+  margin-left: auto;
+}
+
+.loading {
+  text-align: center;
+  padding: 80px 0;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 32px 0 48px;
+  }
+
+  .inner {
+    padding: 0 16px 0 24px;
+  }
+
+  .nav {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .navItem {
+    max-width: 100%;
+  }
+
+  .navRight {
+    text-align: left;
+    margin-left: 0;
+  }
+}
