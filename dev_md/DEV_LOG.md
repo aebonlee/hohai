@@ -103,8 +103,38 @@
 
 ---
 
+## 2026-02-20 (Day 1, 3차) — 배포 전환: Vercel → GitHub Pages
+
+### 배포 방식 변경
+- **사유**: 사용자가 Vercel 계정 사용을 원치 않음, `www.dreamitbiz.com`과 동일한 방식(GitHub Pages) 요청
+- Vercel 프로젝트 삭제 (`npx vercel rm hohai`)
+- `vercel.json` 삭제
+
+### GitHub Pages 배포 설정
+- `.github/workflows/deploy.yml` 추가 — GitHub Actions 자동 배포
+  - `actions/deploy-pages@v4` 사용
+  - 빌드 시 환경변수 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`를 GitHub Secrets에서 주입
+- `package.json` build 스크립트에 `cp dist/index.html dist/404.html` 추가 (SPA 라우팅 지원)
+- `public/CNAME` 추가 → 빌드 시 `dist/CNAME`에 자동 포함
+- `.npmrc` 추가 (`legacy-peer-deps=true`) → CI 환경에서도 react-helmet-async 설치 가능
+
+### 배포 결과
+- GitHub Actions 워크플로우 `Deploy to GitHub Pages #1` — **28초 만에 성공**
+- URL: `https://hohai.dreamitbiz.com` (기존 DNS CNAME 그대로 사용)
+
+### 남은 작업 (업데이트)
+- [x] ~~Vercel에 프로젝트 연결~~ → GitHub Pages로 전환 완료
+- [x] ~~DNS CNAME 변경~~ → 기존 GitHub Pages CNAME 그대로 유지
+- [ ] GitHub 레포 Settings → Secrets에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` 추가
+- [ ] Supabase에 migration.sql 실행 (테이블 생성)
+- [ ] 실제 시/노래 콘텐츠 입력
+- [ ] 프로필 사진 업로드
+
+---
+
 ### 기술적 결정 사항
 1. **CSS Modules 채택**: 컴포넌트별 스타일 격리 + CSS 변수로 글로벌 테마 유지
 2. **lite-youtube 패턴**: YouTube iframe을 썸네일 클릭 시에만 로드하여 초기 로딩 성능 개선
 3. **수동 프로젝트 설정**: create-vite CLI가 비대화형 환경에서 동작하지 않아 package.json부터 수동 작성
 4. **--legacy-peer-deps**: react-helmet-async가 아직 React 19 peer dep을 선언하지 않음
+5. **GitHub Pages 배포**: Vercel 대신 GitHub Pages + GitHub Actions 사용 (www.dreamitbiz.com과 동일 방식)
