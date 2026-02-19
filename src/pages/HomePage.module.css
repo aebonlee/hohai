@@ -16,10 +16,29 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 50% 20%, rgba(196, 149, 106, 0.1), transparent),
-    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(143, 168, 154, 0.08), transparent),
-    radial-gradient(ellipse 50% 30% at 80% 60%, rgba(155, 181, 201, 0.08), transparent);
+    radial-gradient(ellipse 90% 50% at 50% 0%, rgba(44, 142, 150, 0.08), transparent),
+    radial-gradient(ellipse 70% 50% at 20% 90%, rgba(74, 144, 184, 0.1), transparent),
+    radial-gradient(ellipse 60% 40% at 85% 50%, rgba(90, 186, 196, 0.07), transparent),
+    linear-gradient(180deg, transparent 60%, rgba(44, 142, 150, 0.04) 100%);
   pointer-events: none;
+}
+
+/* 파도 애니메이션 */
+.heroBg::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -5%;
+  width: 110%;
+  height: 120px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120'%3E%3Cpath fill='%23E4EEF5' fill-opacity='0.6' d='M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L0,120Z'/%3E%3C/svg%3E") repeat-x;
+  background-size: 1440px 120px;
+  animation: wave 8s linear infinite;
+}
+
+@keyframes wave {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-1440px); }
 }
 
 .heroContent {
@@ -157,7 +176,7 @@
   object-fit: cover;
   flex-shrink: 0;
   background: var(--bg-secondary);
-  border: 3px solid rgba(163, 148, 133, 0.15);
+  border: 3px solid rgba(27, 58, 92, 0.12);
 }
 
 .aboutPhotoPlaceholder {
@@ -166,7 +185,7 @@
   border-radius: 50%;
   flex-shrink: 0;
   background: linear-gradient(135deg, var(--bg-secondary), var(--bg-warm));
-  border: 3px solid rgba(163, 148, 133, 0.15);
+  border: 3px solid rgba(27, 58, 92, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;

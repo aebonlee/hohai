@@ -27,12 +27,12 @@ export default function AboutPage() {
             </div>
             <div className={styles.info}>
               <h2 className={styles.name}>호해</h2>
-              <p className={styles.realName}>호(號): 호해 / 본명: 이성헌</p>
+              <p className={styles.realName}>호(號): 호해(好海) — 바다를 사랑하다 / 본명: 이성헌</p>
               <p className={styles.bio}>
-                시와 노래를 벗삼아 삶의 아름다움을 노래하는 시인입니다.
-                자연의 소리에 귀 기울이고, 사람 사이의 따뜻한 정을 시로 옮깁니다.
-                때로는 시에 멜로디를 입혀 노래로 전하며,
-                일상 속 작은 감동을 소중히 담아내고 있습니다.
+                바다를 사랑하는 시인. 파도 소리에 귀 기울이며
+                시와 노래로 삶의 아름다움을 전합니다.
+                넓은 바다처럼 깊은 마음을 담아,
+                일상 속 작은 감동을 소중히 노래하고 있습니다.
               </p>
             </div>
           </motion.div>
@@ -47,14 +47,14 @@ export default function AboutPage() {
           >
             <h2 className="section-title">시인의 말</h2>
             <blockquote className={styles.quote}>
-              {`바람이 지나간 자리에 시가 머물고
-노래가 피어납니다.
+              {`파도가 밀려왔다 물러가듯
+시도 그렇게 가슴에 닿습니다.
 
-살아가며 만나는 모든 순간이
-한 편의 시가 되기를 바랍니다.
+바다는 늘 그 자리에서
+우리에게 말을 걸어옵니다.
 
-이 작은 공간이
-당신의 마음에 잔잔한 울림이 되길 소망합니다.`}
+이 작은 바다가
+당신의 마음에 잔잔한 파도가 되길 소망합니다.`}
             </blockquote>
             <p className={styles.quoteAuthor}>— 호해 이성헌</p>
           </motion.div>

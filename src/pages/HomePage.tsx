@@ -30,8 +30,9 @@ export default function HomePage() {
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
           <h1 className={styles.heroLogo}>호해</h1>
+          <p className={styles.heroSubLogo} style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginBottom: 24, letterSpacing: '0.15em' }}>好海 — 바다를 사랑하다</p>
           <p className={styles.heroQuote}>
-            {`바람이 지나간 자리에\n시가 머물고\n노래가 피어납니다`}
+            {`파도가 밀려오듯\n시가 가슴에 닿고\n바다가 노래합니다`}
           </p>
           <p className={styles.heroAuthor}>— 호해 이성헌</p>
         </motion.div>
@@ -98,8 +99,8 @@ export default function HomePage() {
             <div className={styles.aboutText}>
               <h3>호해 이성헌</h3>
               <p>
-                시와 노래를 벗삼아 삶의 아름다움을 노래하는 시인입니다.
-                자연과 사람, 그리움과 사랑의 이야기를 따뜻한 언어로 전합니다.
+                바다를 사랑하는 시인. 파도 소리에 귀 기울이며
+                시와 노래로 삶의 아름다움을 전합니다.
               </p>
               <Link to="/about" className={styles.aboutLink}>
                 자세히 보기 →
