@@ -496,3 +496,57 @@ z-index 5: heroContent (텍스트), scrollHint, 최전면 파도
 - TypeScript 타입체크 통과
 - Vite 빌드 성공
 - CSS: 40.51 kB (gzip 8.63 kB), JS: 597.72 kB (gzip 178.72 kB)
+
+---
+
+## 2026-02-20 (Day 1, 11차) — 방파제 제거 + Supabase DB 셋업
+
+### 변경 내역
+
+#### 1. 방파제 실루엣 제거
+- 히어로 섹션의 등대 앞 방파제(breakwater) SVG 경로 2개 제거
+- **사유**: 오른쪽 여백보다 짧아서 잘려보이는 문제
+- 등대, 산, 갈매기, 구름 레이어는 유지
+
+#### 2. Supabase DB 완전 셋업
+
+**프로젝트 정보**:
+- Supabase 프로젝트: `aebonlee's Project` (ID: `hcmgdztsgjvzcyxyayaj`)
+- 리전: `ap-south-1` (Mumbai)
+- PostgreSQL 17.6
+
+**테이블 생성 (5개)**:
+| 테이블 | 설명 |
+|--------|------|
+| `hohai_series` | 시집/앨범 시리즈 (type: poem/song) |
+| `hohai_poems` | 시 (series_id FK) |
+| `hohai_songs` | 노래 (series_id FK, youtube_id) |
+| `hohai_categories` | 카테고리 (사랑/자연/계절/인생/그리움/기타) |
+| `hohai_site_config` | 사이트 설정 (key-value JSONB) |
+
+**인덱스 (3개)**:
+- `idx_hohai_poems_series` — poems.series_id
+- `idx_hohai_songs_series` — songs.series_id
+- `idx_hohai_series_type` — series.type
+
+**RLS 정책 (10개)**:
+- 모든 테이블에 공개 읽기(`is_published = TRUE` 또는 `TRUE`) + 인증된 사용자 전체 권한
+
+**트리거 (4개)**:
+- hohai_series, hohai_poems, hohai_songs, hohai_site_config — `updated_at` 자동 갱신
+
+**샘플 데이터 삽입**:
+- 시리즈 10개 (시집 5개 + 앨범 5개)
+- 카테고리 6개
+
+**환경변수 설정**:
+- `.env.local` 생성 (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
+- REST API (anon key) 접근 정상 확인
+
+### 남은 작업
+- [x] Supabase에 migration.sql 실행 (테이블 생성) ✅
+- [x] `.env.local`에 실제 Supabase URL/Key 설정 ✅
+- [ ] GitHub Secrets에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` 추가 (gh CLI 미설치 → GitHub 웹에서 수동 설정 필요)
+- [ ] 실제 시/노래 콘텐츠 입력
+- [ ] 프로필 사진 업로드
+- [ ] YouTube 노래 영상의 실제 youtube_id로 교체
