@@ -331,6 +331,7 @@ function SongsAdmin() {
   const [form, setForm] = useState<SongInsert>({
     title: '',
     youtube_id: '',
+    suno_url: '',
     description: '',
     lyrics: '',
     series_id: null,
@@ -342,7 +343,7 @@ function SongsAdmin() {
 
   const resetForm = () => {
     setForm({
-      title: '', youtube_id: '', description: '', lyrics: '',
+      title: '', youtube_id: '', suno_url: '', description: '', lyrics: '',
       series_id: null, display_order: 0, is_featured: false, is_published: true, recorded_date: null,
     });
     setEditingId(null);
@@ -359,6 +360,7 @@ function SongsAdmin() {
     setForm({
       title: song.title,
       youtube_id: song.youtube_id,
+      suno_url: song.suno_url || '',
       description: song.description || '',
       lyrics: song.lyrics || '',
       series_id: song.series_id,
@@ -403,7 +405,7 @@ function SongsAdmin() {
             <tr>
               <th>제목</th>
               <th>앨범</th>
-              <th>YouTube ID</th>
+              <th>소스</th>
               <th>상태</th>
               <th>순서</th>
               <th>작업</th>
@@ -414,7 +416,10 @@ function SongsAdmin() {
               <tr key={song.id}>
                 <td className={styles.titleCell}>{song.title}</td>
                 <td>{songSeries.find(s => s.id === song.series_id)?.name || '-'}</td>
-                <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{song.youtube_id}</td>
+                <td style={{ fontSize: '0.75rem' }}>
+                  {song.youtube_id && <span style={{ display: 'block', color: '#c00' }}>YouTube</span>}
+                  {song.suno_url && <span style={{ display: 'block', color: '#6366f1' }}>Suno</span>}
+                </td>
                 <td>
                   <span className={`${styles.statusBadge} ${song.is_published ? styles.published : styles.draft}`}>
                     {song.is_published ? '공개' : '비공개'}
@@ -445,15 +450,25 @@ function SongsAdmin() {
                   required
                 />
               </div>
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>YouTube 영상 ID *</label>
-                <input
-                  className={styles.formInput}
-                  value={form.youtube_id}
-                  onChange={(e) => setForm({ ...form, youtube_id: e.target.value })}
-                  required
-                  placeholder="예: dQw4w9WgXcQ"
-                />
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>YouTube 영상 ID</label>
+                  <input
+                    className={styles.formInput}
+                    value={form.youtube_id || ''}
+                    onChange={(e) => setForm({ ...form, youtube_id: e.target.value })}
+                    placeholder="예: dQw4w9WgXcQ"
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Suno AI URL</label>
+                  <input
+                    className={styles.formInput}
+                    value={form.suno_url || ''}
+                    onChange={(e) => setForm({ ...form, suno_url: e.target.value })}
+                    placeholder="예: https://suno.com/song/..."
+                  />
+                </div>
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>앨범 (시리즈)</label>

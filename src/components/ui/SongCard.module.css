@@ -61,6 +61,25 @@
   transform: translate(-50%, -50%) scale(1.1);
 }
 
+.sunoPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sunoPlaceholder span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .info {
   padding: 20px;
 }
@@ -81,6 +100,19 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.sunoLink {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  transition: opacity var(--transition);
+}
+
+.sunoLink:hover {
+  opacity: 0.8;
 }
 
 .iframe {

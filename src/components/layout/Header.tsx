@@ -5,8 +5,11 @@ import styles from './Header.module.css';
 
 const NAV_ITEMS = [
   { to: '/', label: '홈' },
-  { to: '/poems', label: '시(詩)' },
-  { to: '/songs', label: '노래' },
+  { to: '/poems', label: '추천 시(詩)' },
+  { to: '/poem-series', label: '시집 소개' },
+  { to: '/songs', label: '추천 노래' },
+  { to: '/albums', label: '앨범별 소개' },
+  { to: '/reviews', label: '감상 후기' },
   { to: '/about', label: '시인 소개' },
 ];
 

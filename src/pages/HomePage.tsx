@@ -131,7 +131,7 @@ export default function HomePage() {
         <div className="container">
           <div className={styles.sectionHeader}>
             <h2 className="section-title">최신 시</h2>
-            <Link to="/poems" className={styles.viewAll}>모든 시 보기 →</Link>
+            <Link to="/poems" className={styles.viewAll}>추천 시 보기 →</Link>
           </div>
           {poemsLoading ? (
             <p style={{ color: 'var(--text-muted)' }}>불러오는 중...</p>
@@ -155,10 +155,37 @@ export default function HomePage() {
           <div className={styles.songInner}>
             <div className={styles.sectionHeader}>
               <h2 className="section-title">노래</h2>
-              <Link to="/songs" className={styles.viewAll}>모든 노래 보기 →</Link>
+              <Link to="/songs" className={styles.viewAll}>추천 노래 보기 →</Link>
             </div>
             <div className={styles.songContent}>
-              <YouTubeEmbed videoId={song.youtube_id} title={song.title} />
+              {song.youtube_id ? (
+                <YouTubeEmbed videoId={song.youtube_id} title={song.title} />
+              ) : song.suno_url ? (
+                <a
+                  href={song.suno_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    aspectRatio: '16 / 9',
+                    background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
+                    borderRadius: 'var(--radius-md)',
+                    color: 'rgba(255,255,255,0.7)',
+                    gap: '8px',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M9 18V5l12-2v13" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="6" cy="18" r="3" />
+                    <circle cx="18" cy="16" r="3" />
+                  </svg>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Suno AI에서 듣기</span>
+                </a>
+              ) : null}
               <p className={styles.songTitle}>{song.title}</p>
             </div>
           </div>

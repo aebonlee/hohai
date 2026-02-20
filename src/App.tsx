@@ -4,11 +4,14 @@ import Layout from './components/layout/Layout';
 import AuthGuard from './components/layout/AuthGuard';
 import AdminGuard from './components/layout/AdminGuard';
 import HomePage from './pages/HomePage';
+import FeaturedPoemsPage from './pages/FeaturedPoemsPage';
 import PoemsPage from './pages/PoemsPage';
 import PoemSeriesPage from './pages/PoemSeriesPage';
 import PoemDetailPage from './pages/PoemDetailPage';
+import FeaturedSongsPage from './pages/FeaturedSongsPage';
 import SongsPage from './pages/SongsPage';
 import SongSeriesPage from './pages/SongSeriesPage';
+import ReviewsPage from './pages/ReviewsPage';
 import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -22,11 +25,14 @@ export default function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
-          <Route path="poems" element={<PoemsPage />} />
-          <Route path="poems/series/:slug" element={<PoemSeriesPage />} />
+          <Route path="poems" element={<FeaturedPoemsPage />} />
           <Route path="poems/:id" element={<PoemDetailPage />} />
-          <Route path="songs" element={<SongsPage />} />
-          <Route path="songs/series/:slug" element={<SongSeriesPage />} />
+          <Route path="poem-series" element={<PoemsPage />} />
+          <Route path="poem-series/:slug" element={<PoemSeriesPage />} />
+          <Route path="songs" element={<FeaturedSongsPage />} />
+          <Route path="albums" element={<SongsPage />} />
+          <Route path="albums/:slug" element={<SongSeriesPage />} />
+          <Route path="reviews" element={<ReviewsPage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="mypage" element={
             <AuthGuard><MyPagePage /></AuthGuard>

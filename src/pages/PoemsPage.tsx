@@ -34,7 +34,7 @@ export default function PoemsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: i * 0.1 }}
                 >
-                  <Link to={`/poems/series/${s.slug}`} className={styles.seriesCard}>
+                  <Link to={`/poem-series/${s.slug}`} className={styles.seriesCard}>
                     <div
                       className={styles.seriesCardBg}
                       style={{ background: CARD_GRADIENTS[i % CARD_GRADIENTS.length] }}

@@ -1,6 +1,7 @@
 import type { Poem } from '../types/poem';
 import type { Song } from '../types/song';
 import type { Series } from '../types/series';
+import type { Review } from '../types/review';
 
 /** 시집 시리즈 5개 */
 export const SAMPLE_POEM_SERIES: Series[] = [
@@ -97,30 +98,30 @@ export const SAMPLE_POEMS: Poem[] = [
 /** Supabase DB 미연결 시 표시할 샘플 노래 데이터 (4×5 = 20곡) */
 export const SAMPLE_SONGS: Song[] = [
   // 1집 - 바다 노래 1집 (4곡)
-  { id: 'ss1-1', title: '파도의 노래', description: '바다를 사랑하는 마음을 담은 노래', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-1', display_order: 1, is_featured: true, is_published: true, recorded_date: '2025-01-10', created_at: '2025-01-10T00:00:00Z', updated_at: '2025-01-10T00:00:00Z' },
-  { id: 'ss1-2', title: '수평선 너머', description: '수평선 저편에 있을 그대를 그리며', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-1', display_order: 2, is_featured: false, is_published: true, recorded_date: '2025-01-15', created_at: '2025-01-15T00:00:00Z', updated_at: '2025-01-15T00:00:00Z' },
-  { id: 'ss1-3', title: '갈매기의 꿈', description: '자유를 향해 날아가는 갈매기처럼', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-1', display_order: 3, is_featured: false, is_published: true, recorded_date: '2025-01-20', created_at: '2025-01-20T00:00:00Z', updated_at: '2025-01-20T00:00:00Z' },
-  { id: 'ss1-4', title: '해변의 추억', description: '여름날 해변에서의 소중한 기억', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-1', display_order: 4, is_featured: false, is_published: true, recorded_date: '2025-01-25', created_at: '2025-01-25T00:00:00Z', updated_at: '2025-01-25T00:00:00Z' },
+  { id: 'ss1-1', title: '파도의 노래', description: '바다를 사랑하는 마음을 담은 노래', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-1', display_order: 1, is_featured: true, is_published: true, recorded_date: '2025-01-10', created_at: '2025-01-10T00:00:00Z', updated_at: '2025-01-10T00:00:00Z' },
+  { id: 'ss1-2', title: '수평선 너머', description: '수평선 저편에 있을 그대를 그리며', youtube_id: 'dQw4w9WgXcQ', suno_url: 'https://suno.com/song/example-1', lyrics: null, series_id: 'ss-1', display_order: 2, is_featured: false, is_published: true, recorded_date: '2025-01-15', created_at: '2025-01-15T00:00:00Z', updated_at: '2025-01-15T00:00:00Z' },
+  { id: 'ss1-3', title: '갈매기의 꿈', description: '자유를 향해 날아가는 갈매기처럼', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-1', display_order: 3, is_featured: false, is_published: true, recorded_date: '2025-01-20', created_at: '2025-01-20T00:00:00Z', updated_at: '2025-01-20T00:00:00Z' },
+  { id: 'ss1-4', title: '해변의 추억', description: '여름날 해변에서의 소중한 기억', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-1', display_order: 4, is_featured: false, is_published: true, recorded_date: '2025-01-25', created_at: '2025-01-25T00:00:00Z', updated_at: '2025-01-25T00:00:00Z' },
   // 2집 - 바다 노래 2집 (4곡)
-  { id: 'ss2-1', title: '바다의 자장가', description: '잔잔한 파도가 불러주는 자장가', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-2', display_order: 1, is_featured: false, is_published: true, recorded_date: '2025-03-10', created_at: '2025-03-10T00:00:00Z', updated_at: '2025-03-10T00:00:00Z' },
-  { id: 'ss2-2', title: '모래성', description: '함께 쌓던 모래성처럼 아름다운 시간', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-2', display_order: 2, is_featured: false, is_published: true, recorded_date: '2025-03-15', created_at: '2025-03-15T00:00:00Z', updated_at: '2025-03-15T00:00:00Z' },
-  { id: 'ss2-3', title: '조개껍데기', description: '바다가 선물한 작은 보석', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-2', display_order: 3, is_featured: false, is_published: true, recorded_date: '2025-03-20', created_at: '2025-03-20T00:00:00Z', updated_at: '2025-03-20T00:00:00Z' },
-  { id: 'ss2-4', title: '밀물과 썰물', description: '왔다 가는 것이 사랑이라면', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-2', display_order: 4, is_featured: false, is_published: true, recorded_date: '2025-03-25', created_at: '2025-03-25T00:00:00Z', updated_at: '2025-03-25T00:00:00Z' },
+  { id: 'ss2-1', title: '바다의 자장가', description: '잔잔한 파도가 불러주는 자장가', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-2', display_order: 1, is_featured: false, is_published: true, recorded_date: '2025-03-10', created_at: '2025-03-10T00:00:00Z', updated_at: '2025-03-10T00:00:00Z' },
+  { id: 'ss2-2', title: '모래성', description: '함께 쌓던 모래성처럼 아름다운 시간', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-2', display_order: 2, is_featured: false, is_published: true, recorded_date: '2025-03-15', created_at: '2025-03-15T00:00:00Z', updated_at: '2025-03-15T00:00:00Z' },
+  { id: 'ss2-3', title: '조개껍데기', description: '바다가 선물한 작은 보석', youtube_id: '', suno_url: 'https://suno.com/song/example-2', lyrics: null, series_id: 'ss-2', display_order: 3, is_featured: false, is_published: true, recorded_date: '2025-03-20', created_at: '2025-03-20T00:00:00Z', updated_at: '2025-03-20T00:00:00Z' },
+  { id: 'ss2-4', title: '밀물과 썰물', description: '왔다 가는 것이 사랑이라면', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-2', display_order: 4, is_featured: false, is_published: true, recorded_date: '2025-03-25', created_at: '2025-03-25T00:00:00Z', updated_at: '2025-03-25T00:00:00Z' },
   // 3집 - 바다 노래 3집 (4곡)
-  { id: 'ss3-1', title: '등대지기', description: '외로운 등대지기의 마음을 노래합니다', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-3', display_order: 1, is_featured: false, is_published: true, recorded_date: '2025-05-10', created_at: '2025-05-10T00:00:00Z', updated_at: '2025-05-10T00:00:00Z' },
-  { id: 'ss3-2', title: '소금바람', description: '짠 바람에 실려오는 추억', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-3', display_order: 2, is_featured: false, is_published: true, recorded_date: '2025-05-15', created_at: '2025-05-15T00:00:00Z', updated_at: '2025-05-15T00:00:00Z' },
-  { id: 'ss3-3', title: '포구의 아침', description: '어촌 포구에서 맞이하는 새벽', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-3', display_order: 3, is_featured: false, is_published: true, recorded_date: '2025-05-20', created_at: '2025-05-20T00:00:00Z', updated_at: '2025-05-20T00:00:00Z' },
-  { id: 'ss3-4', title: '해녀의 노래', description: '바다와 함께 살아가는 해녀의 삶', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-3', display_order: 4, is_featured: false, is_published: true, recorded_date: '2025-05-25', created_at: '2025-05-25T00:00:00Z', updated_at: '2025-05-25T00:00:00Z' },
+  { id: 'ss3-1', title: '등대지기', description: '외로운 등대지기의 마음을 노래합니다', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-3', display_order: 1, is_featured: false, is_published: true, recorded_date: '2025-05-10', created_at: '2025-05-10T00:00:00Z', updated_at: '2025-05-10T00:00:00Z' },
+  { id: 'ss3-2', title: '소금바람', description: '짠 바람에 실려오는 추억', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-3', display_order: 2, is_featured: false, is_published: true, recorded_date: '2025-05-15', created_at: '2025-05-15T00:00:00Z', updated_at: '2025-05-15T00:00:00Z' },
+  { id: 'ss3-3', title: '포구의 아침', description: '어촌 포구에서 맞이하는 새벽', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-3', display_order: 3, is_featured: false, is_published: true, recorded_date: '2025-05-20', created_at: '2025-05-20T00:00:00Z', updated_at: '2025-05-20T00:00:00Z' },
+  { id: 'ss3-4', title: '해녀의 노래', description: '바다와 함께 살아가는 해녀의 삶', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-3', display_order: 4, is_featured: false, is_published: true, recorded_date: '2025-05-25', created_at: '2025-05-25T00:00:00Z', updated_at: '2025-05-25T00:00:00Z' },
   // 4집 - 바다 노래 4집 (4곡)
-  { id: 'ss4-1', title: '여름바다', description: '뜨거운 여름, 시원한 바다', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-4', display_order: 1, is_featured: false, is_published: true, recorded_date: '2025-07-10', created_at: '2025-07-10T00:00:00Z', updated_at: '2025-07-10T00:00:00Z' },
-  { id: 'ss4-2', title: '섬으로 가는 길', description: '작은 섬으로 떠나는 여행', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-4', display_order: 2, is_featured: false, is_published: true, recorded_date: '2025-07-15', created_at: '2025-07-15T00:00:00Z', updated_at: '2025-07-15T00:00:00Z' },
-  { id: 'ss4-3', title: '파도소리 명상', description: '파도 소리와 함께하는 고요한 시간', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-4', display_order: 3, is_featured: false, is_published: true, recorded_date: '2025-07-20', created_at: '2025-07-20T00:00:00Z', updated_at: '2025-07-20T00:00:00Z' },
-  { id: 'ss4-4', title: '겨울바다', description: '차갑지만 따뜻한 겨울 바다의 풍경', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-4', display_order: 4, is_featured: false, is_published: true, recorded_date: '2025-07-25', created_at: '2025-07-25T00:00:00Z', updated_at: '2025-07-25T00:00:00Z' },
+  { id: 'ss4-1', title: '여름바다', description: '뜨거운 여름, 시원한 바다', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-4', display_order: 1, is_featured: false, is_published: true, recorded_date: '2025-07-10', created_at: '2025-07-10T00:00:00Z', updated_at: '2025-07-10T00:00:00Z' },
+  { id: 'ss4-2', title: '섬으로 가는 길', description: '작은 섬으로 떠나는 여행', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-4', display_order: 2, is_featured: false, is_published: true, recorded_date: '2025-07-15', created_at: '2025-07-15T00:00:00Z', updated_at: '2025-07-15T00:00:00Z' },
+  { id: 'ss4-3', title: '파도소리 명상', description: '파도 소리와 함께하는 고요한 시간', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-4', display_order: 3, is_featured: false, is_published: true, recorded_date: '2025-07-20', created_at: '2025-07-20T00:00:00Z', updated_at: '2025-07-20T00:00:00Z' },
+  { id: 'ss4-4', title: '겨울바다', description: '차갑지만 따뜻한 겨울 바다의 풍경', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-4', display_order: 4, is_featured: false, is_published: true, recorded_date: '2025-07-25', created_at: '2025-07-25T00:00:00Z', updated_at: '2025-07-25T00:00:00Z' },
   // 5집 - 바다 노래 5집 (4곡)
-  { id: 'ss5-1', title: '별빛 바다', description: '별빛이 내려앉는 밤바다', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-5', display_order: 1, is_featured: false, is_published: true, recorded_date: '2025-09-10', created_at: '2025-09-10T00:00:00Z', updated_at: '2025-09-10T00:00:00Z' },
-  { id: 'ss5-2', title: '돌고래의 춤', description: '자유롭게 뛰노는 돌고래처럼', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-5', display_order: 2, is_featured: false, is_published: true, recorded_date: '2025-09-15', created_at: '2025-09-15T00:00:00Z', updated_at: '2025-09-15T00:00:00Z' },
-  { id: 'ss5-3', title: '해질녘 산책', description: '노을이 물드는 해변을 걸으며', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-5', display_order: 3, is_featured: false, is_published: true, recorded_date: '2025-09-20', created_at: '2025-09-20T00:00:00Z', updated_at: '2025-09-20T00:00:00Z' },
-  { id: 'ss5-4', title: '바다의 약속', description: '다시 만날 그날을 기약하며', youtube_id: 'dQw4w9WgXcQ', lyrics: null, series_id: 'ss-5', display_order: 4, is_featured: false, is_published: true, recorded_date: '2025-09-25', created_at: '2025-09-25T00:00:00Z', updated_at: '2025-09-25T00:00:00Z' },
+  { id: 'ss5-1', title: '별빛 바다', description: '별빛이 내려앉는 밤바다', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-5', display_order: 1, is_featured: false, is_published: true, recorded_date: '2025-09-10', created_at: '2025-09-10T00:00:00Z', updated_at: '2025-09-10T00:00:00Z' },
+  { id: 'ss5-2', title: '돌고래의 춤', description: '자유롭게 뛰노는 돌고래처럼', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-5', display_order: 2, is_featured: false, is_published: true, recorded_date: '2025-09-15', created_at: '2025-09-15T00:00:00Z', updated_at: '2025-09-15T00:00:00Z' },
+  { id: 'ss5-3', title: '해질녘 산책', description: '노을이 물드는 해변을 걸으며', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-5', display_order: 3, is_featured: false, is_published: true, recorded_date: '2025-09-20', created_at: '2025-09-20T00:00:00Z', updated_at: '2025-09-20T00:00:00Z' },
+  { id: 'ss5-4', title: '바다의 약속', description: '다시 만날 그날을 기약하며', youtube_id: 'dQw4w9WgXcQ', suno_url: null, lyrics: null, series_id: 'ss-5', display_order: 4, is_featured: false, is_published: true, recorded_date: '2025-09-25', created_at: '2025-09-25T00:00:00Z', updated_at: '2025-09-25T00:00:00Z' },
 ];
 
 /** 샘플 카테고리 데이터 */
@@ -131,4 +132,13 @@ export const SAMPLE_CATEGORIES = [
   { id: 'cat-4', name: '인생', slug: '인생', description: null, display_order: 4, created_at: '' },
   { id: 'cat-5', name: '그리움', slug: '그리움', description: null, display_order: 5, created_at: '' },
   { id: 'cat-6', name: '기타', slug: '기타', description: null, display_order: 6, created_at: '' },
+];
+
+/** 샘플 감상 후기 데이터 */
+export const SAMPLE_REVIEWS: Review[] = [
+  { id: 'rev-1', author_name: '바다사랑', content: '\"파도에게\"를 읽고 눈물이 났습니다. 바다 앞에서 읽으면 더 깊게 와닿을 것 같아요. 시인의 마음이 파도처럼 밀려옵니다.', user_id: null, is_published: true, created_at: '2025-12-01T10:30:00Z', updated_at: '2025-12-01T10:30:00Z' },
+  { id: 'rev-2', author_name: '해변산책', content: '노래를 들으며 시를 읽으니 마치 바닷가에 서 있는 듯한 기분이에요. 시와 노래가 어우러지는 아름다운 공간이네요.', user_id: null, is_published: true, created_at: '2025-12-05T14:20:00Z', updated_at: '2025-12-05T14:20:00Z' },
+  { id: 'rev-3', author_name: '시를읽는사람', content: '등대 시가 정말 좋았습니다. 누군가에게 등대가 되고 싶다는 구절이 오래 마음에 남습니다. 응원합니다!', user_id: null, is_published: true, created_at: '2025-12-10T09:15:00Z', updated_at: '2025-12-10T09:15:00Z' },
+  { id: 'rev-4', author_name: '파도소리', content: 'Suno로 만든 노래가 정말 인상적이에요. AI와 시인의 감성이 만나니 새로운 예술이 탄생하는 것 같습니다.', user_id: null, is_published: true, created_at: '2026-01-15T16:45:00Z', updated_at: '2026-01-15T16:45:00Z' },
+  { id: 'rev-5', author_name: '수평선', content: '\"그리운 계절\"을 읽으며 가을 바다가 그리워졌습니다. 시의 한 줄 한 줄이 그림 같아요.', user_id: null, is_published: true, created_at: '2026-02-01T11:00:00Z', updated_at: '2026-02-01T11:00:00Z' },
 ];

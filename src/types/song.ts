@@ -3,6 +3,7 @@ export interface Song {
   title: string;
   description: string | null;
   youtube_id: string;
+  suno_url: string | null;
   lyrics: string | null;
   series_id: string | null;
   display_order: number;
@@ -15,7 +16,8 @@ export interface Song {
 
 export interface SongInsert {
   title: string;
-  youtube_id: string;
+  youtube_id?: string;
+  suno_url?: string | null;
   description?: string | null;
   lyrics?: string | null;
   series_id?: string | null;

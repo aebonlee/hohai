@@ -34,7 +34,7 @@ export default function SongsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: i * 0.1 }}
                 >
-                  <Link to={`/songs/series/${s.slug}`} className={styles.seriesCard}>
+                  <Link to={`/albums/${s.slug}`} className={styles.seriesCard}>
                     <div
                       className={styles.seriesCardBg}
                       style={{ background: CARD_GRADIENTS[(i + 3) % CARD_GRADIENTS.length] }}

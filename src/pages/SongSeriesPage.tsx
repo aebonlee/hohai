@@ -32,7 +32,7 @@ export default function SongSeriesPage() {
 
       <div className={styles.page}>
         <div className="container">
-          <Link to="/songs" className={styles.backLink}>← 앨범 목록</Link>
+          <Link to="/albums" className={styles.backLink}>← 앨범 목록</Link>
 
           <div className={styles.header}>
             <h1 className="section-title" style={{ display: 'inline-block' }}>
