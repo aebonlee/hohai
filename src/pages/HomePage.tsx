@@ -6,6 +6,7 @@ import PageTransition from '../components/layout/PageTransition';
 import PoemCard from '../components/ui/PoemCard';
 import YouTubeEmbed from '../components/ui/YouTubeEmbed';
 import SunoEmbed from '../components/ui/SunoEmbed';
+import HeroEffects from '../components/ui/HeroEffects';
 import { useFeaturedPoems } from '../hooks/usePoems';
 import { useFeaturedSong } from '../hooks/useSongs';
 import { SITE } from '../lib/constants';
@@ -45,7 +46,7 @@ export default function HomePage() {
 
       {/* 히어로 캐러셀 */}
       <section className={styles.hero}>
-        {/* 슬라이드 배경들 */}
+        {/* 슬라이드 1: 빨간 등대 (밤바다 사진) */}
         <div className={`${styles.slide} ${styles.slideLighthouse1} ${active === 0 ? styles.slideActive : ''}`}>
           <div className={styles.lighthouseImg1} />
           <div className={styles.lighthouseBeam} />
@@ -53,37 +54,54 @@ export default function HomePage() {
           <div className={styles.lighthouseOverlay} />
         </div>
 
+        {/* 슬라이드 2: 석양 / 노을 바다 */}
         <div className={`${styles.slide} ${styles.slideSunset} ${active === 1 ? styles.slideActive : ''}`}>
           <div className={styles.sunsetBg} />
+          <div className={styles.sunsetHaze} />
           <div className={styles.sunsetSun} />
+          <div className={styles.sunsetReflection} />
           <div className={styles.sunsetWaves} />
+          <div className={styles.sunsetOverlay} />
         </div>
 
+        {/* 슬라이드 3: 숲 (전나무 실루엣 + 안개 + 반딧불) */}
         <div className={`${styles.slide} ${styles.slideForest} ${active === 2 ? styles.slideActive : ''}`}>
           <div className={styles.forestBg} />
+          <div className={styles.forestLightRays} />
           <div className={styles.forestTrees} />
-          <div className={styles.forestMist} />
-          <div className={styles.forestParticles} />
+          <div className={styles.forestMistLayer} />
+          <div className={styles.forestOverlay} />
         </div>
 
+        {/* 슬라이드 4: 비 오는 도시 (사이버틱 + 번개) */}
         <div className={`${styles.slide} ${styles.slideCity} ${active === 3 ? styles.slideActive : ''}`}>
           <div className={styles.cityBg} />
+          <div className={styles.cityNeonHaze} />
           <div className={styles.citySkyline} />
-          <div className={styles.cityRain} />
+          <div className={styles.cityReflection} />
+          <div className={styles.cityRainCSS} />
+          <div className={styles.cityOverlay} />
         </div>
 
+        {/* 슬라이드 5: 밤바다 (별 + 오로라 + 발광 플랑크톤) */}
         <div className={`${styles.slide} ${styles.slideNightSea} ${active === 4 ? styles.slideActive : ''}`}>
           <div className={styles.nightSeaBg} />
+          <div className={styles.nightSeaStars} />
           <div className={styles.nightSeaMoon} />
           <div className={styles.nightSeaWaves} />
+          <div className={styles.nightSeaOverlay} />
         </div>
 
+        {/* 슬라이드 6: 빨간 등대 2 (블루아워 사진) */}
         <div className={`${styles.slide} ${styles.slideLighthouse2} ${active === 5 ? styles.slideActive : ''}`}>
           <div className={styles.lighthouseImg2} />
           <div className={styles.lighthouseBeam2} />
           <div className={styles.lighthouseGlow2} />
           <div className={styles.lighthouseOverlay} />
         </div>
+
+        {/* Canvas 기반 JavaScript 인터랙티브 효과 레이어 */}
+        <HeroEffects activeSlide={active} isActive={true} />
 
         {/* 콘텐츠 */}
         <motion.div
