@@ -11,7 +11,6 @@ interface Props {
 
 // ---- helpers ----
 const rand = (a: number, b: number) => Math.random() * (b - a) + a;
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 // ---- 1. Lighthouse — water shimmer + floating light motes ----
 function drawLighthouse(
