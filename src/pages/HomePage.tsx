@@ -49,9 +49,6 @@ export default function HomePage() {
         {/* 슬라이드 1: 빨간 등대 (밤바다 사진) */}
         <div className={`${styles.slide} ${styles.slideLighthouse1} ${active === 0 ? styles.slideActive : ''}`}>
           <div className={styles.lighthouseImg1} />
-          <div className={styles.lighthouseBeam} />
-          <div className={styles.lighthouseGlow} />
-          <div className={styles.lighthouseOverlay} />
         </div>
 
         {/* 슬라이드 2: 석양 / 노을 바다 (사진 배경) */}
@@ -93,7 +90,6 @@ export default function HomePage() {
         {/* 슬라이드 6: 빨간 등대 2 (블루아워 사진) */}
         <div className={`${styles.slide} ${styles.slideLighthouse2} ${active === 5 ? styles.slideActive : ''}`}>
           <div className={styles.lighthouseImg2} />
-          <div className={styles.lighthouseOverlay} />
         </div>
 
         {/* Canvas 기반 JavaScript 인터랙티브 효과 레이어 */}
