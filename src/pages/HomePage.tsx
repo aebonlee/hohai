@@ -46,12 +46,11 @@ export default function HomePage() {
       {/* 히어로 캐러셀 */}
       <section className={styles.hero}>
         {/* 슬라이드 배경들 */}
-        <div className={`${styles.slide} ${styles.slideOcean} ${active === 0 ? styles.slideActive : ''}`}>
-          <div className={styles.oceanBg} />
-          <div className={styles.oceanClouds} />
-          <div className={styles.oceanScenery} />
-          <div className={styles.oceanWaveMid} />
-          <div className={styles.oceanBottom} />
+        <div className={`${styles.slide} ${styles.slideLighthouse1} ${active === 0 ? styles.slideActive : ''}`}>
+          <div className={styles.lighthouseImg1} />
+          <div className={styles.lighthouseBeam} />
+          <div className={styles.lighthouseGlow} />
+          <div className={styles.lighthouseOverlay} />
         </div>
 
         <div className={`${styles.slide} ${styles.slideSunset} ${active === 1 ? styles.slideActive : ''}`}>
@@ -79,10 +78,11 @@ export default function HomePage() {
           <div className={styles.nightSeaWaves} />
         </div>
 
-        <div className={`${styles.slide} ${styles.slideSunset2} ${active === 5 ? styles.slideActive : ''}`}>
-          <div className={styles.sunset2Bg} />
-          <div className={styles.sunset2Sun} />
-          <div className={styles.sunset2Waves} />
+        <div className={`${styles.slide} ${styles.slideLighthouse2} ${active === 5 ? styles.slideActive : ''}`}>
+          <div className={styles.lighthouseImg2} />
+          <div className={styles.lighthouseBeam2} />
+          <div className={styles.lighthouseGlow2} />
+          <div className={styles.lighthouseOverlay} />
         </div>
 
         {/* 콘텐츠 */}

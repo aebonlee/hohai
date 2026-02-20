@@ -29,58 +29,91 @@
 }
 
 /* ========================================
-   슬라이드 1: 바다 / 파도
+   슬라이드 1: 빨간 등대 — 밤바다 사진 배경
    ======================================== */
-.slideOcean .oceanBg {
+.slideLighthouse1 .lighthouseImg1 {
+  position: absolute;
+  inset: 0;
+  background: url('/images/hero-lighthouse-1.png') no-repeat center center;
+  background-size: cover;
+  animation: slowZoom 20s ease-in-out infinite alternate;
+}
+
+.slideLighthouse1 .lighthouseBeam {
+  position: absolute;
+  top: 15%;
+  right: 30%;
+  width: 500px;
+  height: 500px;
+  background: conic-gradient(
+    from 200deg,
+    transparent 0deg,
+    rgba(255, 240, 180, 0.06) 8deg,
+    rgba(255, 240, 180, 0.12) 15deg,
+    rgba(255, 240, 180, 0.06) 22deg,
+    transparent 30deg
+  );
+  transform-origin: 50% 50%;
+  animation: beamRotate 8s ease-in-out infinite alternate;
+  filter: blur(6px);
+  mix-blend-mode: screen;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.slideLighthouse1 .lighthouseGlow {
+  position: absolute;
+  top: 22%;
+  right: 34%;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 250, 210, 0.9) 0%, rgba(255, 220, 120, 0.5) 30%, rgba(255, 200, 80, 0.15) 60%, transparent 80%);
+  box-shadow:
+    0 0 20px 10px rgba(255, 240, 180, 0.3),
+    0 0 60px 30px rgba(255, 220, 120, 0.15),
+    0 0 120px 60px rgba(255, 200, 80, 0.06);
+  animation: glowPulse 3s ease-in-out infinite;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.slideLighthouse1 .lighthouseOverlay,
+.slideLighthouse2 .lighthouseOverlay {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 120% 60% at 50% -10%, rgba(10, 40, 80, 0.3), transparent 70%),
-    radial-gradient(ellipse 80% 60% at 10% 100%, rgba(10, 50, 100, 0.3), transparent 60%),
-    linear-gradient(180deg, #c8ddf0 0%, #a3c4e0 30%, #5a96bf 60%, #1a4a7a 85%, #0A2E5C 100%);
+    radial-gradient(ellipse 60% 80% at 50% 50%, transparent 30%, rgba(5, 10, 30, 0.35) 100%);
+  z-index: 4;
+  pointer-events: none;
 }
 
-.slideOcean .oceanClouds {
-  position: absolute;
-  top: 5%;
-  left: 0;
-  width: calc(100% + 1800px);
-  height: 40%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1800 350'%3E%3Cellipse cx='200' cy='60' rx='150' ry='40' fill='%23ffffff' fill-opacity='0.14'/%3E%3Cellipse cx='260' cy='50' rx='90' ry='30' fill='%23ffffff' fill-opacity='0.1'/%3E%3Cellipse cx='150' cy='55' rx='70' ry='26' fill='%23ffffff' fill-opacity='0.08'/%3E%3Cellipse cx='700' cy='100' rx='130' ry='36' fill='%23ffffff' fill-opacity='0.12'/%3E%3Cellipse cx='760' cy='90' rx='80' ry='28' fill='%23ffffff' fill-opacity='0.09'/%3E%3Cellipse cx='1200' cy='45' rx='120' ry='34' fill='%23ffffff' fill-opacity='0.13'/%3E%3Cellipse cx='1260' cy='38' rx='75' ry='26' fill='%23ffffff' fill-opacity='0.1'/%3E%3Cellipse cx='400' cy='170' rx='110' ry='32' fill='%23ffffff' fill-opacity='0.08'/%3E%3Cellipse cx='460' cy='165' rx='65' ry='22' fill='%23ffffff' fill-opacity='0.06'/%3E%3Cellipse cx='1000' cy='200' rx='100' ry='30' fill='%23ffffff' fill-opacity='0.07'/%3E%3Cellipse cx='1060' cy='195' rx='60' ry='20' fill='%23ffffff' fill-opacity='0.05'/%3E%3Cellipse cx='1500' cy='140' rx='90' ry='28' fill='%23ffffff' fill-opacity='0.09'/%3E%3Cellipse cx='550' cy='260' rx='80' ry='24' fill='%23ffffff' fill-opacity='0.05'/%3E%3Cellipse cx='1350' cy='280' rx='70' ry='22' fill='%23ffffff' fill-opacity='0.04'/%3E%3C/svg%3E") repeat-x;
-  background-size: 1800px 350px;
-  animation: clouds 60s linear infinite;
+@keyframes slowZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.06); }
 }
 
-.slideOcean .oceanScenery {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 400'%3E%3Cpath fill='%230A2E5C' fill-opacity='0.15' d='M0,320 C120,290 240,300 360,270 C480,250 560,265 680,245 C800,230 880,250 1000,235 C1120,225 1200,240 1320,220 C1440,215 1520,225 1600,222 L1600,400 L0,400 Z'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.1' d='M0,340 C180,320 300,330 480,310 C660,295 780,315 960,295 C1100,282 1260,305 1440,285 C1520,278 1580,290 1600,285 L1600,400 L0,400 Z'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.18' d='M1250,400 L1262,155 C1264,148 1272,143 1280,143 L1300,143 C1308,143 1316,148 1318,155 L1330,400 Z'/%3E%3Crect x='1248' y='135' width='84' height='14' rx='4' fill='%230A2E5C' fill-opacity='0.18'/%3E%3Crect x='1258' y='100' width='64' height='38' rx='5' fill='%230A2E5C' fill-opacity='0.16'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.18' d='M1290,72 L1250,100 L1330,100 Z'/%3E%3Ccircle cx='1290' cy='119' r='12' fill='%23E8B060' fill-opacity='0.5'/%3E%3Ccircle cx='1290' cy='119' r='28' fill='%23E8B060' fill-opacity='0.1'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.2' stroke-width='2' stroke-linecap='round' d='M420,150 Q428,140 436,147 Q444,140 452,150'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.15' stroke-width='1.5' stroke-linecap='round' d='M480,125 Q486,118 492,123 Q498,118 504,125'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.12' stroke-width='1.8' stroke-linecap='round' d='M870,115 Q878,106 886,113 Q894,106 902,115'/%3E%3C/svg%3E") no-repeat center bottom / cover;
+@keyframes beamRotate {
+  0% { transform: rotate(-8deg); opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { transform: rotate(8deg); opacity: 0.7; }
 }
 
-.slideOcean .oceanWaveMid {
-  position: absolute;
-  bottom: 2%;
-  left: 0;
-  width: 6400px;
-  height: 140px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 140'%3E%3Cpath fill='%23145B8A' fill-opacity='0.35' d='M0,70 C160,100 360,40 560,70 C760,100 960,40 1160,70 C1360,100 1500,80 1600,70 L1600,140 L0,140 Z'/%3E%3C/svg%3E") repeat-x;
-  background-size: 1600px 140px;
-  animation: wave 9s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite,
-             swell 6s ease -0.5s infinite;
-  z-index: 2;
-}
-
-.slideOcean .oceanBottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 8%;
-  background: linear-gradient(180deg, rgba(10, 46, 92, 0.6), #0A2E5C);
-  z-index: 3;
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 20px 10px rgba(255, 240, 180, 0.3),
+      0 0 60px 30px rgba(255, 220, 120, 0.15),
+      0 0 120px 60px rgba(255, 200, 80, 0.06);
+    opacity: 0.9;
+  }
+  50% {
+    box-shadow:
+      0 0 30px 15px rgba(255, 240, 180, 0.5),
+      0 0 80px 40px rgba(255, 220, 120, 0.25),
+      0 0 160px 80px rgba(255, 200, 80, 0.1);
+    opacity: 1;
+  }
 }
 
 /* ========================================
@@ -357,94 +390,59 @@
 }
 
 /* ========================================
-   슬라이드 6: 석양 바다 2 (슬라이드 2 변형)
+   슬라이드 6: 빨간 등대 2 — 블루아워 사진 배경
    ======================================== */
-.slideSunset2 .sunset2Bg {
+.slideLighthouse2 .lighthouseImg2 {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    #1a1040 0%,
-    #3a1855 10%,
-    #7a2060 22%,
-    #c44a35 36%,
-    #e88030 48%,
-    #f0a840 56%,
-    #f5c860 62%,
-    #e8a040 68%,
-    #c06030 74%,
-    #803828 82%,
-    #402018 92%,
-    #1a0c08 100%
+  background: url('/images/hero-lighthouse-2.png') no-repeat center center;
+  background-size: cover;
+  animation: slowZoom 22s ease-in-out infinite alternate-reverse;
+}
+
+.slideLighthouse2 .lighthouseBeam2 {
+  position: absolute;
+  top: 10%;
+  left: 42%;
+  width: 600px;
+  height: 600px;
+  background: conic-gradient(
+    from 160deg,
+    transparent 0deg,
+    rgba(255, 230, 160, 0.05) 5deg,
+    rgba(255, 230, 160, 0.1) 12deg,
+    rgba(255, 230, 160, 0.05) 19deg,
+    transparent 25deg
   );
-}
-
-.slideSunset2 .sunset2Sun {
-  position: absolute;
-  bottom: 35%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff5cc 0%, #ffcc44 30%, #ff8800 60%, transparent 72%);
-  box-shadow:
-    0 0 60px 30px rgba(255, 180, 50, 0.4),
-    0 0 120px 60px rgba(255, 120, 20, 0.2);
-  animation: sunPulse 4s ease-in-out infinite;
-}
-
-.slideSunset2 .sunset2Sun::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 8px;
-  height: 200px;
-  background: linear-gradient(180deg,
-    rgba(255, 200, 80, 0.4) 0%,
-    rgba(255, 160, 50, 0.2) 30%,
-    rgba(255, 120, 30, 0.1) 60%,
-    transparent 100%
-  );
-  filter: blur(10px);
-  animation: sunReflect 3s ease-in-out infinite alternate;
-}
-
-.slideSunset2 .sunset2Waves {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 30%;
+  transform-origin: 50% 50%;
+  animation: beamRotate2 10s ease-in-out infinite alternate;
+  filter: blur(8px);
+  mix-blend-mode: screen;
   z-index: 2;
+  pointer-events: none;
 }
 
-.slideSunset2 .sunset2Waves::before {
-  content: '';
+.slideLighthouse2 .lighthouseGlow2 {
   position: absolute;
-  bottom: 8%;
-  left: 0;
-  width: 6400px;
-  height: 120px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 120'%3E%3Cpath fill='%23401810' fill-opacity='0.5' d='M0,60 C200,90 400,30 600,60 C800,90 1000,30 1200,60 C1400,90 1500,70 1600,60 L1600,120 L0,120 Z'/%3E%3C/svg%3E") repeat-x;
-  background-size: 1600px 120px;
-  animation: wave 10s cubic-bezier(0.36,0.45,0.63,0.53) infinite,
-             swell 7s ease infinite;
+  top: 18%;
+  left: 48%;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 250, 220, 0.85) 0%, rgba(255, 200, 100, 0.4) 30%, rgba(255, 180, 60, 0.1) 60%, transparent 80%);
+  box-shadow:
+    0 0 18px 8px rgba(255, 240, 180, 0.25),
+    0 0 50px 25px rgba(255, 220, 120, 0.12),
+    0 0 100px 50px rgba(255, 200, 80, 0.05);
+  animation: glowPulse 4s ease-in-out infinite;
+  z-index: 3;
+  pointer-events: none;
 }
 
-.slideSunset2 .sunset2Waves::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 6400px;
-  height: 100px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 100'%3E%3Cpath fill='%23200a06' fill-opacity='0.8' d='M0,50 C180,75 380,25 560,50 C740,75 940,25 1120,50 C1300,75 1480,55 1600,50 L1600,100 L0,100 Z'/%3E%3C/svg%3E") repeat-x;
-  background-size: 1600px 100px;
-  animation: wave 7s cubic-bezier(0.36,0.45,0.63,0.53) -0.5s infinite,
-             swell 5s ease -1s infinite;
+@keyframes beamRotate2 {
+  0% { transform: rotate(-5deg); opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { transform: rotate(10deg); opacity: 0.6; }
 }
 
 /* ========================================
