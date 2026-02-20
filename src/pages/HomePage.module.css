@@ -156,11 +156,11 @@
 .slideForest .forestTrees {
   position: absolute;
   bottom: 0;
-  left: 0;
-  right: 0;
+  left: -5%;
+  right: -5%;
   height: 70%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 500'%3E%3C!-- 뒤쪽 나무 --%3E%3Cpath fill='%23163d1a' fill-opacity='0.6' d='M0,200 L60,80 L120,200 L100,200 L140,120 L180,200 L160,200 L220,60 L280,200 L260,200 L320,100 L380,200 L360,200 L420,70 L480,200 L460,200 L520,110 L580,200 L560,200 L620,50 L680,200 L660,200 L720,90 L780,200 L760,200 L820,65 L880,200 L860,200 L920,105 L980,200 L960,200 L1020,55 L1080,200 L1060,200 L1120,85 L1180,200 L1160,200 L1220,70 L1280,200 L1260,200 L1320,100 L1380,200 L1360,200 L1420,80 L1440,120 L1440,500 L0,500 Z'/%3E%3C!-- 중간 나무 --%3E%3Cpath fill='%230e2a10' fill-opacity='0.8' d='M0,300 L80,160 L160,300 L140,300 L200,180 L260,300 L240,300 L340,140 L440,300 L420,300 L500,190 L580,300 L560,300 L660,150 L760,300 L740,300 L820,175 L900,300 L880,300 L960,155 L1040,300 L1020,300 L1100,170 L1180,300 L1160,300 L1260,145 L1360,300 L1340,300 L1420,180 L1440,220 L1440,500 L0,500 Z'/%3E%3C!-- 앞쪽 나무 --%3E%3Cpath fill='%23071808' d='M0,380 L50,280 L100,380 L90,380 L150,260 L210,380 L200,380 L280,240 L360,380 L350,380 L420,270 L490,380 L480,380 L560,250 L640,380 L630,380 L710,265 L790,380 L780,380 L860,245 L940,380 L930,380 L1010,260 L1090,380 L1080,380 L1160,250 L1240,380 L1230,380 L1310,270 L1390,380 L1380,380 L1440,300 L1440,500 L0,500 Z'/%3E%3C!-- 나무 줄기 --%3E%3Crect x='65' y='310' width='10' height='120' rx='2' fill='%23302010' fill-opacity='0.4'/%3E%3Crect x='335' y='280' width='12' height='150' rx='2' fill='%23302010' fill-opacity='0.4'/%3E%3Crect x='655' y='290' width='11' height='140' rx='2' fill='%23302010' fill-opacity='0.4'/%3E%3Crect x='1025' y='285' width='12' height='145' rx='2' fill='%23302010' fill-opacity='0.4'/%3E%3Crect x='1345' y='300' width='10' height='130' rx='2' fill='%23302010' fill-opacity='0.4'/%3E%3C/svg%3E") no-repeat center bottom;
-  background-size: 100% 100%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 500' preserveAspectRatio='none'%3E%3Cpath fill='%23163d1a' fill-opacity='0.6' d='M-20,200 L60,80 L120,200 L100,200 L140,120 L180,200 L160,200 L220,60 L280,200 L260,200 L320,100 L380,200 L360,200 L420,70 L480,200 L460,200 L520,110 L580,200 L560,200 L620,50 L680,200 L660,200 L720,90 L780,200 L760,200 L820,65 L880,200 L860,200 L920,105 L980,200 L960,200 L1020,55 L1080,200 L1060,200 L1120,85 L1180,200 L1160,200 L1220,70 L1280,200 L1260,200 L1320,100 L1380,200 L1360,200 L1420,80 L1500,120 L1560,70 L1620,200 L1620,500 L-20,500 Z'/%3E%3Cpath fill='%230e2a10' fill-opacity='0.8' d='M-20,300 L80,160 L160,300 L140,300 L200,180 L260,300 L240,300 L340,140 L440,300 L420,300 L500,190 L580,300 L560,300 L660,150 L760,300 L740,300 L820,175 L900,300 L880,300 L960,155 L1040,300 L1020,300 L1100,170 L1180,300 L1160,300 L1260,145 L1360,300 L1340,300 L1420,180 L1500,160 L1580,300 L1620,220 L1620,500 L-20,500 Z'/%3E%3Cpath fill='%23071808' d='M-20,380 L50,280 L100,380 L90,380 L150,260 L210,380 L200,380 L280,240 L360,380 L350,380 L420,270 L490,380 L480,380 L560,250 L640,380 L630,380 L710,265 L790,380 L780,380 L860,245 L940,380 L930,380 L1010,260 L1090,380 L1080,380 L1160,250 L1240,380 L1230,380 L1310,270 L1390,380 L1380,380 L1460,300 L1540,260 L1620,380 L1620,500 L-20,500 Z'/%3E%3Crect x='65' y='310' width='10' height='120' rx='2' fill='%23302010' fill-opacity='0.4'/%3E%3Crect x='335' y='280' width='12' height='150' rx='2' fill='%23302010' fill-opacity='0.4'/%3E%3Crect x='655' y='290' width='11' height='140' rx='2' fill='%23302010' fill-opacity='0.4'/%3E%3Crect x='1025' y='285' width='12' height='145' rx='2' fill='%23302010' fill-opacity='0.4'/%3E%3Crect x='1345' y='300' width='10' height='130' rx='2' fill='%23302010' fill-opacity='0.4'/%3E%3Crect x='1505' y='290' width='10' height='140' rx='2' fill='%23302010' fill-opacity='0.4'/%3E%3C/svg%3E") no-repeat center bottom;
+  background-size: 110% 100%;
 }
 
 .slideForest .forestMist {
@@ -178,6 +178,65 @@
     transparent 100%
   );
   animation: mistDrift 12s ease-in-out infinite alternate;
+}
+
+/* 숲 파티클 — 다양한 크기의 빛 입자가 떠다님 */
+.slideForest .forestParticles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.slideForest .forestParticles::before,
+.slideForest .forestParticles::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle 5px at 8% 25%, rgba(200, 240, 180, 0.5) 0%, transparent 100%),
+    radial-gradient(circle 3px at 15% 60%, rgba(220, 250, 200, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 7px at 22% 15%, rgba(180, 230, 160, 0.35) 0%, transparent 100%),
+    radial-gradient(circle 4px at 30% 45%, rgba(200, 240, 180, 0.45) 0%, transparent 100%),
+    radial-gradient(circle 6px at 38% 72%, rgba(220, 250, 200, 0.3) 0%, transparent 100%),
+    radial-gradient(circle 3px at 45% 30%, rgba(240, 255, 220, 0.5) 0%, transparent 100%),
+    radial-gradient(circle 8px at 52% 55%, rgba(180, 230, 160, 0.25) 0%, transparent 100%),
+    radial-gradient(circle 4px at 60% 20%, rgba(200, 240, 180, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 5px at 68% 65%, rgba(220, 250, 200, 0.35) 0%, transparent 100%),
+    radial-gradient(circle 3px at 75% 40%, rgba(240, 255, 220, 0.45) 0%, transparent 100%),
+    radial-gradient(circle 6px at 82% 18%, rgba(180, 230, 160, 0.3) 0%, transparent 100%),
+    radial-gradient(circle 4px at 90% 50%, rgba(200, 240, 180, 0.4) 0%, transparent 100%);
+  animation: particleFloat1 8s ease-in-out infinite alternate;
+}
+
+.slideForest .forestParticles::after {
+  background:
+    radial-gradient(circle 4px at 5% 40%, rgba(240, 255, 200, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 7px at 12% 70%, rgba(200, 240, 180, 0.3) 0%, transparent 100%),
+    radial-gradient(circle 3px at 20% 35%, rgba(220, 250, 200, 0.5) 0%, transparent 100%),
+    radial-gradient(circle 5px at 28% 58%, rgba(180, 230, 160, 0.35) 0%, transparent 100%),
+    radial-gradient(circle 8px at 35% 22%, rgba(200, 240, 180, 0.25) 0%, transparent 100%),
+    radial-gradient(circle 3px at 42% 48%, rgba(240, 255, 220, 0.45) 0%, transparent 100%),
+    radial-gradient(circle 6px at 50% 75%, rgba(180, 230, 160, 0.3) 0%, transparent 100%),
+    radial-gradient(circle 4px at 58% 32%, rgba(220, 250, 200, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 5px at 65% 52%, rgba(200, 240, 180, 0.35) 0%, transparent 100%),
+    radial-gradient(circle 7px at 72% 28%, rgba(240, 255, 220, 0.3) 0%, transparent 100%),
+    radial-gradient(circle 3px at 80% 62%, rgba(180, 230, 160, 0.45) 0%, transparent 100%),
+    radial-gradient(circle 5px at 88% 38%, rgba(200, 240, 180, 0.35) 0%, transparent 100%),
+    radial-gradient(circle 4px at 95% 55%, rgba(220, 250, 200, 0.4) 0%, transparent 100%);
+  animation: particleFloat2 10s ease-in-out infinite alternate;
+}
+
+@keyframes particleFloat1 {
+  0% { transform: translateY(0) translateX(0); opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-20px) translateX(12px); opacity: 0.5; }
+}
+
+@keyframes particleFloat2 {
+  0% { transform: translateY(0) translateX(0); opacity: 0.5; }
+  50% { opacity: 0.9; }
+  100% { transform: translateY(-15px) translateX(-10px); opacity: 0.4; }
 }
 
 @keyframes mistDrift {

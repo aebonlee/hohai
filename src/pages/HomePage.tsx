@@ -62,6 +62,7 @@ export default function HomePage() {
           <div className={styles.forestBg} />
           <div className={styles.forestTrees} />
           <div className={styles.forestMist} />
+          <div className={styles.forestParticles} />
         </div>
 
         <div className={`${styles.slide} ${styles.slideCity} ${active === 3 ? styles.slideActive : ''}`}>
