@@ -10,7 +10,7 @@ import type { SongInsert } from '../types/song';
 import type { SeriesInsert } from '../types/series';
 import styles from './AdminPage.module.css';
 
-type Tab = 'poems' | 'songs' | 'series';
+type Tab = 'poems' | 'poem-boards' | 'songs' | 'song-boards';
 
 export default function AdminPage() {
   const { signOut } = useAuth();
@@ -41,22 +41,29 @@ export default function AdminPage() {
               시 관리
             </button>
             <button
+              className={`${styles.tab} ${activeTab === 'poem-boards' ? styles.active : ''}`}
+              onClick={() => setActiveTab('poem-boards')}
+            >
+              시집 관리
+            </button>
+            <button
               className={`${styles.tab} ${activeTab === 'songs' ? styles.active : ''}`}
               onClick={() => setActiveTab('songs')}
             >
               노래 관리
             </button>
             <button
-              className={`${styles.tab} ${activeTab === 'series' ? styles.active : ''}`}
-              onClick={() => setActiveTab('series')}
+              className={`${styles.tab} ${activeTab === 'song-boards' ? styles.active : ''}`}
+              onClick={() => setActiveTab('song-boards')}
             >
-              시리즈 관리
+              앨범 관리
             </button>
           </div>
 
           {activeTab === 'poems' && <PoemsAdmin />}
+          {activeTab === 'poem-boards' && <BoardSeriesAdmin seriesType="poem" typeLabel="시집" itemLabel="시" />}
           {activeTab === 'songs' && <SongsAdmin />}
-          {activeTab === 'series' && <SeriesAdmin />}
+          {activeTab === 'song-boards' && <BoardSeriesAdmin seriesType="song" typeLabel="앨범" itemLabel="노래" />}
         </div>
       </div>
     </>
@@ -530,16 +537,21 @@ function SongsAdmin() {
 }
 
 /* ========================================
-   시리즈 관리 컴포넌트
+   게시판 카테고리(시집/앨범) 관리 컴포넌트
    ======================================== */
-function SeriesAdmin() {
+function BoardSeriesAdmin({ seriesType, typeLabel, itemLabel }: {
+  seriesType: 'poem' | 'song';
+  typeLabel: string;
+  itemLabel: string;
+}) {
   const { series, loading, createSeries, updateSeries, deleteSeries } = useAllSeries();
+  const filtered = series.filter(s => s.type === seriesType);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<SeriesInsert>({
     name: '',
     slug: '',
-    type: 'poem',
+    type: seriesType,
     description: '',
     display_order: 0,
     is_published: true,
@@ -547,7 +559,7 @@ function SeriesAdmin() {
 
   const resetForm = () => {
     setForm({
-      name: '', slug: '', type: 'poem', description: '', display_order: 0, is_published: true,
+      name: '', slug: '', type: seriesType, description: '', display_order: 0, is_published: true,
     });
     setEditingId(null);
   };
@@ -558,12 +570,12 @@ function SeriesAdmin() {
   };
 
   const openEdit = (id: string) => {
-    const item = series.find((s) => s.id === id);
+    const item = filtered.find((s) => s.id === id);
     if (!item) return;
     setForm({
       name: item.name,
       slug: item.slug,
-      type: item.type,
+      type: seriesType,
       description: item.description || '',
       display_order: item.display_order,
       is_published: item.is_published,
@@ -584,19 +596,16 @@ function SeriesAdmin() {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('정말 삭제하시겠습니까? 연결된 시/노래의 시리즈가 해제됩니다.')) {
+    if (window.confirm(`정말 삭제하시겠습니까? 연결된 ${itemLabel}의 ${typeLabel}가 해제됩니다.`)) {
       await deleteSeries(id);
     }
   };
 
-  const poemSeries = series.filter(s => s.type === 'poem');
-  const songSeries = series.filter(s => s.type === 'song');
-
   return (
     <>
       <div className={styles.header}>
-        <h2>시리즈 관리 (시집 {poemSeries.length}개 / 앨범 {songSeries.length}개)</h2>
-        <button className={styles.addBtn} onClick={openCreate}>+ 새 시리즈 추가</button>
+        <h2>{typeLabel} 목록 ({filtered.length}개)</h2>
+        <button className={styles.addBtn} onClick={openCreate}>+ 새 {typeLabel} 추가</button>
       </div>
 
       {loading ? (
@@ -606,7 +615,7 @@ function SeriesAdmin() {
           <thead>
             <tr>
               <th>이름</th>
-              <th>유형</th>
+              <th>설명</th>
               <th>슬러그</th>
               <th>상태</th>
               <th>순서</th>
@@ -614,10 +623,12 @@ function SeriesAdmin() {
             </tr>
           </thead>
           <tbody>
-            {series.map((item) => (
+            {filtered.map((item) => (
               <tr key={item.id}>
                 <td className={styles.titleCell}>{item.name}</td>
-                <td>{item.type === 'poem' ? '시집' : '앨범'}</td>
+                <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                  {item.description ? (item.description.length > 30 ? item.description.slice(0, 30) + '...' : item.description) : '-'}
+                </td>
                 <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{item.slug}</td>
                 <td>
                   <span className={`${styles.statusBadge} ${item.is_published ? styles.published : styles.draft}`}>
@@ -638,40 +649,27 @@ function SeriesAdmin() {
       {showModal && (
         <div className={styles.overlay} onClick={() => setShowModal(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>{editingId ? '시리즈 수정' : '새 시리즈 추가'}</h3>
+            <h3 className={styles.modalTitle}>{editingId ? `${typeLabel} 수정` : `새 ${typeLabel} 추가`}</h3>
             <form onSubmit={handleSubmit}>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>이름 *</label>
+                <label className={styles.formLabel}>{typeLabel} 이름 *</label>
                 <input
                   className={styles.formInput}
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   required
-                  placeholder="예: 파도의 시, 바다 노래 1집"
+                  placeholder={seriesType === 'poem' ? '예: 파도의 시, 바다의 노래' : '예: 바다 노래 1집'}
                 />
               </div>
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>슬러그 (URL) *</label>
-                  <input
-                    className={styles.formInput}
-                    value={form.slug}
-                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                    required
-                    placeholder="예: wave-poems"
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>유형 *</label>
-                  <select
-                    className={styles.formInput}
-                    value={form.type}
-                    onChange={(e) => setForm({ ...form, type: e.target.value as 'poem' | 'song' })}
-                  >
-                    <option value="poem">시집</option>
-                    <option value="song">앨범</option>
-                  </select>
-                </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>슬러그 (URL) *</label>
+                <input
+                  className={styles.formInput}
+                  value={form.slug}
+                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                  required
+                  placeholder="예: wave-poems (영문, 하이픈)"
+                />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>설명</label>
@@ -680,6 +678,7 @@ function SeriesAdmin() {
                   style={{ minHeight: 60 }}
                   value={form.description || ''}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  placeholder={`이 ${typeLabel}에 대한 간단한 설명`}
                 />
               </div>
               <div className={styles.formRow}>

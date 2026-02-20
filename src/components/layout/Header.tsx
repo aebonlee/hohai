@@ -4,10 +4,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import styles from './Header.module.css';
 
 const NAV_ITEMS = [
-  { to: '/', label: '홈', icon: '🏠' },
-  { to: '/poems', label: '시(詩)', icon: '📝' },
-  { to: '/songs', label: '노래', icon: '🎵' },
-  { to: '/about', label: '시인 소개', icon: '👤' },
+  { to: '/', label: '홈' },
+  { to: '/poems', label: '시(詩)' },
+  { to: '/songs', label: '노래' },
+  { to: '/about', label: '시인 소개' },
 ];
 
 export default function Header() {
@@ -67,7 +67,6 @@ export default function Header() {
                   `${styles.navLink} ${isActive ? styles.active : ''}`
                 }
               >
-                <span className={styles.navIcon}>{item.icon}</span>
                 {item.label}
                 {i < NAV_ITEMS.length - 1 && <span className={styles.navDivider} />}
               </NavLink>
@@ -132,7 +131,6 @@ export default function Header() {
             }
             onClick={() => setMenuOpen(false)}
           >
-            <span className={styles.mobileIcon}>{item.icon}</span>
             {item.label}
           </NavLink>
         ))}
@@ -140,12 +138,10 @@ export default function Header() {
           {isLoggedIn ? (
             <>
               <Link to="/mypage" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                <span className={styles.mobileIcon}>👤</span>
                 마이페이지
               </Link>
               {isAdmin && (
                 <Link to="/admin" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                  <span className={styles.mobileIcon}>⚙️</span>
                   관리자
                 </Link>
               )}
@@ -154,13 +150,11 @@ export default function Header() {
                 onClick={() => { handleSignOut(); setMenuOpen(false); }}
                 style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', font: 'inherit' }}
               >
-                <span className={styles.mobileIcon}>🚪</span>
                 로그아웃
               </button>
             </>
           ) : (
             <Link to="/login" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-              <span className={styles.mobileIcon}>🔑</span>
               로그인
             </Link>
           )}
