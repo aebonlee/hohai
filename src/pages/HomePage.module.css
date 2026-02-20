@@ -253,64 +253,70 @@
 }
 
 /* ==========================================================================
-   슬라이드 3: 숲 — 전나무 실루엣 3톤 레이어 + 안개 + 빛줄기
+   슬라이드 3: 숲 — 어두운 신비로운 숲 사진 배경 + 반딧불 + 빛줄기
    ========================================================================== */
 .slideForest .forestBg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #e8ede2 0%, #dde4d5 30%, #c8d4b8 60%, #b8c8a5 80%, #a0b890 100%);
+  background: url('/images/hero-forest.png') no-repeat center center;
+  background-size: cover;
+  animation: slowZoomForest 25s ease-in-out infinite alternate;
 }
 
-/* CSS 빛줄기 (캔버스 위에 부드러운 보조) */
+@keyframes slowZoomForest {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+/* CSS 빛줄기 (캔버스 위에 부드러운 보조 — 어두운 배경용) */
 .slideForest .forestLightRays {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(105deg, transparent 42%, rgba(255,255,220,0.06) 44%, rgba(255,255,220,0.1) 46%, rgba(255,255,220,0.06) 48%, transparent 50%),
-    linear-gradient(115deg, transparent 55%, rgba(255,255,210,0.05) 57%, rgba(255,255,210,0.08) 59%, rgba(255,255,210,0.05) 61%, transparent 63%),
-    linear-gradient(98deg,  transparent 25%, rgba(255,255,230,0.04) 27%, rgba(255,255,230,0.07) 29%, rgba(255,255,230,0.04) 31%, transparent 33%);
+    linear-gradient(100deg, transparent 38%, rgba(180,220,240,0.04) 41%, rgba(180,220,240,0.08) 44%, rgba(180,220,240,0.04) 47%, transparent 50%),
+    linear-gradient(110deg, transparent 48%, rgba(160,210,230,0.03) 50%, rgba(160,210,230,0.06) 52%, rgba(160,210,230,0.03) 54%, transparent 56%),
+    linear-gradient(95deg,  transparent 30%, rgba(180,220,240,0.03) 32%, rgba(180,220,240,0.05) 34%, rgba(180,220,240,0.03) 36%, transparent 38%);
   animation: lightRaysSway 12s ease-in-out infinite alternate;
   z-index: 1;
   pointer-events: none;
 }
 
 @keyframes lightRaysSway {
-  0% { transform: translateX(-10px) skewX(-1deg); opacity: 0.7; }
+  0% { transform: translateX(-10px) skewX(-1deg); opacity: 0.6; }
   100% { transform: translateX(10px) skewX(1deg); opacity: 1; }
 }
 
+/* 나무 SVG 레이어 제거 — 사진 배경 사용 */
 .slideForest .forestTrees {
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 800'%3E%3Cdefs%3E%3Cpath id='t' d='M0-270L15-235L7-230L27-195L15-190L40-155L26-150L54-115L38-110L68-75L50-70L82-35L63-30L70 0L-70 0L-63-30L-82-35L-50-70L-68-75L-38-110L-54-115L-26-150L-40-155L-15-190L-27-195L-7-230L-15-235Z'/%3E%3C/defs%3E%3Cg fill='%23A2B18A'%3E%3Cuse href='%23t' transform='translate(-35,535) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(40,525) scale(0.5)'/%3E%3Cuse href='%23t' transform='translate(110,540) scale(0.58)'/%3E%3Cuse href='%23t' transform='translate(180,530) scale(0.48)'/%3E%3Cuse href='%23t' transform='translate(250,538) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(320,525) scale(0.52)'/%3E%3Cuse href='%23t' transform='translate(390,540) scale(0.6)'/%3E%3Cuse href='%23t' transform='translate(460,528) scale(0.5)'/%3E%3Cuse href='%23t' transform='translate(530,535) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(600,525) scale(0.6)'/%3E%3Cuse href='%23t' transform='translate(670,540) scale(0.48)'/%3E%3Cuse href='%23t' transform='translate(740,530) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(810,538) scale(0.52)'/%3E%3Cuse href='%23t' transform='translate(880,525) scale(0.58)'/%3E%3Cuse href='%23t' transform='translate(950,540) scale(0.5)'/%3E%3Cuse href='%23t' transform='translate(1020,530) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(1090,538) scale(0.6)'/%3E%3Cuse href='%23t' transform='translate(1160,525) scale(0.5)'/%3E%3Cuse href='%23t' transform='translate(1230,540) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(1300,528) scale(0.58)'/%3E%3Cuse href='%23t' transform='translate(1370,535) scale(0.52)'/%3E%3Cuse href='%23t' transform='translate(1440,540) scale(0.6)'/%3E%3Cuse href='%23t' transform='translate(1510,525) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(1580,538) scale(0.5)'/%3E%3Cuse href='%23t' transform='translate(1640,530) scale(0.55)'/%3E%3C/g%3E%3Cg fill='%237D9466'%3E%3Cuse href='%23t' transform='translate(-10,600) scale(0.65)'/%3E%3Cuse href='%23t' transform='translate(70,590) scale(0.58)'/%3E%3Cuse href='%23t' transform='translate(150,605) scale(0.7)'/%3E%3Cuse href='%23t' transform='translate(240,595) scale(0.6)'/%3E%3Cuse href='%23t' transform='translate(310,600) scale(0.65)'/%3E%3Cuse href='%23t' transform='translate(400,590) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(470,605) scale(0.68)'/%3E%3Cuse href='%23t' transform='translate(550,592) scale(0.62)'/%3E%3Cuse href='%23t' transform='translate(630,600) scale(0.7)'/%3E%3Cuse href='%23t' transform='translate(720,595) scale(0.58)'/%3E%3Cuse href='%23t' transform='translate(800,605) scale(0.65)'/%3E%3Cuse href='%23t' transform='translate(890,590) scale(0.6)'/%3E%3Cuse href='%23t' transform='translate(960,600) scale(0.68)'/%3E%3Cuse href='%23t' transform='translate(1050,595) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(1130,605) scale(0.7)'/%3E%3Cuse href='%23t' transform='translate(1210,590) scale(0.62)'/%3E%3Cuse href='%23t' transform='translate(1290,600) scale(0.65)'/%3E%3Cuse href='%23t' transform='translate(1370,595) scale(0.58)'/%3E%3Cuse href='%23t' transform='translate(1460,605) scale(0.68)'/%3E%3Cuse href='%23t' transform='translate(1540,592) scale(0.6)'/%3E%3Cuse href='%23t' transform='translate(1620,600) scale(0.65)'/%3E%3C/g%3E%3Cg fill='%235A7A42'%3E%3Cuse href='%23t' transform='translate(20,680) scale(0.78)'/%3E%3Cuse href='%23t' transform='translate(120,670) scale(0.7)'/%3E%3Cuse href='%23t' transform='translate(210,685) scale(0.82)'/%3E%3Cuse href='%23t' transform='translate(310,675) scale(0.72)'/%3E%3Cuse href='%23t' transform='translate(400,680) scale(0.78)'/%3E%3Cuse href='%23t' transform='translate(500,670) scale(0.68)'/%3E%3Cuse href='%23t' transform='translate(590,685) scale(0.82)'/%3E%3Cuse href='%23t' transform='translate(690,672) scale(0.75)'/%3E%3Cuse href='%23t' transform='translate(780,680) scale(0.8)'/%3E%3Cuse href='%23t' transform='translate(870,675) scale(0.72)'/%3E%3Cuse href='%23t' transform='translate(960,685) scale(0.78)'/%3E%3Cuse href='%23t' transform='translate(1060,670) scale(0.7)'/%3E%3Cuse href='%23t' transform='translate(1150,680) scale(0.82)'/%3E%3Cuse href='%23t' transform='translate(1240,675) scale(0.68)'/%3E%3Cuse href='%23t' transform='translate(1330,685) scale(0.78)'/%3E%3Cuse href='%23t' transform='translate(1430,672) scale(0.75)'/%3E%3Cuse href='%23t' transform='translate(1520,680) scale(0.8)'/%3E%3Cuse href='%23t' transform='translate(1610,670) scale(0.72)'/%3E%3C/g%3E%3Crect y='760' width='1600' height='40' fill='%234A6A35'/%3E%3C/svg%3E") no-repeat center bottom / cover;
-  z-index: 2;
+  display: none;
 }
 
-/* CSS 안개 레이어 (canvas 보조) */
+/* CSS 안개 레이어 (어두운 숲 분위기) */
 .slideForest .forestMistLayer {
   position: absolute;
-  bottom: 15%;
+  bottom: 10%;
   left: -5%;
   right: -5%;
-  height: 35%;
+  height: 40%;
   background:
-    radial-gradient(ellipse 80% 40% at 20% 60%, rgba(220,230,210,0.15), transparent 70%),
-    radial-gradient(ellipse 70% 35% at 70% 50%, rgba(220,230,210,0.12), transparent 60%),
-    radial-gradient(ellipse 90% 30% at 50% 70%, rgba(230,235,220,0.1), transparent 65%);
-  animation: mistDrift 15s ease-in-out infinite alternate;
+    radial-gradient(ellipse 80% 40% at 20% 60%, rgba(60,100,80,0.12), transparent 70%),
+    radial-gradient(ellipse 70% 35% at 70% 50%, rgba(50,90,70,0.1), transparent 60%),
+    radial-gradient(ellipse 90% 30% at 50% 70%, rgba(70,110,90,0.08), transparent 65%);
+  animation: mistDrift 18s ease-in-out infinite alternate;
   z-index: 3;
   pointer-events: none;
 }
 
 @keyframes mistDrift {
-  0% { transform: translateX(-15px); opacity: 0.6; }
-  100% { transform: translateX(15px); opacity: 1; }
+  0% { transform: translateX(-20px); opacity: 0.5; }
+  100% { transform: translateX(20px); opacity: 1; }
 }
 
 .slideForest .forestOverlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 70% 70% at 50% 50%, transparent 30%, rgba(40, 50, 30, 0.15) 100%);
+  background:
+    radial-gradient(ellipse 50% 50% at 50% 35%, transparent 20%, rgba(10, 20, 15, 0.3) 100%);
   z-index: 4;
   pointer-events: none;
 }
