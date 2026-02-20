@@ -16,6 +16,7 @@ const SLIDES = [
   { quote: '숲이 들려주는 이야기\n나뭇잎 사이로\n바람이 시를 읊는다', author: '— 호해 이성헌' },
   { quote: '빗줄기 사이로\n도시의 불빛이 흐르고\n밤은 시가 된다', author: '— 호해 이성헌' },
   { quote: '달빛이 바다 위에\n은빛 길을 놓으면\n밤은 고요히 노래한다', author: '— 호해 이성헌' },
+  { quote: '수평선 너머로\n붉은 하늘이 물들면\n바다는 시가 된다', author: '— 호해 이성헌' },
 ];
 
 const SLIDE_INTERVAL = 6000;
@@ -75,6 +76,12 @@ export default function HomePage() {
           <div className={styles.nightSeaBg} />
           <div className={styles.nightSeaMoon} />
           <div className={styles.nightSeaWaves} />
+        </div>
+
+        <div className={`${styles.slide} ${styles.slideSunset2} ${active === 5 ? styles.slideActive : ''}`}>
+          <div className={styles.sunset2Bg} />
+          <div className={styles.sunset2Sun} />
+          <div className={styles.sunset2Waves} />
         </div>
 
         {/* 콘텐츠 */}

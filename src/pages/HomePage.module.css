@@ -189,66 +189,59 @@
 }
 
 /* ========================================
-   슬라이드 3: 숲 — 깊은 숲 속 분위기
+   슬라이드 3: 숲 — 레이어드 소나무 능선 실루엣
    ======================================== */
 
-/* 배경: 위에서 빛이 스며드는 캐노피 → 깊은 숲 바닥 */
+/* 배경: 안개 낀 새벽 하늘 그라데이션 */
 .slideForest .forestBg {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse 60% 40% at 50% 10%, rgba(120, 180, 80, 0.25), transparent 70%),
-    radial-gradient(ellipse 40% 30% at 30% 5%, rgba(160, 200, 100, 0.15), transparent 60%),
-    radial-gradient(ellipse 35% 25% at 72% 8%, rgba(140, 190, 90, 0.18), transparent 60%),
-    linear-gradient(180deg,
-      #1a3318 0%,
-      #1e3a1a 8%,
-      #22421e 18%,
-      #284a22 30%,
-      #2a4e24 45%,
-      #244620 60%,
-      #1c3818 75%,
-      #142a12 88%,
-      #0c1c0a 100%
-    );
+  background: linear-gradient(
+    180deg,
+    #b8ccc0 0%,
+    #9ab8a8 15%,
+    #7da898 30%,
+    #5a8a78 50%,
+    #3d6e58 70%,
+    #2a5442 85%,
+    #1a3c2e 100%
+  );
 }
 
-/* 빛줄기 (캐노피 사이로 내려오는 선라이트) */
+/* 숲 속 은은한 빛 — 위에서 내려오는 부드러운 광선 */
 .slideForest .forestBg::before {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(168deg, transparent 30%, rgba(180, 220, 120, 0.06) 32%, rgba(180, 220, 120, 0.03) 36%, transparent 38%),
-    linear-gradient(162deg, transparent 18%, rgba(200, 230, 140, 0.05) 20%, rgba(200, 230, 140, 0.02) 25%, transparent 27%),
-    linear-gradient(172deg, transparent 42%, rgba(160, 210, 100, 0.07) 44%, rgba(160, 210, 100, 0.03) 48%, transparent 50%),
-    linear-gradient(155deg, transparent 55%, rgba(180, 220, 120, 0.04) 57%, rgba(180, 220, 120, 0.02) 62%, transparent 64%);
-  animation: sunbeamShift 15s ease-in-out infinite alternate;
+    radial-gradient(ellipse 50% 60% at 40% 0%, rgba(220, 240, 210, 0.25), transparent 70%),
+    radial-gradient(ellipse 40% 50% at 65% 5%, rgba(200, 230, 190, 0.15), transparent 65%);
+  animation: forestGlow 10s ease-in-out infinite alternate;
 }
 
-@keyframes sunbeamShift {
-  0% { opacity: 0.6; transform: translateX(-1%); }
-  100% { opacity: 1; transform: translateX(1%); }
+@keyframes forestGlow {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
 }
 
-/* 나무 실루엣 — 유기적 path로 3중 깊이 */
+/* 나무 실루엣 — 4겹 소나무 능선 (뒤→앞으로 점점 진해짐) */
 .slideForest .forestTrees {
   position: absolute;
   inset: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 800'%3E%3C!-- 뒤쪽 나무 (먼, 희미한 실루엣) --%3E%3Cpath fill='%23203820' opacity='0.4' d='M80,800 L80,320 C80,300 75,260 65,230 C55,200 78,170 80,140 C82,110 60,80 80,50 C100,20 70,10 80,0 L100,0 C110,10 90,20 110,50 C130,80 108,110 110,140 C112,170 135,200 125,230 C115,260 110,300 110,320 L110,800 Z'/%3E%3Cpath fill='%23203820' opacity='0.35' d='M280,800 L280,350 C280,325 270,280 260,250 C250,220 275,185 280,150 C285,115 265,85 280,55 C295,25 275,10 285,0 L305,0 C315,10 295,25 310,55 C325,85 305,115 310,150 C315,185 340,220 330,250 C320,280 310,325 310,350 L310,800 Z'/%3E%3Cpath fill='%23203820' opacity='0.38' d='M520,800 L520,300 C520,275 510,235 500,205 C490,175 515,145 520,110 C525,75 505,50 520,25 C535,0 520,0 530,0 L550,0 C560,0 545,0 560,25 C575,50 555,75 560,110 C565,145 590,175 580,205 C570,235 560,275 560,300 L560,800 Z'/%3E%3Cpath fill='%23203820' opacity='0.35' d='M750,800 L750,340 C750,310 740,270 730,240 C720,210 745,175 750,140 C755,105 735,75 750,45 C765,15 750,5 755,0 L775,0 C780,5 765,15 780,45 C795,75 775,105 780,140 C785,175 810,210 800,240 C790,270 780,310 780,340 L780,800 Z'/%3E%3Cpath fill='%23203820' opacity='0.4' d='M980,800 L980,310 C980,285 970,245 960,215 C950,185 975,150 980,115 C985,80 965,55 980,30 C995,5 980,0 985,0 L1010,0 C1015,0 1000,5 1015,30 C1030,55 1010,80 1015,115 C1020,150 1045,185 1035,215 C1025,245 1015,285 1015,310 L1015,800 Z'/%3E%3Cpath fill='%23203820' opacity='0.35' d='M1200,800 L1200,330 C1200,305 1190,265 1180,235 C1170,205 1195,170 1200,135 C1205,100 1185,70 1200,40 C1215,10 1200,0 1205,0 L1225,0 C1230,0 1215,10 1230,40 C1245,70 1225,100 1230,135 C1235,170 1260,205 1250,235 C1240,265 1230,305 1230,330 L1230,800 Z'/%3E%3Cpath fill='%23203820' opacity='0.38' d='M1430,800 L1430,315 C1430,290 1420,250 1410,220 C1400,190 1425,155 1430,120 C1435,85 1415,60 1430,35 C1445,10 1430,0 1435,0 L1460,0 C1465,0 1450,10 1465,35 C1480,60 1460,85 1465,120 C1470,155 1495,190 1485,220 C1475,250 1465,290 1465,315 L1465,800 Z'/%3E%3C!-- 중간 나무 (줄기+가지+잎뭉치) --%3E%3Cpath fill='%23152e14' opacity='0.6' d='M160,800 L160,280 C155,250 140,200 145,160 C150,120 135,80 155,45 C175,10 145,0 165,0 L190,0 C210,0 180,10 200,45 C220,80 205,120 210,160 C215,200 200,250 195,280 L195,800 Z'/%3E%3Cpath fill='%23253a20' opacity='0.45' d='M130,100 C140,70 165,40 178,30 C165,35 145,55 130,100 Z M225,80 C215,55 195,35 178,30 C195,35 218,60 225,80 Z M120,170 C135,140 160,120 178,110 C158,118 132,145 120,170 Z M235,155 C220,130 198,115 178,110 C200,118 225,140 235,155 Z'/%3E%3Cpath fill='%23152e14' opacity='0.65' d='M420,800 L420,260 C415,230 400,180 405,140 C410,100 395,60 415,30 C430,5 415,0 425,0 L455,0 C465,0 450,5 465,30 C480,60 465,100 470,140 C475,180 460,230 455,260 L455,800 Z'/%3E%3Cpath fill='%23253a20' opacity='0.45' d='M390,80 C405,50 430,25 438,15 C425,22 400,50 390,80 Z M490,65 C475,40 455,22 438,15 C460,25 480,48 490,65 Z M385,150 C400,120 425,95 438,85 C420,92 395,125 385,150 Z M500,140 C485,115 462,95 438,85 C465,95 490,120 500,140 Z'/%3E%3Cpath fill='%23152e14' opacity='0.6' d='M660,800 L660,250 C655,220 640,170 645,130 C650,90 635,55 655,25 C670,2 655,0 665,0 L695,0 C705,0 690,2 705,25 C720,55 705,90 710,130 C715,170 700,220 695,250 L695,800 Z'/%3E%3Cpath fill='%23253a20' opacity='0.45' d='M630,70 C645,40 670,18 680,8 C665,15 640,42 630,70 Z M730,55 C715,30 695,15 680,8 C700,18 722,38 730,55 Z M625,140 C640,110 665,85 680,75 C660,82 635,115 625,140 Z M740,125 C725,100 700,82 680,75 C705,85 730,105 740,125 Z'/%3E%3Cpath fill='%23152e14' opacity='0.65' d='M900,800 L900,270 C895,240 880,190 885,150 C890,110 875,70 895,40 C910,12 895,0 905,0 L935,0 C945,0 930,12 945,40 C960,70 945,110 950,150 C955,190 940,240 935,270 L935,800 Z'/%3E%3Cpath fill='%23253a20' opacity='0.45' d='M870,90 C885,60 910,35 920,25 C905,32 880,58 870,90 Z M960,75 C945,50 925,32 920,25 C940,35 955,55 960,75 Z M865,160 C880,130 905,105 920,95 C900,102 875,130 865,160 Z M970,145 C955,120 932,102 920,95 C945,105 960,125 970,145 Z'/%3E%3Cpath fill='%23152e14' opacity='0.6' d='M1120,800 L1120,255 C1115,225 1100,175 1105,135 C1110,95 1095,60 1115,30 C1130,5 1115,0 1125,0 L1155,0 C1165,0 1150,5 1165,30 C1180,60 1165,95 1170,135 C1175,175 1160,225 1155,255 L1155,800 Z'/%3E%3Cpath fill='%23253a20' opacity='0.45' d='M1090,75 C1105,45 1130,22 1140,12 C1125,20 1100,48 1090,75 Z M1185,60 C1170,35 1150,20 1140,12 C1160,22 1178,42 1185,60 Z'/%3E%3Cpath fill='%23152e14' opacity='0.65' d='M1340,800 L1340,265 C1335,235 1320,185 1325,145 C1330,105 1315,68 1335,38 C1350,10 1335,0 1345,0 L1375,0 C1385,0 1370,10 1385,38 C1400,68 1385,105 1390,145 C1395,185 1380,235 1375,265 L1375,800 Z'/%3E%3Cpath fill='%23253a20' opacity='0.45' d='M1310,85 C1325,55 1350,30 1360,20 C1345,28 1320,55 1310,85 Z M1405,70 C1390,45 1370,28 1360,20 C1380,30 1398,50 1405,70 Z'/%3E%3C!-- 앞쪽 나무 프레임 (좌우 큰 나무) --%3E%3Cpath fill='%230e220c' d='M0,0 L0,800 L60,800 L60,350 C55,280 30,200 40,140 C50,80 25,40 50,0 Z'/%3E%3Cpath fill='%23182e16' opacity='0.7' d='M0,0 C30,20 15,60 30,120 C45,180 10,280 15,350 L0,350 Z'/%3E%3Cpath fill='%230e220c' d='M1600,0 L1600,800 L1540,800 L1540,360 C1545,290 1570,210 1560,150 C1550,90 1575,45 1550,0 Z'/%3E%3Cpath fill='%23182e16' opacity='0.7' d='M1600,0 C1570,25 1585,65 1570,130 C1555,195 1590,290 1585,360 L1600,360 Z'/%3E%3C!-- 바닥: 덤불 + 풀 + 떨어진 잎 --%3E%3Cpath fill='%23162e14' d='M0,720 C80,700 160,730 260,710 C360,690 440,720 560,705 C680,690 780,715 880,700 C980,685 1080,710 1180,698 C1280,686 1380,708 1480,695 C1540,688 1570,700 1600,695 L1600,800 L0,800 Z'/%3E%3Cpath fill='%23102410' d='M0,755 C120,742 240,760 380,748 C520,736 640,755 800,744 C960,733 1080,752 1240,742 C1400,732 1500,748 1600,740 L1600,800 L0,800 Z'/%3E%3C/svg%3E") no-repeat center center / cover;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 800' preserveAspectRatio='none'%3E%3C!-- 4층: 가장 먼 능선 (연하고 흐릿) --%3E%3Cpath fill='%23608878' d='M0,420 l30,-40 l15,25 l20,-55 l15,30 l25,-60 l12,35 l20,-45 l18,30 l22,-50 l15,28 l30,-65 l12,40 l20,-50 l15,25 l25,-55 l18,35 l20,-48 l12,30 l22,-52 l15,28 l28,-58 l14,32 l20,-45 l16,25 l24,-50 l18,32 l22,-55 l12,30 l20,-42 l15,28 l25,-52 l18,35 l20,-45 l14,25 l22,-48 l16,30 l28,-55 l12,32 l20,-40 l15,25 l25,-50 l18,30 l22,-45 l14,28 l20,-48 l16,32 l25,-52 l12,28 l20,-42 l18,30 l22,-50 l15,25 l28,-55 l14,32 l20,-48 l16,30 l25,-52 l12,28 l20,-45 l18,32 l22,-50 l15,28 l20,-40 l14,25 l25,-48 l18,30 L1600,380 L1600,800 L0,800 Z'/%3E%3C!-- 3층: 중간 먼 능선 --%3E%3Cpath fill='%23466e5a' d='M0,500 l25,-50 l18,30 l22,-65 l14,38 l28,-70 l15,42 l20,-58 l16,35 l24,-62 l18,40 l22,-55 l14,32 l26,-60 l16,38 l20,-52 l18,35 l24,-65 l14,40 l22,-55 l16,32 l28,-68 l15,42 l20,-55 l18,35 l24,-60 l14,38 l22,-52 l16,32 l26,-58 l18,40 l20,-55 l14,32 l28,-65 l15,40 l22,-58 l16,35 l24,-55 l18,38 l20,-60 l14,35 l26,-55 l16,32 l22,-62 l18,40 l28,-58 l14,35 l20,-52 l16,30 l24,-55 l18,38 l22,-60 l14,35 l26,-55 l16,32 l20,-50 l18,35 l24,-58 l14,32 l22,-52 l16,35 L1600,460 L1600,800 L0,800 Z'/%3E%3C!-- 2층: 중간 가까운 능선 --%3E%3Cpath fill='%23305040' d='M0,580 l20,-55 l16,32 l24,-70 l14,42 l28,-75 l18,48 l22,-65 l14,38 l26,-72 l16,45 l20,-60 l18,38 l24,-68 l14,42 l28,-72 l16,48 l22,-65 l18,40 l24,-70 l14,45 l26,-68 l16,42 l20,-62 l18,38 l28,-72 l14,45 l22,-65 l16,40 l24,-68 l18,42 l20,-60 l14,38 l26,-65 l16,42 l28,-70 l18,45 l22,-68 l14,40 l24,-62 l16,38 l20,-65 l18,42 l26,-70 l14,45 l28,-68 l16,42 l22,-62 l18,38 l24,-65 l14,40 l20,-58 l16,35 l26,-62 l18,40 l22,-58 l14,35 l28,-65 l16,40 L1600,545 L1600,800 L0,800 Z'/%3E%3C!-- 1층: 가장 앞 능선 (가장 진함) --%3E%3Cpath fill='%231a3828' d='M0,680 l18,-60 l14,35 l22,-75 l16,48 l26,-80 l18,52 l24,-72 l14,45 l28,-78 l16,50 l22,-68 l18,42 l26,-75 l14,48 l20,-70 l16,45 l28,-78 l18,52 l24,-72 l14,45 l22,-75 l16,48 l26,-70 l18,45 l20,-68 l14,42 l28,-75 l16,48 l22,-72 l18,45 l26,-78 l14,50 l24,-72 l16,45 l20,-68 l18,42 l28,-75 l14,48 l22,-70 l16,45 l26,-75 l18,48 l24,-72 l14,45 l20,-68 l16,42 l28,-75 l18,48 l22,-72 l14,45 l26,-68 l16,42 l24,-72 l18,48 l20,-68 l14,42 l28,-72 l16,45 L1600,650 L1600,800 L0,800 Z'/%3E%3C/svg%3E") no-repeat center center / cover;
 }
 
-/* 안개 — 숲 중간에 떠도는 엷은 안개 */
+/* 안개 — 능선 사이에 떠도는 엷은 안개 */
 .slideForest .forestMist {
   position: absolute;
-  bottom: 15%;
+  bottom: 20%;
   left: -5%;
   right: -5%;
-  height: 35%;
+  height: 40%;
   background:
-    radial-gradient(ellipse 80% 40% at 20% 50%, rgba(160, 200, 150, 0.12), transparent),
-    radial-gradient(ellipse 60% 35% at 70% 60%, rgba(150, 190, 140, 0.1), transparent),
-    radial-gradient(ellipse 100% 30% at 50% 45%, rgba(170, 210, 160, 0.08), transparent);
+    radial-gradient(ellipse 70% 25% at 25% 30%, rgba(180, 210, 190, 0.2), transparent),
+    radial-gradient(ellipse 60% 20% at 65% 50%, rgba(170, 200, 180, 0.18), transparent),
+    radial-gradient(ellipse 90% 18% at 50% 70%, rgba(190, 215, 200, 0.15), transparent);
   animation: mistDrift 14s ease-in-out infinite alternate;
 }
 
@@ -266,28 +259,24 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle 3px at 18% 28%, rgba(220, 240, 180, 0.6) 0%, transparent 100%),
-    radial-gradient(circle 2px at 25% 52%, rgba(200, 230, 160, 0.5) 0%, transparent 100%),
-    radial-gradient(circle 4px at 35% 38%, rgba(240, 255, 200, 0.4) 0%, transparent 100%),
-    radial-gradient(circle 2px at 42% 22%, rgba(220, 240, 180, 0.55) 0%, transparent 100%),
-    radial-gradient(circle 3px at 55% 45%, rgba(200, 230, 160, 0.45) 0%, transparent 100%),
-    radial-gradient(circle 2px at 62% 62%, rgba(240, 255, 200, 0.5) 0%, transparent 100%),
-    radial-gradient(circle 3px at 72% 32%, rgba(220, 240, 180, 0.4) 0%, transparent 100%),
-    radial-gradient(circle 2px at 82% 55%, rgba(200, 230, 160, 0.55) 0%, transparent 100%);
+    radial-gradient(circle 3px at 18% 28%, rgba(220, 240, 200, 0.5) 0%, transparent 100%),
+    radial-gradient(circle 2px at 30% 52%, rgba(200, 230, 180, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 3px at 45% 35%, rgba(230, 250, 210, 0.35) 0%, transparent 100%),
+    radial-gradient(circle 2px at 58% 22%, rgba(220, 240, 200, 0.45) 0%, transparent 100%),
+    radial-gradient(circle 3px at 72% 42%, rgba(200, 230, 180, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 2px at 85% 55%, rgba(230, 250, 210, 0.35) 0%, transparent 100%);
   animation: particleFloat1 8s ease-in-out infinite alternate;
 }
 
 .slideForest .forestParticles::after {
   background:
-    radial-gradient(circle 2px at 12% 42%, rgba(240, 255, 200, 0.5) 0%, transparent 100%),
-    radial-gradient(circle 3px at 22% 65%, rgba(220, 240, 180, 0.4) 0%, transparent 100%),
-    radial-gradient(circle 2px at 32% 30%, rgba(200, 230, 160, 0.55) 0%, transparent 100%),
-    radial-gradient(circle 3px at 48% 58%, rgba(240, 255, 200, 0.4) 0%, transparent 100%),
-    radial-gradient(circle 2px at 58% 25%, rgba(220, 240, 180, 0.5) 0%, transparent 100%),
-    radial-gradient(circle 3px at 68% 48%, rgba(200, 230, 160, 0.45) 0%, transparent 100%),
-    radial-gradient(circle 2px at 78% 68%, rgba(240, 255, 200, 0.5) 0%, transparent 100%),
-    radial-gradient(circle 3px at 88% 35%, rgba(220, 240, 180, 0.4) 0%, transparent 100%),
-    radial-gradient(circle 2px at 92% 52%, rgba(200, 230, 160, 0.5) 0%, transparent 100%);
+    radial-gradient(circle 2px at 12% 45%, rgba(230, 250, 210, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 3px at 25% 62%, rgba(220, 240, 200, 0.35) 0%, transparent 100%),
+    radial-gradient(circle 2px at 40% 30%, rgba(200, 230, 180, 0.45) 0%, transparent 100%),
+    radial-gradient(circle 3px at 55% 55%, rgba(230, 250, 210, 0.35) 0%, transparent 100%),
+    radial-gradient(circle 2px at 68% 25%, rgba(220, 240, 200, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 3px at 80% 48%, rgba(200, 230, 180, 0.35) 0%, transparent 100%),
+    radial-gradient(circle 2px at 92% 38%, rgba(230, 250, 210, 0.4) 0%, transparent 100%);
   animation: particleFloat2 11s ease-in-out infinite alternate;
 }
 
@@ -450,6 +439,97 @@
   height: 35%;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 300' preserveAspectRatio='none'%3E%3Cpath fill='%23061530' fill-opacity='0.6' d='M-20,100 C180,130 360,70 540,100 C720,130 900,70 1080,100 C1260,130 1440,90 1620,100 L1620,300 L-20,300 Z'/%3E%3Cpath fill='%23040e22' fill-opacity='0.8' d='M-20,150 C200,180 400,120 600,150 C800,180 1000,120 1200,150 C1400,180 1520,155 1620,160 L1620,300 L-20,300 Z'/%3E%3Cpath fill='%23020810' d='M-20,200 C160,220 340,190 520,210 C700,230 880,195 1060,215 C1240,235 1420,205 1620,220 L1620,300 L-20,300 Z'/%3E%3C/svg%3E") no-repeat center bottom;
   background-size: 110% 100%;
+}
+
+/* ========================================
+   슬라이드 6: 석양 바다 2 (슬라이드 2 변형)
+   ======================================== */
+.slideSunset2 .sunset2Bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    #1a1040 0%,
+    #3a1855 10%,
+    #7a2060 22%,
+    #c44a35 36%,
+    #e88030 48%,
+    #f0a840 56%,
+    #f5c860 62%,
+    #e8a040 68%,
+    #c06030 74%,
+    #803828 82%,
+    #402018 92%,
+    #1a0c08 100%
+  );
+}
+
+.slideSunset2 .sunset2Sun {
+  position: absolute;
+  bottom: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff5cc 0%, #ffcc44 30%, #ff8800 60%, transparent 72%);
+  box-shadow:
+    0 0 60px 30px rgba(255, 180, 50, 0.4),
+    0 0 120px 60px rgba(255, 120, 20, 0.2);
+  animation: sunPulse 4s ease-in-out infinite;
+}
+
+.slideSunset2 .sunset2Sun::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 200px;
+  background: linear-gradient(180deg,
+    rgba(255, 200, 80, 0.4) 0%,
+    rgba(255, 160, 50, 0.2) 30%,
+    rgba(255, 120, 30, 0.1) 60%,
+    transparent 100%
+  );
+  filter: blur(10px);
+  animation: sunReflect 3s ease-in-out infinite alternate;
+}
+
+.slideSunset2 .sunset2Waves {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  z-index: 2;
+}
+
+.slideSunset2 .sunset2Waves::before {
+  content: '';
+  position: absolute;
+  bottom: 8%;
+  left: 0;
+  width: 6400px;
+  height: 120px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 120'%3E%3Cpath fill='%23401810' fill-opacity='0.5' d='M0,60 C200,90 400,30 600,60 C800,90 1000,30 1200,60 C1400,90 1500,70 1600,60 L1600,120 L0,120 Z'/%3E%3C/svg%3E") repeat-x;
+  background-size: 1600px 120px;
+  animation: wave 10s cubic-bezier(0.36,0.45,0.63,0.53) infinite,
+             swell 7s ease infinite;
+}
+
+.slideSunset2 .sunset2Waves::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 6400px;
+  height: 100px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 100'%3E%3Cpath fill='%23200a06' fill-opacity='0.8' d='M0,50 C180,75 380,25 560,50 C740,75 940,25 1120,50 C1300,75 1480,55 1600,50 L1600,100 L0,100 Z'/%3E%3C/svg%3E") repeat-x;
+  background-size: 1600px 100px;
+  animation: wave 7s cubic-bezier(0.36,0.45,0.63,0.53) -0.5s infinite,
+             swell 5s ease -1s infinite;
 }
 
 /* ========================================
