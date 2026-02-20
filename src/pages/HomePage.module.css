@@ -42,23 +42,22 @@
 
 .slideOcean .oceanClouds {
   position: absolute;
-  top: 0;
+  top: 5%;
   left: 0;
   width: calc(100% + 1800px);
-  height: 200px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1800 200'%3E%3Cellipse cx='250' cy='55' rx='140' ry='38' fill='%23ffffff' fill-opacity='0.15'/%3E%3Cellipse cx='300' cy='45' rx='90' ry='30' fill='%23ffffff' fill-opacity='0.12'/%3E%3Cellipse cx='750' cy='35' rx='110' ry='32' fill='%23ffffff' fill-opacity='0.12'/%3E%3Cellipse cx='800' cy='28' rx='70' ry='24' fill='%23ffffff' fill-opacity='0.1'/%3E%3Cellipse cx='1250' cy='60' rx='120' ry='34' fill='%23ffffff' fill-opacity='0.12'/%3E%3Cellipse cx='1550' cy='42' rx='90' ry='28' fill='%23ffffff' fill-opacity='0.1'/%3E%3C/svg%3E") repeat-x;
-  background-size: 1800px 200px;
+  height: 40%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1800 350'%3E%3Cellipse cx='200' cy='60' rx='150' ry='40' fill='%23ffffff' fill-opacity='0.14'/%3E%3Cellipse cx='260' cy='50' rx='90' ry='30' fill='%23ffffff' fill-opacity='0.1'/%3E%3Cellipse cx='150' cy='55' rx='70' ry='26' fill='%23ffffff' fill-opacity='0.08'/%3E%3Cellipse cx='700' cy='100' rx='130' ry='36' fill='%23ffffff' fill-opacity='0.12'/%3E%3Cellipse cx='760' cy='90' rx='80' ry='28' fill='%23ffffff' fill-opacity='0.09'/%3E%3Cellipse cx='1200' cy='45' rx='120' ry='34' fill='%23ffffff' fill-opacity='0.13'/%3E%3Cellipse cx='1260' cy='38' rx='75' ry='26' fill='%23ffffff' fill-opacity='0.1'/%3E%3Cellipse cx='400' cy='170' rx='110' ry='32' fill='%23ffffff' fill-opacity='0.08'/%3E%3Cellipse cx='460' cy='165' rx='65' ry='22' fill='%23ffffff' fill-opacity='0.06'/%3E%3Cellipse cx='1000' cy='200' rx='100' ry='30' fill='%23ffffff' fill-opacity='0.07'/%3E%3Cellipse cx='1060' cy='195' rx='60' ry='20' fill='%23ffffff' fill-opacity='0.05'/%3E%3Cellipse cx='1500' cy='140' rx='90' ry='28' fill='%23ffffff' fill-opacity='0.09'/%3E%3Cellipse cx='550' cy='260' rx='80' ry='24' fill='%23ffffff' fill-opacity='0.05'/%3E%3Cellipse cx='1350' cy='280' rx='70' ry='22' fill='%23ffffff' fill-opacity='0.04'/%3E%3C/svg%3E") repeat-x;
+  background-size: 1800px 350px;
   animation: clouds 60s linear infinite;
 }
 
 .slideOcean .oceanScenery {
   position: absolute;
   bottom: 0;
-  left: -5%;
-  right: -5%;
-  height: 400px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 400' preserveAspectRatio='none'%3E%3Cpath fill='%230A2E5C' fill-opacity='0.15' d='M-20,320 C120,290 240,300 360,270 C480,250 560,265 680,245 C800,230 880,250 1000,235 C1120,225 1200,240 1320,220 C1440,215 1520,225 1620,222 L1620,400 L-20,400 Z'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.1' d='M-20,340 C180,320 300,330 480,310 C660,295 780,315 960,295 C1100,282 1260,305 1440,285 C1520,278 1580,290 1620,285 L1620,400 L-20,400 Z'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.18' d='M1250,400 L1262,155 C1264,148 1272,143 1280,143 L1300,143 C1308,143 1316,148 1318,155 L1330,400 Z'/%3E%3Crect x='1248' y='135' width='84' height='14' rx='4' fill='%230A2E5C' fill-opacity='0.18'/%3E%3Crect x='1258' y='100' width='64' height='38' rx='5' fill='%230A2E5C' fill-opacity='0.16'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.18' d='M1290,72 L1250,100 L1330,100 Z'/%3E%3Ccircle cx='1290' cy='119' r='12' fill='%23E8B060' fill-opacity='0.5'/%3E%3Ccircle cx='1290' cy='119' r='28' fill='%23E8B060' fill-opacity='0.1'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.2' stroke-width='2' stroke-linecap='round' d='M420,150 Q428,140 436,147 Q444,140 452,150'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.15' stroke-width='1.5' stroke-linecap='round' d='M480,125 Q486,118 492,123 Q498,118 504,125'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.12' stroke-width='1.8' stroke-linecap='round' d='M870,115 Q878,106 886,113 Q894,106 902,115'/%3E%3C/svg%3E") no-repeat center bottom;
-  background-size: 110% 400px;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 400'%3E%3Cpath fill='%230A2E5C' fill-opacity='0.15' d='M0,320 C120,290 240,300 360,270 C480,250 560,265 680,245 C800,230 880,250 1000,235 C1120,225 1200,240 1320,220 C1440,215 1520,225 1600,222 L1600,400 L0,400 Z'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.1' d='M0,340 C180,320 300,330 480,310 C660,295 780,315 960,295 C1100,282 1260,305 1440,285 C1520,278 1580,290 1600,285 L1600,400 L0,400 Z'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.18' d='M1250,400 L1262,155 C1264,148 1272,143 1280,143 L1300,143 C1308,143 1316,148 1318,155 L1330,400 Z'/%3E%3Crect x='1248' y='135' width='84' height='14' rx='4' fill='%230A2E5C' fill-opacity='0.18'/%3E%3Crect x='1258' y='100' width='64' height='38' rx='5' fill='%230A2E5C' fill-opacity='0.16'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.18' d='M1290,72 L1250,100 L1330,100 Z'/%3E%3Ccircle cx='1290' cy='119' r='12' fill='%23E8B060' fill-opacity='0.5'/%3E%3Ccircle cx='1290' cy='119' r='28' fill='%23E8B060' fill-opacity='0.1'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.2' stroke-width='2' stroke-linecap='round' d='M420,150 Q428,140 436,147 Q444,140 452,150'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.15' stroke-width='1.5' stroke-linecap='round' d='M480,125 Q486,118 492,123 Q498,118 504,125'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.12' stroke-width='1.8' stroke-linecap='round' d='M870,115 Q878,106 886,113 Q894,106 902,115'/%3E%3C/svg%3E") no-repeat center bottom / cover;
 }
 
 .slideOcean .oceanWaveMid {
