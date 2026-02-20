@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import PageTransition from '../components/layout/PageTransition';
 import PoemCard from '../components/ui/PoemCard';
 import YouTubeEmbed from '../components/ui/YouTubeEmbed';
+import SunoEmbed from '../components/ui/SunoEmbed';
 import { useFeaturedPoems } from '../hooks/usePoems';
 import { useFeaturedSong } from '../hooks/useSongs';
 import { SITE } from '../lib/constants';
@@ -161,30 +162,7 @@ export default function HomePage() {
               {song.youtube_id ? (
                 <YouTubeEmbed videoId={song.youtube_id} title={song.title} />
               ) : song.suno_url ? (
-                <a
-                  href={song.suno_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    aspectRatio: '16 / 9',
-                    background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
-                    borderRadius: 'var(--radius-md)',
-                    color: 'rgba(255,255,255,0.7)',
-                    gap: '8px',
-                    textDecoration: 'none',
-                  }}
-                >
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M9 18V5l12-2v13" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="6" cy="18" r="3" />
-                    <circle cx="18" cy="16" r="3" />
-                  </svg>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Suno AI에서 듣기</span>
-                </a>
+                <SunoEmbed sunoUrl={song.suno_url} title={song.title} />
               ) : null}
               <p className={styles.songTitle}>{song.title}</p>
             </div>
