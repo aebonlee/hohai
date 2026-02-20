@@ -16,6 +16,7 @@ const SLIDES = [
   { quote: '파도가 밀려오듯\n시가 가슴에 닿고\n바다가 노래합니다', author: '— 호해 이성헌' },
   { quote: '석양이 물드는 하늘 아래\n하루의 끝에서\n시가 피어납니다', author: '— 호해 이성헌' },
   { quote: '숲이 들려주는 이야기\n나뭇잎 사이로\n바람이 시를 읊는다', author: '— 호해 이성헌' },
+  { quote: '황혼이 내려앉은 바다 위\n등대 하나 서서\n어둠 속 길을 밝힌다', author: '— 호해 이성헌' },
   { quote: '빗줄기 사이로\n도시의 불빛이 흐르고\n밤은 시가 된다', author: '— 호해 이성헌' },
   { quote: '달빛이 바다 위에\n은빛 길을 놓으면\n밤은 고요히 노래한다', author: '— 호해 이성헌' },
   { quote: '수평선 너머로\n붉은 하늘이 물들면\n바다는 시가 된다', author: '— 호해 이성헌' },
@@ -68,8 +69,13 @@ export default function HomePage() {
           <div className={styles.forestOverlay} />
         </div>
 
-        {/* 슬라이드 4: 비 오는 도시 (사이버틱 + 번개) */}
-        <div className={`${styles.slide} ${styles.slideCity} ${active === 3 ? styles.slideActive : ''}`}>
+        {/* 슬라이드 4: 황혼 등대 (밤바다 사진) */}
+        <div className={`${styles.slide} ${styles.slideLighthouse3} ${active === 3 ? styles.slideActive : ''}`}>
+          <div className={styles.lighthouseImg3} />
+        </div>
+
+        {/* 슬라이드 5: 비 오는 도시 (사이버틱 + 번개) */}
+        <div className={`${styles.slide} ${styles.slideCity} ${active === 4 ? styles.slideActive : ''}`}>
           <div className={styles.cityBg} />
           <div className={styles.cityNeonHaze} />
           <div className={styles.citySkyline} />
@@ -78,8 +84,8 @@ export default function HomePage() {
           <div className={styles.cityOverlay} />
         </div>
 
-        {/* 슬라이드 5: 밤바다 (별 + 오로라 + 발광 플랑크톤) */}
-        <div className={`${styles.slide} ${styles.slideNightSea} ${active === 4 ? styles.slideActive : ''}`}>
+        {/* 슬라이드 6: 밤바다 (별 + 오로라 + 발광 플랑크톤) */}
+        <div className={`${styles.slide} ${styles.slideNightSea} ${active === 5 ? styles.slideActive : ''}`}>
           <div className={styles.nightSeaBg} />
           <div className={styles.nightSeaStars} />
           <div className={styles.nightSeaMoon} />
@@ -87,8 +93,8 @@ export default function HomePage() {
           <div className={styles.nightSeaOverlay} />
         </div>
 
-        {/* 슬라이드 6: 빨간 등대 2 (블루아워 사진) */}
-        <div className={`${styles.slide} ${styles.slideLighthouse2} ${active === 5 ? styles.slideActive : ''}`}>
+        {/* 슬라이드 7: 빨간 등대 2 (블루아워 사진) */}
+        <div className={`${styles.slide} ${styles.slideLighthouse2} ${active === 6 ? styles.slideActive : ''}`}>
           <div className={styles.lighthouseImg2} />
         </div>
 
