@@ -189,112 +189,27 @@
 }
 
 /* ========================================
-   슬라이드 3: 숲 — 레이어드 소나무 능선 실루엣
+   슬라이드 3: 숲 — 전나무 실루엣 3톤 레이어 일러스트
    ======================================== */
 
-/* 배경: 안개 낀 새벽 하늘 그라데이션 */
+/* 배경: 밝은 하늘 (거의 흰색) */
 .slideForest .forestBg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    #b8ccc0 0%,
-    #9ab8a8 15%,
-    #7da898 30%,
-    #5a8a78 50%,
-    #3d6e58 70%,
-    #2a5442 85%,
-    #1a3c2e 100%
-  );
+  background: linear-gradient(180deg, #f0f3ec 0%, #e8ede2 60%, #dde4d5 100%);
 }
 
-/* 숲 속 은은한 빛 — 위에서 내려오는 부드러운 광선 */
-.slideForest .forestBg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 50% 60% at 40% 0%, rgba(220, 240, 210, 0.25), transparent 70%),
-    radial-gradient(ellipse 40% 50% at 65% 5%, rgba(200, 230, 190, 0.15), transparent 65%);
-  animation: forestGlow 10s ease-in-out infinite alternate;
-}
-
-@keyframes forestGlow {
-  0% { opacity: 0.7; }
-  100% { opacity: 1; }
-}
-
-/* 나무 실루엣 — 4겹 소나무 능선 (뒤→앞으로 점점 진해짐) */
+/* 전나무 실루엣 3레이어 + 바닥 */
 .slideForest .forestTrees {
   position: absolute;
   inset: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 800' preserveAspectRatio='none'%3E%3C!-- 4층: 가장 먼 능선 (연하고 흐릿) --%3E%3Cpath fill='%23608878' d='M0,420 l30,-40 l15,25 l20,-55 l15,30 l25,-60 l12,35 l20,-45 l18,30 l22,-50 l15,28 l30,-65 l12,40 l20,-50 l15,25 l25,-55 l18,35 l20,-48 l12,30 l22,-52 l15,28 l28,-58 l14,32 l20,-45 l16,25 l24,-50 l18,32 l22,-55 l12,30 l20,-42 l15,28 l25,-52 l18,35 l20,-45 l14,25 l22,-48 l16,30 l28,-55 l12,32 l20,-40 l15,25 l25,-50 l18,30 l22,-45 l14,28 l20,-48 l16,32 l25,-52 l12,28 l20,-42 l18,30 l22,-50 l15,25 l28,-55 l14,32 l20,-48 l16,30 l25,-52 l12,28 l20,-45 l18,32 l22,-50 l15,28 l20,-40 l14,25 l25,-48 l18,30 L1600,380 L1600,800 L0,800 Z'/%3E%3C!-- 3층: 중간 먼 능선 --%3E%3Cpath fill='%23466e5a' d='M0,500 l25,-50 l18,30 l22,-65 l14,38 l28,-70 l15,42 l20,-58 l16,35 l24,-62 l18,40 l22,-55 l14,32 l26,-60 l16,38 l20,-52 l18,35 l24,-65 l14,40 l22,-55 l16,32 l28,-68 l15,42 l20,-55 l18,35 l24,-60 l14,38 l22,-52 l16,32 l26,-58 l18,40 l20,-55 l14,32 l28,-65 l15,40 l22,-58 l16,35 l24,-55 l18,38 l20,-60 l14,35 l26,-55 l16,32 l22,-62 l18,40 l28,-58 l14,35 l20,-52 l16,30 l24,-55 l18,38 l22,-60 l14,35 l26,-55 l16,32 l20,-50 l18,35 l24,-58 l14,32 l22,-52 l16,35 L1600,460 L1600,800 L0,800 Z'/%3E%3C!-- 2층: 중간 가까운 능선 --%3E%3Cpath fill='%23305040' d='M0,580 l20,-55 l16,32 l24,-70 l14,42 l28,-75 l18,48 l22,-65 l14,38 l26,-72 l16,45 l20,-60 l18,38 l24,-68 l14,42 l28,-72 l16,48 l22,-65 l18,40 l24,-70 l14,45 l26,-68 l16,42 l20,-62 l18,38 l28,-72 l14,45 l22,-65 l16,40 l24,-68 l18,42 l20,-60 l14,38 l26,-65 l16,42 l28,-70 l18,45 l22,-68 l14,40 l24,-62 l16,38 l20,-65 l18,42 l26,-70 l14,45 l28,-68 l16,42 l22,-62 l18,38 l24,-65 l14,40 l20,-58 l16,35 l26,-62 l18,40 l22,-58 l14,35 l28,-65 l16,40 L1600,545 L1600,800 L0,800 Z'/%3E%3C!-- 1층: 가장 앞 능선 (가장 진함) --%3E%3Cpath fill='%231a3828' d='M0,680 l18,-60 l14,35 l22,-75 l16,48 l26,-80 l18,52 l24,-72 l14,45 l28,-78 l16,50 l22,-68 l18,42 l26,-75 l14,48 l20,-70 l16,45 l28,-78 l18,52 l24,-72 l14,45 l22,-75 l16,48 l26,-70 l18,45 l20,-68 l14,42 l28,-75 l16,48 l22,-72 l18,45 l26,-78 l14,50 l24,-72 l16,45 l20,-68 l18,42 l28,-75 l14,48 l22,-70 l16,45 l26,-75 l18,48 l24,-72 l14,45 l20,-68 l16,42 l28,-75 l18,48 l22,-72 l14,45 l26,-68 l16,42 l24,-72 l18,48 l20,-68 l14,42 l28,-72 l16,45 L1600,650 L1600,800 L0,800 Z'/%3E%3C/svg%3E") no-repeat center center / cover;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 800'%3E%3Cdefs%3E%3Cpath id='t' d='M0-270L15-235L7-230L27-195L15-190L40-155L26-150L54-115L38-110L68-75L50-70L82-35L63-30L70 0L-70 0L-63-30L-82-35L-50-70L-68-75L-38-110L-54-115L-26-150L-40-155L-15-190L-27-195L-7-230L-15-235Z'/%3E%3C/defs%3E%3Cg fill='%23A2B18A'%3E%3Cuse href='%23t' transform='translate(-35,535) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(40,525) scale(0.5)'/%3E%3Cuse href='%23t' transform='translate(110,540) scale(0.58)'/%3E%3Cuse href='%23t' transform='translate(180,530) scale(0.48)'/%3E%3Cuse href='%23t' transform='translate(250,538) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(320,525) scale(0.52)'/%3E%3Cuse href='%23t' transform='translate(390,540) scale(0.6)'/%3E%3Cuse href='%23t' transform='translate(460,528) scale(0.5)'/%3E%3Cuse href='%23t' transform='translate(530,535) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(600,525) scale(0.6)'/%3E%3Cuse href='%23t' transform='translate(670,540) scale(0.48)'/%3E%3Cuse href='%23t' transform='translate(740,530) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(810,538) scale(0.52)'/%3E%3Cuse href='%23t' transform='translate(880,525) scale(0.58)'/%3E%3Cuse href='%23t' transform='translate(950,540) scale(0.5)'/%3E%3Cuse href='%23t' transform='translate(1020,530) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(1090,538) scale(0.6)'/%3E%3Cuse href='%23t' transform='translate(1160,525) scale(0.5)'/%3E%3Cuse href='%23t' transform='translate(1230,540) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(1300,528) scale(0.58)'/%3E%3Cuse href='%23t' transform='translate(1370,535) scale(0.52)'/%3E%3Cuse href='%23t' transform='translate(1440,540) scale(0.6)'/%3E%3Cuse href='%23t' transform='translate(1510,525) scale(0.55)'/%3E%3Cuse href='%23t' transform='translate(1580,538) scale(0.5)'/%3E%3Cuse href='%23t' transform='translate(1640,530) scale(0.55)'/%3E%3C/g%3E%3Cg fill='%23588157'%3E%3Cuse href='%23t' transform='translate(-40,595) scale(0.75)'/%3E%3Cuse href='%23t' transform='translate(50,585) scale(0.82)'/%3E%3Cuse href='%23t' transform='translate(140,598) scale(0.7)'/%3E%3Cuse href='%23t' transform='translate(230,588) scale(0.85)'/%3E%3Cuse href='%23t' transform='translate(320,595) scale(0.72)'/%3E%3Cuse href='%23t' transform='translate(410,585) scale(0.88)'/%3E%3Cuse href='%23t' transform='translate(500,598) scale(0.75)'/%3E%3Cuse href='%23t' transform='translate(590,588) scale(0.82)'/%3E%3Cuse href='%23t' transform='translate(680,595) scale(0.7)'/%3E%3Cuse href='%23t' transform='translate(770,585) scale(0.85)'/%3E%3Cuse href='%23t' transform='translate(860,598) scale(0.75)'/%3E%3Cuse href='%23t' transform='translate(950,588) scale(0.82)'/%3E%3Cuse href='%23t' transform='translate(1040,595) scale(0.7)'/%3E%3Cuse href='%23t' transform='translate(1130,585) scale(0.88)'/%3E%3Cuse href='%23t' transform='translate(1220,598) scale(0.75)'/%3E%3Cuse href='%23t' transform='translate(1310,588) scale(0.82)'/%3E%3Cuse href='%23t' transform='translate(1400,595) scale(0.7)'/%3E%3Cuse href='%23t' transform='translate(1490,585) scale(0.85)'/%3E%3Cuse href='%23t' transform='translate(1580,598) scale(0.75)'/%3E%3Cuse href='%23t' transform='translate(1650,588) scale(0.8)'/%3E%3C/g%3E%3Crect fill='%23344E41' x='0' y='660' width='1600' height='140'/%3E%3Cg fill='%23344E41'%3E%3Cuse href='%23t' transform='translate(-20,680) scale(1.1)'/%3E%3Cuse href='%23t' transform='translate(100,668) scale(1.3)'/%3E%3Cuse href='%23t' transform='translate(220,685) scale(1.0)'/%3E%3Cuse href='%23t' transform='translate(340,672) scale(1.35)'/%3E%3Cuse href='%23t' transform='translate(460,688) scale(1.05)'/%3E%3Cuse href='%23t' transform='translate(580,662) scale(1.45)'/%3E%3Cuse href='%23t' transform='translate(700,680) scale(1.15)'/%3E%3Cuse href='%23t' transform='translate(820,670) scale(1.3)'/%3E%3Cuse href='%23t' transform='translate(940,688) scale(1.05)'/%3E%3Cuse href='%23t' transform='translate(1060,665) scale(1.4)'/%3E%3Cuse href='%23t' transform='translate(1180,682) scale(1.1)'/%3E%3Cuse href='%23t' transform='translate(1300,670) scale(1.35)'/%3E%3Cuse href='%23t' transform='translate(1420,688) scale(1.05)'/%3E%3Cuse href='%23t' transform='translate(1540,672) scale(1.25)'/%3E%3Cuse href='%23t' transform='translate(1650,680) scale(1.15)'/%3E%3C/g%3E%3C/svg%3E") no-repeat center center / cover;
 }
 
-/* 안개 — 능선 사이에 떠도는 엷은 안개 */
-.slideForest .forestMist {
-  position: absolute;
-  bottom: 20%;
-  left: -5%;
-  right: -5%;
-  height: 40%;
-  background:
-    radial-gradient(ellipse 70% 25% at 25% 30%, rgba(180, 210, 190, 0.2), transparent),
-    radial-gradient(ellipse 60% 20% at 65% 50%, rgba(170, 200, 180, 0.18), transparent),
-    radial-gradient(ellipse 90% 18% at 50% 70%, rgba(190, 215, 200, 0.15), transparent);
-  animation: mistDrift 14s ease-in-out infinite alternate;
-}
-
-/* 숲 파티클 — 빛이 스며든 먼지/꽃가루 */
+/* 안개/파티클 — 플랫 일러스트 스타일이므로 비활성 */
+.slideForest .forestMist,
 .slideForest .forestParticles {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  z-index: 2;
-}
-
-.slideForest .forestParticles::before,
-.slideForest .forestParticles::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle 3px at 18% 28%, rgba(220, 240, 200, 0.5) 0%, transparent 100%),
-    radial-gradient(circle 2px at 30% 52%, rgba(200, 230, 180, 0.4) 0%, transparent 100%),
-    radial-gradient(circle 3px at 45% 35%, rgba(230, 250, 210, 0.35) 0%, transparent 100%),
-    radial-gradient(circle 2px at 58% 22%, rgba(220, 240, 200, 0.45) 0%, transparent 100%),
-    radial-gradient(circle 3px at 72% 42%, rgba(200, 230, 180, 0.4) 0%, transparent 100%),
-    radial-gradient(circle 2px at 85% 55%, rgba(230, 250, 210, 0.35) 0%, transparent 100%);
-  animation: particleFloat1 8s ease-in-out infinite alternate;
-}
-
-.slideForest .forestParticles::after {
-  background:
-    radial-gradient(circle 2px at 12% 45%, rgba(230, 250, 210, 0.4) 0%, transparent 100%),
-    radial-gradient(circle 3px at 25% 62%, rgba(220, 240, 200, 0.35) 0%, transparent 100%),
-    radial-gradient(circle 2px at 40% 30%, rgba(200, 230, 180, 0.45) 0%, transparent 100%),
-    radial-gradient(circle 3px at 55% 55%, rgba(230, 250, 210, 0.35) 0%, transparent 100%),
-    radial-gradient(circle 2px at 68% 25%, rgba(220, 240, 200, 0.4) 0%, transparent 100%),
-    radial-gradient(circle 3px at 80% 48%, rgba(200, 230, 180, 0.35) 0%, transparent 100%),
-    radial-gradient(circle 2px at 92% 38%, rgba(230, 250, 210, 0.4) 0%, transparent 100%);
-  animation: particleFloat2 11s ease-in-out infinite alternate;
-}
-
-@keyframes particleFloat1 {
-  0% { transform: translateY(0) translateX(0); opacity: 0.5; }
-  50% { opacity: 1; }
-  100% { transform: translateY(-18px) translateX(10px); opacity: 0.4; }
-}
-
-@keyframes particleFloat2 {
-  0% { transform: translateY(0) translateX(0); opacity: 0.4; }
-  50% { opacity: 0.9; }
-  100% { transform: translateY(-14px) translateX(-8px); opacity: 0.3; }
-}
-
-@keyframes mistDrift {
-  0% { transform: translateX(-2%); opacity: 0.7; }
-  100% { transform: translateX(2%); opacity: 1; }
+  display: none;
 }
 
 /* ========================================
