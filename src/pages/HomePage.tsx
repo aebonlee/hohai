@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -9,9 +10,29 @@ import { useFeaturedSong } from '../hooks/useSongs';
 import { SITE } from '../lib/constants';
 import styles from './HomePage.module.css';
 
+const SLIDES = [
+  { quote: '파도가 밀려오듯\n시가 가슴에 닿고\n바다가 노래합니다', author: '— 호해 이성헌' },
+  { quote: '석양이 물드는 하늘 아래\n하루의 끝에서\n시가 피어납니다', author: '— 호해 이성헌' },
+  { quote: '숲이 들려주는 이야기\n나뭇잎 사이로\n바람이 시를 읊는다', author: '— 호해 이성헌' },
+  { quote: '빗줄기 사이로\n도시의 불빛이 흐르고\n밤은 시가 된다', author: '— 호해 이성헌' },
+  { quote: '길 위의 불빛들이\n어둠을 가르며\n내일을 향해 달린다', author: '— 호해 이성헌' },
+];
+
+const SLIDE_INTERVAL = 6000;
+
 export default function HomePage() {
   const { poems, loading: poemsLoading } = useFeaturedPoems();
   const { song, loading: songLoading } = useFeaturedSong();
+  const [active, setActive] = useState(0);
+
+  const goTo = useCallback((i: number) => {
+    setActive(((i % SLIDES.length) + SLIDES.length) % SLIDES.length);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => setActive(p => (p + 1) % SLIDES.length), SLIDE_INTERVAL);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <PageTransition>
@@ -20,27 +41,75 @@ export default function HomePage() {
         <meta name="description" content={SITE.description} />
       </Helmet>
 
-      {/* 히어로 섹션 */}
+      {/* 히어로 캐러셀 */}
       <section className={styles.hero}>
-        <div className={styles.heroBg} />
-        <div className={styles.heroClouds} />
-        <div className={styles.heroClouds2} />
-        <div className={styles.heroScenery} />
-        <div className={styles.heroWaveMid} />
-        <div className={styles.heroOcean} />
+        {/* 슬라이드 배경들 */}
+        <div className={`${styles.slide} ${styles.slideOcean} ${active === 0 ? styles.slideActive : ''}`}>
+          <div className={styles.oceanBg} />
+          <div className={styles.oceanClouds} />
+          <div className={styles.oceanScenery} />
+          <div className={styles.oceanWaveMid} />
+          <div className={styles.oceanBottom} />
+        </div>
+
+        <div className={`${styles.slide} ${styles.slideSunset} ${active === 1 ? styles.slideActive : ''}`}>
+          <div className={styles.sunsetBg} />
+          <div className={styles.sunsetSun} />
+          <div className={styles.sunsetMountains} />
+        </div>
+
+        <div className={`${styles.slide} ${styles.slideForest} ${active === 2 ? styles.slideActive : ''}`}>
+          <div className={styles.forestBg} />
+          <div className={styles.forestTrees} />
+          <div className={styles.forestMist} />
+        </div>
+
+        <div className={`${styles.slide} ${styles.slideCity} ${active === 3 ? styles.slideActive : ''}`}>
+          <div className={styles.cityBg} />
+          <div className={styles.citySkyline} />
+          <div className={styles.cityRain} />
+        </div>
+
+        <div className={`${styles.slide} ${styles.slideHighway} ${active === 4 ? styles.slideActive : ''}`}>
+          <div className={styles.highwayBg} />
+          <div className={styles.highwayLights} />
+          <div className={styles.highwayRoad} />
+        </div>
+
+        {/* 콘텐츠 */}
         <motion.div
           className={styles.heroContent}
-          initial={{ opacity: 0, y: 30 }}
+          key={active}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
         >
           <h1 className={styles.heroLogo}>好海</h1>
-          <p className={styles.heroSubLogo} style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginBottom: 24, letterSpacing: '0.15em' }}>호해 — 바다를 사랑하다</p>
-          <p className={styles.heroQuote}>
-            {`파도가 밀려오듯\n시가 가슴에 닿고\n바다가 노래합니다`}
-          </p>
-          <p className={styles.heroAuthor}>— 호해 이성헌</p>
+          <p className={styles.heroSubLogo}>호해 — 바다를 사랑하다</p>
+          <p className={styles.heroQuote}>{SLIDES[active].quote}</p>
+          <p className={styles.heroAuthor}>{SLIDES[active].author}</p>
         </motion.div>
+
+        {/* 캐러셀 컨트롤 */}
+        <div className={styles.carouselControls}>
+          <button className={styles.carouselArrow} onClick={() => goTo(active - 1)} aria-label="이전">
+            ‹
+          </button>
+          <div className={styles.carouselDots}>
+            {SLIDES.map((_, i) => (
+              <button
+                key={i}
+                className={`${styles.dot} ${active === i ? styles.dotActive : ''}`}
+                onClick={() => goTo(i)}
+                aria-label={`슬라이드 ${i + 1}`}
+              />
+            ))}
+          </div>
+          <button className={styles.carouselArrow} onClick={() => goTo(active + 1)} aria-label="다음">
+            ›
+          </button>
+        </div>
+
         <div className={styles.scrollHint}>
           <span>아래로</span>
           <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round">
