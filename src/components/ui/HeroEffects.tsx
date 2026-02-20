@@ -149,7 +149,7 @@ function drawSunset(
   }
 }
 
-// ---- 3. Forest — layered mist + fireflies + light shafts ----
+// ---- 3. Forest — dark mystical: bright fireflies + falling leaves + mist + light shafts ----
 function drawForest(
   ctx: CanvasRenderingContext2D,
   w: number,
@@ -160,92 +160,153 @@ function drawForest(
 ) {
   ctx.clearRect(0, 0, w, h);
 
-  // Light shafts from top
-  const shaftCount = 6;
+  // Volumetric light shafts from top-center (bright in dark scene)
+  const shaftCount = 5;
   for (let i = 0; i < shaftCount; i++) {
-    const sx = w * (0.15 + (i / shaftCount) * 0.7);
-    const sway = Math.sin(t * 0.0004 + i * 1.5) * 20;
-    const topW = 10 + i * 4;
-    const botW = 60 + i * 15;
-    const alpha = 0.025 + 0.015 * Math.sin(t * 0.001 + i * 2);
+    const sx = w * (0.3 + (i / shaftCount) * 0.4);
+    const sway = Math.sin(t * 0.0003 + i * 1.8) * 25;
+    const topW = 15 + i * 5;
+    const botW = 80 + i * 20;
+    const alpha = 0.04 + 0.03 * Math.sin(t * 0.0008 + i * 2.5);
 
     ctx.beginPath();
     ctx.moveTo(sx - topW / 2 + sway, 0);
     ctx.lineTo(sx + topW / 2 + sway, 0);
-    ctx.lineTo(sx + botW / 2 + sway * 0.3, h * 0.85);
-    ctx.lineTo(sx - botW / 2 + sway * 0.3, h * 0.85);
+    ctx.lineTo(sx + botW / 2 + sway * 0.2, h * 0.9);
+    ctx.lineTo(sx - botW / 2 + sway * 0.2, h * 0.9);
     ctx.closePath();
 
-    const grad = ctx.createLinearGradient(sx, 0, sx, h * 0.85);
-    grad.addColorStop(0, `rgba(255,255,230,${alpha * 1.5})`);
-    grad.addColorStop(0.5, `rgba(255,255,220,${alpha})`);
-    grad.addColorStop(1, `rgba(255,255,210,0)`);
+    const grad = ctx.createLinearGradient(sx, 0, sx, h * 0.9);
+    grad.addColorStop(0, `rgba(180,220,240,${alpha * 1.8})`);
+    grad.addColorStop(0.3, `rgba(180,210,230,${alpha})`);
+    grad.addColorStop(0.7, `rgba(160,200,220,${alpha * 0.5})`);
+    grad.addColorStop(1, 'rgba(160,200,220,0)');
     ctx.fillStyle = grad;
     ctx.fill();
   }
 
-  // Layered mist (3 horizontal bands)
-  for (let layer = 0; layer < 3; layer++) {
-    const baseY = h * (0.45 + layer * 0.15);
-    const speed = 0.0002 * (layer + 1);
-    const amplitude = 20 + layer * 10;
-    const alpha = 0.06 - layer * 0.015;
+  // Floating dust in light beams
+  for (let i = 0; i < 25; i++) {
+    const dx = w * 0.3 + rand(0, w * 0.4);
+    const dy = (t * 0.015 + i * h / 25) % h;
+    const driftX = Math.sin(t * 0.001 + i * 2.7) * 20;
+    const dustAlpha = 0.15 + 0.1 * Math.sin(t * 0.003 + i * 1.5);
+    const dustSize = 1 + rand(0, 1.5);
+    ctx.beginPath();
+    ctx.arc(dx + driftX, dy, dustSize, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(200,220,240,${dustAlpha})`;
+    ctx.fill();
+  }
+
+  // Layered mist (darker, more atmospheric)
+  for (let layer = 0; layer < 4; layer++) {
+    const baseY = h * (0.4 + layer * 0.12);
+    const speed = 0.00015 * (layer + 1);
+    const amplitude = 15 + layer * 8;
+    const alpha = 0.07 - layer * 0.012;
 
     ctx.beginPath();
-    ctx.moveTo(-50, baseY + 80);
-    for (let x = -50; x <= w + 50; x += 8) {
+    ctx.moveTo(-50, baseY + 90);
+    for (let x = -50; x <= w + 50; x += 6) {
       const y = baseY + Math.sin(x * 0.003 + t * speed) * amplitude +
-                Math.sin(x * 0.007 + t * speed * 1.3) * amplitude * 0.4;
+                Math.sin(x * 0.008 + t * speed * 1.5) * amplitude * 0.4;
       ctx.lineTo(x, y);
     }
-    ctx.lineTo(w + 50, baseY + 80);
+    ctx.lineTo(w + 50, baseY + 90);
     ctx.closePath();
 
-    const grad = ctx.createLinearGradient(0, baseY - 40, 0, baseY + 80);
-    grad.addColorStop(0, `rgba(230,235,220,0)`);
-    grad.addColorStop(0.3, `rgba(230,235,220,${alpha})`);
-    grad.addColorStop(0.7, `rgba(230,235,220,${alpha})`);
-    grad.addColorStop(1, `rgba(230,235,220,0)`);
+    const grad = ctx.createLinearGradient(0, baseY - 30, 0, baseY + 90);
+    grad.addColorStop(0, 'rgba(100,140,120,0)');
+    grad.addColorStop(0.3, `rgba(100,140,120,${alpha})`);
+    grad.addColorStop(0.7, `rgba(80,120,100,${alpha})`);
+    grad.addColorStop(1, 'rgba(80,120,100,0)');
     ctx.fillStyle = grad;
     ctx.fill();
   }
 
-  // Fireflies
-  for (let i = 0; i < PARTICLE_COUNT; i++) {
+  // Fireflies — first 45 particles (bright yellow-green with large glow halos)
+  const fireflyCount = Math.min(45, PARTICLE_COUNT);
+  for (let i = 0; i < fireflyCount; i++) {
     const idx = i * 4;
     let px = particles[idx];
     let py = particles[idx + 1];
     const sz = particles[idx + 2];
     const phase = particles[idx + 3];
 
-    // Drift gently
-    px += Math.sin(t * 0.001 + phase) * 0.3;
-    py += Math.cos(t * 0.0008 + phase * 1.5) * 0.2;
-    if (px > w + 20) px = -20;
-    if (px < -20) px = w + 20;
-    if (py > h + 20) py = -20;
-    if (py < -20) py = h + 20;
+    // Gentle organic drift
+    px += Math.sin(t * 0.0008 + phase) * 0.4;
+    py += Math.cos(t * 0.0006 + phase * 1.3) * 0.3;
+    px += Math.sin(t * 0.0003 + phase * 2.5) * 0.15;
+    if (px > w + 30) px = -30;
+    if (px < -30) px = w + 30;
+    if (py > h + 30) py = -30;
+    if (py < -30) py = h + 30;
     particles[idx] = px;
     particles[idx + 1] = py;
 
-    const glow = 0.3 + 0.7 * Math.pow(Math.max(0, Math.sin(t * 0.003 + phase * 3)), 2);
-    const r = sz * (0.8 + glow * 0.6);
+    // Bioluminescent glow pattern — slow pulse with random phase
+    const glow = 0.2 + 0.8 * Math.pow(Math.max(0, Math.sin(t * 0.002 + phase * 3.7)), 2.5);
+    const r = sz * (0.7 + glow * 0.8);
 
-    // Outer glow
-    const grad = ctx.createRadialGradient(px, py, 0, px, py, r * 6);
-    grad.addColorStop(0, `rgba(200,240,120,${glow * 0.3})`);
-    grad.addColorStop(0.5, `rgba(180,220,100,${glow * 0.08})`);
-    grad.addColorStop(1, 'rgba(180,220,100,0)');
-    ctx.fillStyle = grad;
+    // Large outer halo
+    const haloR = r * 10;
+    const haloGrad = ctx.createRadialGradient(px, py, 0, px, py, haloR);
+    haloGrad.addColorStop(0, `rgba(220,255,80,${glow * 0.2})`);
+    haloGrad.addColorStop(0.3, `rgba(180,240,60,${glow * 0.08})`);
+    haloGrad.addColorStop(0.6, `rgba(150,220,50,${glow * 0.02})`);
+    haloGrad.addColorStop(1, 'rgba(150,220,50,0)');
+    ctx.fillStyle = haloGrad;
     ctx.beginPath();
-    ctx.arc(px, py, r * 6, 0, Math.PI * 2);
+    ctx.arc(px, py, haloR, 0, Math.PI * 2);
     ctx.fill();
 
-    // Core
+    // Inner glow
+    const innerGrad = ctx.createRadialGradient(px, py, 0, px, py, r * 4);
+    innerGrad.addColorStop(0, `rgba(255,255,180,${glow * 0.6})`);
+    innerGrad.addColorStop(0.4, `rgba(220,250,100,${glow * 0.3})`);
+    innerGrad.addColorStop(1, 'rgba(200,240,80,0)');
+    ctx.fillStyle = innerGrad;
     ctx.beginPath();
-    ctx.arc(px, py, r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(220,255,150,${glow * 0.8})`;
+    ctx.arc(px, py, r * 4, 0, Math.PI * 2);
     ctx.fill();
+
+    // Bright core
+    ctx.beginPath();
+    ctx.arc(px, py, r * 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,220,${glow * 0.9})`;
+    ctx.fill();
+  }
+
+  // Falling leaves — remaining particles
+  for (let i = fireflyCount; i < PARTICLE_COUNT; i++) {
+    const idx = i * 4;
+    let px = particles[idx];
+    let py = particles[idx + 1];
+    const sz = particles[idx + 2]; // used as leaf size
+    const phase = particles[idx + 3];
+
+    // Fall + drift
+    py += 0.3 + Math.sin(t * 0.001 + phase) * 0.15;
+    px += Math.sin(t * 0.0005 + phase * 2) * 0.5 + 0.1;
+    if (py > h + 20) { py = -20; px = rand(0, w); }
+    particles[idx] = px;
+    particles[idx + 1] = py;
+
+    const rotation = t * 0.002 + phase * 5;
+    const leafAlpha = 0.25 + 0.15 * Math.sin(t * 0.001 + phase);
+
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(rotation);
+    // Simple leaf shape
+    ctx.beginPath();
+    ctx.ellipse(0, 0, sz * 2, sz * 0.8, 0, 0, Math.PI * 2);
+    const leafColor = i % 3 === 0 ? `rgba(80,120,60,${leafAlpha})` :
+                      i % 3 === 1 ? `rgba(100,140,50,${leafAlpha})` :
+                                    `rgba(60,100,70,${leafAlpha})`;
+    ctx.fillStyle = leafColor;
+    ctx.fill();
+    ctx.restore();
   }
 }
 
@@ -574,11 +635,20 @@ function initSunsetParticles(w: number, h: number, count: number): Float64Array 
 
 function initForestParticles(w: number, h: number, count: number): Float64Array {
   const p = new Float64Array(count * 4);
-  for (let i = 0; i < count; i++) {
+  // First 45: fireflies spread across scene
+  const fireflyCount = Math.min(45, count);
+  for (let i = 0; i < fireflyCount; i++) {
     p[i * 4] = rand(0, w);
-    p[i * 4 + 1] = rand(h * 0.2, h * 0.85);
-    p[i * 4 + 2] = rand(1.5, 3); // size
+    p[i * 4 + 1] = rand(h * 0.1, h * 0.9);
+    p[i * 4 + 2] = rand(1.5, 3.5); // size
     p[i * 4 + 3] = rand(0, Math.PI * 2); // phase
+  }
+  // Rest: falling leaves from above
+  for (let i = fireflyCount; i < count; i++) {
+    p[i * 4] = rand(0, w);
+    p[i * 4 + 1] = rand(-h, h);
+    p[i * 4 + 2] = rand(2, 4); // leaf size
+    p[i * 4 + 3] = rand(0, Math.PI * 2); // phase/rotation
   }
   return p;
 }
@@ -616,7 +686,7 @@ export default function HeroEffects({ activeSlide, isActive }: Props) {
   const PARTICLE_COUNTS: Record<number, number> = {
     0: 40, // lighthouse motes
     1: 60, // sunset sparkles
-    2: 30, // forest fireflies
+    2: 60, // forest fireflies + falling leaves
     3: 200, // city rain
     4: 50, // night sea plankton
     5: 35, // lighthouse2 mist
