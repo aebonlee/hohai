@@ -117,139 +117,72 @@
 }
 
 /* ==========================================================================
-   슬라이드 2: 석양 / 노을 바다 — 풍부한 색감 + 태양열기 + 물반사
+   슬라이드 2: 석양 / 노을 바다 — 사진 배경 + 우아한 따뜻한 오버레이
    ========================================================================== */
-.slideSunset .sunsetBg {
+.slideSunset .sunsetImg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    #0d0822 0%,
-    #1a1040 6%,
-    #3a1855 14%,
-    #6a1858 22%,
-    #a03048 30%,
-    #c44a35 38%,
-    #e07028 46%,
-    #f0a840 54%,
-    #f5c860 60%,
-    #e8a040 66%,
-    #c06030 73%,
-    #803828 82%,
-    #402018 92%,
-    #1a0c08 100%
-  );
+  background: url('/images/hero-sunset-a.png') no-repeat center center;
+  background-size: cover;
+  animation: slowZoomSunset 24s ease-in-out infinite alternate;
 }
 
-/* 대기 열기 효과 (heat haze) */
-.slideSunset .sunsetHaze {
+@keyframes slowZoomSunset {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+/* 따뜻한 대기 글로우 — 태양 주변 부드러운 빛 */
+.slideSunset .sunsetWarmGlow {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 40% at 50% 55%, rgba(255, 150, 50, 0.08), transparent 60%),
-    radial-gradient(ellipse 60% 30% at 50% 55%, rgba(255, 200, 100, 0.06), transparent 50%);
-  animation: hazeShimmer 8s ease-in-out infinite alternate;
+    radial-gradient(ellipse 50% 50% at 50% 48%, rgba(255, 180, 80, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 40% at 50% 55%, rgba(255, 140, 50, 0.06) 0%, transparent 60%);
+  animation: warmGlowPulse 6s ease-in-out infinite alternate;
+  z-index: 1;
+  pointer-events: none;
 }
 
-@keyframes hazeShimmer {
-  0% { opacity: 0.7; transform: scaleY(1); }
-  100% { opacity: 1; transform: scaleY(1.02); }
+@keyframes warmGlowPulse {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
 }
 
-.slideSunset .sunsetSun {
-  position: absolute;
-  bottom: 35%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fffde0 0%, #ffcc44 25%, #ff9920 50%, #ff6600 70%, transparent 75%);
-  box-shadow:
-    0 0 40px 20px rgba(255, 200, 80, 0.5),
-    0 0 80px 40px rgba(255, 150, 50, 0.3),
-    0 0 160px 80px rgba(255, 100, 20, 0.15),
-    0 0 300px 150px rgba(255, 80, 10, 0.06);
-  animation: sunPulse 4s ease-in-out infinite;
-}
-
-/* 태양 반사 — 수면 위 빛 기둥 */
+/* 수면 반사 — 따뜻한 빛 기둥 (부드럽게 흔들림) */
 .slideSunset .sunsetReflection {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
-  height: 35%;
+  width: 80px;
+  height: 40%;
   background: linear-gradient(180deg,
-    rgba(255, 220, 100, 0.35) 0%,
-    rgba(255, 180, 60, 0.2) 20%,
-    rgba(255, 140, 40, 0.12) 40%,
-    rgba(255, 100, 30, 0.06) 60%,
+    rgba(255, 200, 100, 0.18) 0%,
+    rgba(255, 160, 60, 0.1) 30%,
+    rgba(255, 120, 40, 0.05) 60%,
     transparent 100%
   );
-  filter: blur(15px);
-  animation: reflectionWobble 4s ease-in-out infinite alternate;
+  filter: blur(20px);
+  animation: sunsetReflWobble 5s ease-in-out infinite alternate;
   z-index: 1;
-}
-
-@keyframes reflectionWobble {
-  0% { width: 50px; opacity: 0.8; }
-  50% { width: 80px; opacity: 1; }
-  100% { width: 55px; opacity: 0.85; }
-}
-
-/* 노을 바다 파도 — 3중 레이어 */
-.slideSunset .sunsetWaves {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 30%;
-  z-index: 2;
-}
-
-.slideSunset .sunsetWaves::before {
-  content: '';
-  position: absolute;
-  bottom: 8%;
-  left: 0;
-  width: 6400px;
-  height: 120px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 120'%3E%3Cpath fill='%23401810' fill-opacity='0.5' d='M0,60 C200,90 400,30 600,60 C800,90 1000,30 1200,60 C1400,90 1500,70 1600,60 L1600,120 L0,120 Z'/%3E%3C/svg%3E") repeat-x;
-  background-size: 1600px 120px;
-  animation: wave 10s cubic-bezier(0.36,0.45,0.63,0.53) infinite,
-             swell 7s ease infinite;
-}
-
-.slideSunset .sunsetWaves::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 6400px;
-  height: 100px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 100'%3E%3Cpath fill='%23200a06' fill-opacity='0.8' d='M0,50 C180,75 380,25 560,50 C740,75 940,25 1120,50 C1300,75 1480,55 1600,50 L1600,100 L0,100 Z'/%3E%3C/svg%3E") repeat-x;
-  background-size: 1600px 100px;
-  animation: wave 7s cubic-bezier(0.36,0.45,0.63,0.53) -0.5s infinite,
-             swell 5s ease -1s infinite;
-}
-
-.slideSunset .sunsetOverlay {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 70% 60% at 50% 45%, transparent 20%, rgba(10, 5, 2, 0.25) 100%);
-  z-index: 3;
   pointer-events: none;
 }
 
-@keyframes sunPulse {
-  0%, 100% {
-    box-shadow: 0 0 40px 20px rgba(255,200,80,0.5), 0 0 80px 40px rgba(255,150,50,0.3), 0 0 160px 80px rgba(255,100,20,0.15);
-  }
-  50% {
-    box-shadow: 0 0 60px 30px rgba(255,200,80,0.6), 0 0 120px 60px rgba(255,150,50,0.35), 0 0 200px 100px rgba(255,100,20,0.2);
-  }
+@keyframes sunsetReflWobble {
+  0% { width: 70px; opacity: 0.6; }
+  50% { width: 100px; opacity: 0.8; }
+  100% { width: 75px; opacity: 0.65; }
+}
+
+/* 비네트 오버레이 — 가장자리 어둡게 처리 */
+.slideSunset .sunsetOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 65% 70% at 50% 45%, transparent 25%, rgba(20, 8, 2, 0.3) 100%);
+  z-index: 4;
+  pointer-events: none;
 }
 
 /* ==========================================================================

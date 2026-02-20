@@ -65,7 +65,7 @@ function drawLighthouse(
   }
 }
 
-// ---- 2. Sunset — god‑rays + water sparkles + bird silhouettes ----
+// ---- 2. Sunset — soft golden god‑rays + gentle water shimmer + warm floating dust ----
 function drawSunset(
   ctx: CanvasRenderingContext2D,
   w: number,
@@ -76,76 +76,101 @@ function drawSunset(
 ) {
   ctx.clearRect(0, 0, w, h);
 
-  // God‑rays from sun center
-  const cx = w / 2, cy = h * 0.38;
-  const rayCount = 12;
+  // Soft golden god‑rays from horizon center (wide, gentle, warm)
+  const cx = w / 2, cy = h * 0.42;
+  const rayCount = 8;
   for (let i = 0; i < rayCount; i++) {
-    const angle = (Math.PI * 2 * i) / rayCount + t * 0.00008;
-    const len = h * 0.7 + Math.sin(t * 0.001 + i) * 60;
-    const spread = 0.04 + Math.sin(t * 0.0015 + i * 0.8) * 0.015;
-    const alpha = 0.03 + 0.02 * Math.sin(t * 0.002 + i * 1.3);
+    // Rays fan out in upper half only (downward from horizon)
+    const baseAngle = -Math.PI * 0.8 + (Math.PI * 0.6 / rayCount) * i;
+    const angle = baseAngle + Math.sin(t * 0.00006 + i * 0.9) * 0.02;
+    const len = h * 0.9 + Math.sin(t * 0.0008 + i * 1.5) * 40;
+    const spread = 0.06 + 0.02 * Math.sin(t * 0.001 + i * 1.1);
+    const alpha = 0.015 + 0.01 * Math.sin(t * 0.0012 + i * 2);
 
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.lineTo(cx + Math.cos(angle - spread) * len, cy + Math.sin(angle - spread) * len);
     ctx.lineTo(cx + Math.cos(angle + spread) * len, cy + Math.sin(angle + spread) * len);
     ctx.closePath();
-    ctx.fillStyle = `rgba(255,200,100,${alpha})`;
+
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, len);
+    grad.addColorStop(0, `rgba(255,210,130,${alpha * 2.5})`);
+    grad.addColorStop(0.3, `rgba(255,180,90,${alpha * 1.5})`);
+    grad.addColorStop(0.7, `rgba(255,150,60,${alpha * 0.6})`);
+    grad.addColorStop(1, 'rgba(255,140,50,0)');
+    ctx.fillStyle = grad;
     ctx.fill();
   }
 
-  // Water sparkles (bottom 30%)
-  const sparkleY = h * 0.7;
+  // Gentle water surface shimmer (bottom 35%) — soft horizontal lines
+  const waterY = h * 0.65;
+  for (let i = 0; i < 14; i++) {
+    const y = waterY + (h - waterY) * (i / 14);
+    const amplitude = 1.5 + i * 0.3;
+    const freq = 0.004 + i * 0.0002;
+    const speed = t * (0.0003 + i * 0.00004);
+
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    for (let x = 0; x <= w; x += 8) {
+      const yOff = Math.sin(x * freq + speed) * amplitude +
+                   Math.sin(x * freq * 1.8 + speed * 0.6) * amplitude * 0.4;
+      ctx.lineTo(x, y + yOff);
+    }
+    // Warm golden tint for upper water lines, darker for lower
+    const fade = 1 - (i / 14);
+    const r = Math.round(255 - fade * 30);
+    const g = Math.round(200 - (1 - fade) * 60);
+    const b = Math.round(140 - (1 - fade) * 60);
+    const lineAlpha = 0.02 + fade * 0.03;
+    ctx.strokeStyle = `rgba(${r},${g},${b},${lineAlpha})`;
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+  }
+
+  // Warm floating dust / light particles — very gentle, slow drift
   for (let i = 0; i < PARTICLE_COUNT; i++) {
     const idx = i * 4;
     let px = particles[idx];
-    const baseY = particles[idx + 1];
+    let py = particles[idx + 1];
     const sz = particles[idx + 2];
     const phase = particles[idx + 3];
 
-    const sparkle = Math.pow(Math.max(0, Math.sin(t * 0.004 + phase)), 8);
-    if (sparkle < 0.01) continue;
+    // Slow organic float upward + horizontal sway
+    py -= 0.12 + Math.sin(t * 0.0006 + phase) * 0.08;
+    px += Math.sin(t * 0.0004 + phase * 1.7) * 0.2;
+    if (py < -10) { py = h + 10; px = rand(w * 0.15, w * 0.85); }
+    particles[idx] = px;
+    particles[idx + 1] = py;
 
-    const py = baseY + Math.sin(t * 0.001 + phase) * 3;
-    px += Math.sin(t * 0.0005 + phase * 2) * 0.5;
+    const glow = 0.3 + 0.7 * Math.pow(Math.max(0, Math.sin(t * 0.0015 + phase * 2.8)), 2);
+    const r = sz * (0.6 + glow * 0.5);
 
+    // Soft warm halo
+    const haloGrad = ctx.createRadialGradient(px, py, 0, px, py, r * 6);
+    haloGrad.addColorStop(0, `rgba(255,220,140,${glow * 0.12})`);
+    haloGrad.addColorStop(0.5, `rgba(255,190,100,${glow * 0.04})`);
+    haloGrad.addColorStop(1, 'rgba(255,180,80,0)');
+    ctx.fillStyle = haloGrad;
     ctx.beginPath();
-    ctx.arc(px, sparkleY + (py % (h - sparkleY)), sz * sparkle * 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255,230,160,${sparkle * 0.7})`;
+    ctx.arc(px, py, r * 6, 0, Math.PI * 2);
     ctx.fill();
 
-    // Cross highlight
-    if (sparkle > 0.5) {
-      ctx.strokeStyle = `rgba(255,240,200,${sparkle * 0.3})`;
-      ctx.lineWidth = 0.5;
-      const r = sz * sparkle * 5;
-      ctx.beginPath();
-      ctx.moveTo(px - r, sparkleY + (py % (h - sparkleY)));
-      ctx.lineTo(px + r, sparkleY + (py % (h - sparkleY)));
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(px, sparkleY + (py % (h - sparkleY)) - r);
-      ctx.lineTo(px, sparkleY + (py % (h - sparkleY)) + r);
-      ctx.stroke();
-    }
-  }
-
-  // Bird silhouettes (simple V shapes)
-  const birdCount = 5;
-  for (let i = 0; i < birdCount; i++) {
-    const bx = ((t * 0.02 + i * w / birdCount * 1.3) % (w + 200)) - 100;
-    const by = h * 0.12 + i * 25 + Math.sin(t * 0.002 + i * 3) * 15;
-    const wingSpan = 8 + i * 2;
-    const wingY = Math.sin(t * 0.008 + i * 4) * 3;
-
+    // Warm core
     ctx.beginPath();
-    ctx.moveTo(bx - wingSpan, by + wingY);
-    ctx.quadraticCurveTo(bx - wingSpan * 0.3, by - 3, bx, by);
-    ctx.quadraticCurveTo(bx + wingSpan * 0.3, by - 3, bx + wingSpan, by + wingY);
-    ctx.strokeStyle = `rgba(60,20,10,${0.2 + i * 0.04})`;
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
+    ctx.arc(px, py, r * 0.6, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,240,200,${glow * 0.3})`;
+    ctx.fill();
   }
+
+  // Horizon glow band — soft warm light along the horizon
+  const horizonGrad = ctx.createLinearGradient(0, cy - 40, 0, cy + 60);
+  horizonGrad.addColorStop(0, 'rgba(255,200,100,0)');
+  horizonGrad.addColorStop(0.4, `rgba(255,190,90,${0.03 + 0.02 * Math.sin(t * 0.0008)})`);
+  horizonGrad.addColorStop(0.6, `rgba(255,170,70,${0.025 + 0.015 * Math.sin(t * 0.001)})`);
+  horizonGrad.addColorStop(1, 'rgba(255,150,50,0)');
+  ctx.fillStyle = horizonGrad;
+  ctx.fillRect(0, cy - 40, w, 100);
 }
 
 // ---- 3. Forest — dark mystical: bright fireflies + falling leaves + mist + light shafts ----
@@ -624,10 +649,10 @@ function initLighthouseParticles(w: number, h: number, count: number): Float64Ar
 function initSunsetParticles(w: number, h: number, count: number): Float64Array {
   const p = new Float64Array(count * 4);
   for (let i = 0; i < count; i++) {
-    p[i * 4] = rand(0, w);
-    p[i * 4 + 1] = rand(0, h * 0.3);
-    p[i * 4 + 2] = rand(1, 2.5); // size
-    p[i * 4 + 3] = rand(0, Math.PI * 2); // phase
+    p[i * 4] = rand(w * 0.15, w * 0.85);  // concentrated in center
+    p[i * 4 + 1] = rand(0, h);             // full height spread
+    p[i * 4 + 2] = rand(1, 2.8);           // size
+    p[i * 4 + 3] = rand(0, Math.PI * 2);   // phase
   }
   return p;
 }
@@ -684,7 +709,7 @@ export default function HeroEffects({ activeSlide, isActive }: Props) {
 
   const PARTICLE_COUNTS: Record<number, number> = {
     0: 40, // lighthouse motes
-    1: 60, // sunset sparkles
+    1: 35, // sunset warm dust
     2: 60, // forest fireflies + falling leaves
     3: 200, // city rain
     4: 50, // night sea plankton

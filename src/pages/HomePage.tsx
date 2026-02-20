@@ -54,13 +54,11 @@ export default function HomePage() {
           <div className={styles.lighthouseOverlay} />
         </div>
 
-        {/* 슬라이드 2: 석양 / 노을 바다 */}
+        {/* 슬라이드 2: 석양 / 노을 바다 (사진 배경) */}
         <div className={`${styles.slide} ${styles.slideSunset} ${active === 1 ? styles.slideActive : ''}`}>
-          <div className={styles.sunsetBg} />
-          <div className={styles.sunsetHaze} />
-          <div className={styles.sunsetSun} />
+          <div className={styles.sunsetImg} />
+          <div className={styles.sunsetWarmGlow} />
           <div className={styles.sunsetReflection} />
-          <div className={styles.sunsetWaves} />
           <div className={styles.sunsetOverlay} />
         </div>
 
