@@ -711,9 +711,10 @@ export default function HeroEffects({ activeSlide, isActive }: Props) {
     0: 40, // lighthouse motes
     1: 35, // sunset warm dust
     2: 60, // forest fireflies + falling leaves
-    3: 200, // city rain
-    4: 50, // night sea plankton
-    5: 35, // lighthouse2 mist
+    3: 40, // lighthouse3 (twilight) motes
+    4: 200, // city rain
+    5: 50, // night sea plankton
+    6: 35, // lighthouse2 mist
   };
 
   const initParticles = useCallback((slide: number, w: number, h: number) => {
@@ -722,9 +723,10 @@ export default function HeroEffects({ activeSlide, isActive }: Props) {
       case 0: return initLighthouseParticles(w, h, count);
       case 1: return initSunsetParticles(w, h, count);
       case 2: return initForestParticles(w, h, count);
-      case 3: return initCityParticles(w, h, count);
-      case 4: return initNightSeaParticles(w, h, count);
-      case 5: return initLighthouseParticles(w, h, count);
+      case 3: return initLighthouseParticles(w, h, count);
+      case 4: return initCityParticles(w, h, count);
+      case 5: return initNightSeaParticles(w, h, count);
+      case 6: return initLighthouseParticles(w, h, count);
       default: return initLighthouseParticles(w, h, count);
     }
   }, []);
@@ -762,9 +764,9 @@ export default function HeroEffects({ activeSlide, isActive }: Props) {
         const rect = parent.getBoundingClientRect();
         particlesRef.current = initParticles(activeSlide, rect.width, rect.height);
         // Reset extra data
-        if (activeSlide === 3) {
+        if (activeSlide === 4) {
           extraRef.current = { lightning: { active: false, alpha: 0, nextAt: performance.now() + rand(4000, 8000) } };
-        } else if (activeSlide === 4) {
+        } else if (activeSlide === 5) {
           extraRef.current = { shootingStars: [], nextStar: performance.now() + rand(1000, 3000) };
         } else {
           extraRef.current = {};
@@ -794,9 +796,10 @@ export default function HeroEffects({ activeSlide, isActive }: Props) {
         case 0: drawLighthouse(ctx, w, h, t, particles, count); break;
         case 1: drawSunset(ctx, w, h, t, particles, count); break;
         case 2: drawForest(ctx, w, h, t, particles, count); break;
-        case 3: drawCity(ctx, w, h, t, particles, count, extraRef.current as never); break;
-        case 4: drawNightSea(ctx, w, h, t, particles, count, extraRef.current as never); break;
-        case 5: drawLighthouse2(ctx, w, h, t, particles, count); break;
+        case 3: drawLighthouse(ctx, w, h, t, particles, count); break;
+        case 4: drawCity(ctx, w, h, t, particles, count, extraRef.current as never); break;
+        case 5: drawNightSea(ctx, w, h, t, particles, count, extraRef.current as never); break;
+        case 6: drawLighthouse2(ctx, w, h, t, particles, count); break;
         default: break;
       }
 

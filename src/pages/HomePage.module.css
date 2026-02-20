@@ -140,7 +140,17 @@
 }
 
 /* ==========================================================================
-   슬라이드 4: 비 오는 도시 (사이버틱 + 네온 + 번개)
+   슬라이드 4: 황혼 등대 — 깨끗한 밤바다 사진 배경
+   ========================================================================== */
+.slideLighthouse3 .lighthouseImg3 {
+  position: absolute;
+  inset: 0;
+  background: url('/images/hero-lighthouse-3.png') no-repeat center center;
+  background-size: cover;
+}
+
+/* ==========================================================================
+   슬라이드 5: 비 오는 도시 (사이버틱 + 네온 + 번개)
    ========================================================================== */
 .slideCity .cityBg {
   position: absolute;
@@ -766,12 +776,5 @@
 
   .songInner {
     padding: 0 16px;
-  }
-
-  /* 모바일에서 빔/글로우 크기 축소 */
-  .slideLighthouse1 .lighthouseBeam,
-  .slideLighthouse2 .lighthouseBeam2 {
-    width: 300px;
-    height: 300px;
   }
 }
