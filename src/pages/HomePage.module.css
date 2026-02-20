@@ -54,11 +54,11 @@
 .slideOcean .oceanScenery {
   position: absolute;
   bottom: 0;
-  left: 0;
-  right: 0;
+  left: -5%;
+  right: -5%;
   height: 400px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400'%3E%3Cpath fill='%230A2E5C' fill-opacity='0.15' d='M0,320 C120,290 240,300 360,270 C480,250 560,265 680,245 C800,230 880,250 1000,235 C1120,225 1200,240 1320,220 C1380,215 1420,225 1440,222 L1440,400 L0,400 Z'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.1' d='M0,340 C180,320 300,330 480,310 C660,295 780,315 960,295 C1100,282 1260,305 1440,285 L1440,400 L0,400 Z'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.18' d='M1150,400 L1162,155 C1164,148 1172,143 1180,143 L1200,143 C1208,143 1216,148 1218,155 L1230,400 Z'/%3E%3Crect x='1148' y='135' width='84' height='14' rx='4' fill='%230A2E5C' fill-opacity='0.18'/%3E%3Crect x='1158' y='100' width='64' height='38' rx='5' fill='%230A2E5C' fill-opacity='0.16'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.18' d='M1190,72 L1150,100 L1230,100 Z'/%3E%3Ccircle cx='1190' cy='119' r='12' fill='%23E8B060' fill-opacity='0.5'/%3E%3Ccircle cx='1190' cy='119' r='28' fill='%23E8B060' fill-opacity='0.1'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.2' stroke-width='2' stroke-linecap='round' d='M420,150 Q428,140 436,147 Q444,140 452,150'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.15' stroke-width='1.5' stroke-linecap='round' d='M480,125 Q486,118 492,123 Q498,118 504,125'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.12' stroke-width='1.8' stroke-linecap='round' d='M870,115 Q878,106 886,113 Q894,106 902,115'/%3E%3C/svg%3E") no-repeat center bottom;
-  background-size: 100% 400px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 400' preserveAspectRatio='none'%3E%3Cpath fill='%230A2E5C' fill-opacity='0.15' d='M-20,320 C120,290 240,300 360,270 C480,250 560,265 680,245 C800,230 880,250 1000,235 C1120,225 1200,240 1320,220 C1440,215 1520,225 1620,222 L1620,400 L-20,400 Z'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.1' d='M-20,340 C180,320 300,330 480,310 C660,295 780,315 960,295 C1100,282 1260,305 1440,285 C1520,278 1580,290 1620,285 L1620,400 L-20,400 Z'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.18' d='M1250,400 L1262,155 C1264,148 1272,143 1280,143 L1300,143 C1308,143 1316,148 1318,155 L1330,400 Z'/%3E%3Crect x='1248' y='135' width='84' height='14' rx='4' fill='%230A2E5C' fill-opacity='0.18'/%3E%3Crect x='1258' y='100' width='64' height='38' rx='5' fill='%230A2E5C' fill-opacity='0.16'/%3E%3Cpath fill='%230A2E5C' fill-opacity='0.18' d='M1290,72 L1250,100 L1330,100 Z'/%3E%3Ccircle cx='1290' cy='119' r='12' fill='%23E8B060' fill-opacity='0.5'/%3E%3Ccircle cx='1290' cy='119' r='28' fill='%23E8B060' fill-opacity='0.1'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.2' stroke-width='2' stroke-linecap='round' d='M420,150 Q428,140 436,147 Q444,140 452,150'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.15' stroke-width='1.5' stroke-linecap='round' d='M480,125 Q486,118 492,123 Q498,118 504,125'/%3E%3Cpath fill='none' stroke='%23ffffff' stroke-opacity='0.12' stroke-width='1.8' stroke-linecap='round' d='M870,115 Q878,106 886,113 Q894,106 902,115'/%3E%3C/svg%3E") no-repeat center bottom;
+  background-size: 110% 400px;
 }
 
 .slideOcean .oceanWaveMid {
@@ -123,11 +123,11 @@
 .slideSunset .sunsetMountains {
   position: absolute;
   bottom: 0;
-  left: 0;
-  right: 0;
-  height: 35%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 300'%3E%3Cpath fill='%23200a18' fill-opacity='0.6' d='M0,180 C60,140 120,100 240,130 C360,160 420,90 540,110 C660,130 720,60 840,100 C960,140 1020,80 1140,110 C1260,140 1380,120 1440,130 L1440,300 L0,300 Z'/%3E%3Cpath fill='%23120510' fill-opacity='0.8' d='M0,220 C100,190 200,160 360,190 C520,220 600,170 780,200 C960,230 1080,180 1200,200 C1320,220 1400,210 1440,215 L1440,300 L0,300 Z'/%3E%3Cpath fill='%230a0208' d='M0,260 C120,245 240,250 400,240 C560,230 680,250 840,245 C1000,240 1120,255 1280,248 C1360,244 1400,250 1440,248 L1440,300 L0,300 Z'/%3E%3C/svg%3E") no-repeat center bottom;
-  background-size: 100% 100%;
+  left: -5%;
+  right: -5%;
+  height: 40%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 300' preserveAspectRatio='none'%3E%3Cpath fill='%23200a18' fill-opacity='0.6' d='M-20,180 C60,140 120,100 240,130 C360,160 420,90 540,110 C660,130 720,60 840,100 C960,140 1020,80 1140,110 C1260,140 1380,120 1500,130 C1560,135 1600,120 1620,125 L1620,300 L-20,300 Z'/%3E%3Cpath fill='%23120510' fill-opacity='0.8' d='M-20,220 C100,190 200,160 360,190 C520,220 600,170 780,200 C960,230 1080,180 1200,200 C1320,220 1440,210 1540,215 C1580,218 1600,212 1620,215 L1620,300 L-20,300 Z'/%3E%3Cpath fill='%230a0208' d='M-20,255 C120,240 240,248 400,238 C560,228 680,248 840,243 C1000,238 1120,253 1280,246 C1400,240 1500,250 1580,246 C1600,244 1610,248 1620,246 L1620,300 L-20,300 Z'/%3E%3C/svg%3E") no-repeat center bottom;
+  background-size: 110% 100%;
 }
 
 @keyframes sunPulse {
@@ -229,89 +229,104 @@
 }
 
 /* ========================================
-   슬라이드 5: 고속도로 불빛
+   슬라이드 5: 밤바다
    ======================================== */
-.slideHighway .highwayBg {
+.slideNightSea .nightSeaBg {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     180deg,
-    #050810 0%,
-    #0a1020 20%,
-    #0d1830 40%,
-    #101828 60%,
-    #0a1020 80%,
-    #050510 100%
+    #020810 0%,
+    #051025 15%,
+    #081830 30%,
+    #0a2040 50%,
+    #0c2848 65%,
+    #0a2040 80%,
+    #061530 92%,
+    #030a18 100%
   );
 }
 
-.slideHighway .highwayRoad {
+/* 별 */
+.slideNightSea .nightSeaBg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 25% 8%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 40% 22%, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1px 1px at 55% 5%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 70% 18%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 85% 12%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 15% 32%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 35% 38%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 60% 28%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 78% 35%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 92% 25%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 5% 42%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 48% 10%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 20% 20%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 65% 40%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 88% 8%, rgba(255,255,255,0.7), transparent);
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* 달 */
+.slideNightSea .nightSeaMoon {
+  position: absolute;
+  top: 12%;
+  right: 18%;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffff0 0%, #f0e8c8 40%, #d0c8a0 70%, transparent 72%);
+  box-shadow:
+    0 0 30px 15px rgba(240, 230, 180, 0.3),
+    0 0 80px 40px rgba(240, 230, 180, 0.12),
+    0 0 150px 70px rgba(200, 190, 140, 0.06);
+}
+
+/* 달빛 반사 (바다 위) */
+.slideNightSea .nightSeaMoon::after {
+  content: '';
+  position: absolute;
+  top: 300%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 250px;
+  background: linear-gradient(
+    180deg,
+    rgba(240, 230, 180, 0.25) 0%,
+    rgba(240, 230, 180, 0.15) 20%,
+    rgba(240, 230, 180, 0.08) 50%,
+    rgba(240, 230, 180, 0.03) 80%,
+    transparent 100%
+  );
+  filter: blur(8px);
+  animation: moonReflection 3s ease-in-out infinite alternate;
+}
+
+@keyframes moonReflection {
+  0% { width: 6px; opacity: 0.8; }
+  100% { width: 14px; opacity: 1; }
+}
+
+/* 밤바다 파도 */
+.slideNightSea .nightSeaWaves {
   position: absolute;
   bottom: 0;
-  left: 0;
-  right: 0;
-  height: 45%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400'%3E%3C!-- 도로 --%3E%3Cpath fill='%23181820' d='M0,100 L580,100 C620,100 660,120 700,200 L720,200 C760,120 800,100 840,100 L1440,100 L1440,400 L0,400 Z'/%3E%3C!-- 도로 중앙선 --%3E%3Cline x1='200' y1='250' x2='500' y2='250' stroke='%23f0c040' stroke-opacity='0.3' stroke-width='2' stroke-dasharray='20,15'/%3E%3Cline x1='940' y1='250' x2='1240' y2='250' stroke='%23f0c040' stroke-opacity='0.3' stroke-width='2' stroke-dasharray='20,15'/%3E%3C!-- 가로등 --%3E%3Crect x='300' y='80' width='4' height='170' fill='%23303040'/%3E%3Cellipse cx='300' cy='80' rx='20' ry='4' fill='%23303040'/%3E%3Ccircle cx='318' cy='80' r='5' fill='%23ffa020' fill-opacity='0.7'/%3E%3Ccircle cx='318' cy='80' r='20' fill='%23ffa020' fill-opacity='0.08'/%3E%3Crect x='600' y='80' width='4' height='170' fill='%23303040'/%3E%3Cellipse cx='600' cy='80' rx='20' ry='4' fill='%23303040'/%3E%3Ccircle cx='618' cy='80' r='5' fill='%23ffa020' fill-opacity='0.7'/%3E%3Ccircle cx='618' cy='80' r='20' fill='%23ffa020' fill-opacity='0.08'/%3E%3Crect x='900' y='80' width='4' height='170' fill='%23303040'/%3E%3Cellipse cx='900' cy='80' rx='20' ry='4' fill='%23303040'/%3E%3Ccircle cx='918' cy='80' r='5' fill='%23ffa020' fill-opacity='0.7'/%3E%3Ccircle cx='918' cy='80' r='20' fill='%23ffa020' fill-opacity='0.08'/%3E%3Crect x='1200' y='80' width='4' height='170' fill='%23303040'/%3E%3Cellipse cx='1200' cy='80' rx='20' ry='4' fill='%23303040'/%3E%3Ccircle cx='1218' cy='80' r='5' fill='%23ffa020' fill-opacity='0.7'/%3E%3Ccircle cx='1218' cy='80' r='20' fill='%23ffa020' fill-opacity='0.08'/%3E%3C/svg%3E") no-repeat center bottom;
-  background-size: 100% 100%;
-}
-
-.slideHighway .highwayLights {
-  position: absolute;
-  bottom: 15%;
-  left: 0;
-  right: 0;
-  height: 30%;
-  overflow: hidden;
-}
-
-.slideHighway .highwayLights::before {
-  content: '';
-  position: absolute;
-  bottom: 20%;
-  left: -200%;
-  width: 400%;
-  height: 4px;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    transparent 30px,
-    rgba(255, 80, 60, 0.6) 30px,
-    rgba(255, 80, 60, 0.6) 50px,
-    transparent 50px,
-    transparent 80px
-  );
-  animation: lightStreamLeft 3s linear infinite;
-  filter: blur(2px);
-}
-
-.slideHighway .highwayLights::after {
-  content: '';
-  position: absolute;
-  bottom: 40%;
-  left: -200%;
-  width: 400%;
-  height: 4px;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    transparent 25px,
-    rgba(255, 220, 100, 0.5) 25px,
-    rgba(255, 220, 100, 0.5) 45px,
-    transparent 45px,
-    transparent 70px
-  );
-  animation: lightStreamRight 4s linear infinite;
-  filter: blur(2px);
-}
-
-@keyframes lightStreamLeft {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(20%); }
-}
-
-@keyframes lightStreamRight {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-15%); }
+  left: -5%;
+  right: -5%;
+  height: 35%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 300' preserveAspectRatio='none'%3E%3Cpath fill='%23061530' fill-opacity='0.6' d='M-20,100 C180,130 360,70 540,100 C720,130 900,70 1080,100 C1260,130 1440,90 1620,100 L1620,300 L-20,300 Z'/%3E%3Cpath fill='%23040e22' fill-opacity='0.8' d='M-20,150 C200,180 400,120 600,150 C800,180 1000,120 1200,150 C1400,180 1520,155 1620,160 L1620,300 L-20,300 Z'/%3E%3Cpath fill='%23020810' d='M-20,200 C160,220 340,190 520,210 C700,230 880,195 1060,215 C1240,235 1420,205 1620,220 L1620,300 L-20,300 Z'/%3E%3C/svg%3E") no-repeat center bottom;
+  background-size: 110% 100%;
 }
 
 /* ========================================
