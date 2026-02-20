@@ -54,47 +54,10 @@
   100% { transform: scale(1.05); }
 }
 
-/* 따뜻한 대기 글로우 — 태양 주변 부드러운 빛 */
-.slideSunset .sunsetWarmGlow {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 50% 50% at 50% 48%, rgba(255, 180, 80, 0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 80% 40% at 50% 55%, rgba(255, 140, 50, 0.06) 0%, transparent 60%);
-  animation: warmGlowPulse 6s ease-in-out infinite alternate;
-  z-index: 1;
-  pointer-events: none;
-}
-
-@keyframes warmGlowPulse {
-  0% { opacity: 0.7; }
-  100% { opacity: 1; }
-}
-
-/* 수면 반사 — 따뜻한 빛 기둥 (부드럽게 흔들림) */
+/* 렌즈플레어/글로우 효과 제거됨 */
+.slideSunset .sunsetWarmGlow,
 .slideSunset .sunsetReflection {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 40%;
-  background: linear-gradient(180deg,
-    rgba(255, 200, 100, 0.18) 0%,
-    rgba(255, 160, 60, 0.1) 30%,
-    rgba(255, 120, 40, 0.05) 60%,
-    transparent 100%
-  );
-  filter: blur(20px);
-  animation: sunsetReflWobble 5s ease-in-out infinite alternate;
-  z-index: 1;
-  pointer-events: none;
-}
-
-@keyframes sunsetReflWobble {
-  0% { width: 70px; opacity: 0.6; }
-  50% { width: 100px; opacity: 0.8; }
-  100% { width: 75px; opacity: 0.65; }
+  display: none;
 }
 
 /* 비네트 오버레이 — 가장자리 어둡게 처리 */
