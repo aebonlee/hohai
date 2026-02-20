@@ -93,8 +93,6 @@ export default function HomePage() {
         {/* 슬라이드 6: 빨간 등대 2 (블루아워 사진) */}
         <div className={`${styles.slide} ${styles.slideLighthouse2} ${active === 5 ? styles.slideActive : ''}`}>
           <div className={styles.lighthouseImg2} />
-          <div className={styles.lighthouseBeam2} />
-          <div className={styles.lighthouseGlow2} />
           <div className={styles.lighthouseOverlay} />
         </div>
 
