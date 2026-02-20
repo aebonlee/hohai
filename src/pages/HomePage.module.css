@@ -36,7 +36,6 @@
   inset: 0;
   background: url('/images/hero-lighthouse-1.png') no-repeat center center;
   background-size: cover;
-  animation: slowZoom 20s ease-in-out infinite alternate;
 }
 
 .slideLighthouse1 .lighthouseBeam {
@@ -86,11 +85,6 @@
     radial-gradient(ellipse 60% 80% at 50% 50%, transparent 30%, rgba(5, 10, 30, 0.35) 100%);
   z-index: 4;
   pointer-events: none;
-}
-
-@keyframes slowZoom {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.06); }
 }
 
 @keyframes beamRotate {
@@ -510,7 +504,6 @@
   inset: 0;
   background: url('/images/hero-lighthouse-2.png') no-repeat center center;
   background-size: cover;
-  animation: slowZoom 22s ease-in-out infinite alternate-reverse;
 }
 
 .slideLighthouse2 .lighthouseBeam2 {
