@@ -55,7 +55,7 @@ export default function HomePage() {
         <div className={`${styles.slide} ${styles.slideSunset} ${active === 1 ? styles.slideActive : ''}`}>
           <div className={styles.sunsetBg} />
           <div className={styles.sunsetSun} />
-          <div className={styles.sunsetMountains} />
+          <div className={styles.sunsetWaves} />
         </div>
 
         <div className={`${styles.slide} ${styles.slideForest} ${active === 2 ? styles.slideActive : ''}`}>
