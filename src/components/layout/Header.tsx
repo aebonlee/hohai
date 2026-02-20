@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import styles from './Header.module.css';
 
 const NAV_ITEMS = [
@@ -12,7 +13,11 @@ const NAV_ITEMS = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { isLoggedIn, user, profile, isAdmin, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -23,7 +28,25 @@ export default function Header() {
   // 라우트 변경 시 모바일 메뉴 닫기
   useEffect(() => {
     setMenuOpen(false);
+    setUserMenuOpen(false);
   }, [location.pathname]);
+
+  // 바깥 클릭 시 유저 메뉴 닫기
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    setUserMenuOpen(false);
+    navigate('/');
+  };
 
   return (
     <>
@@ -51,15 +74,50 @@ export default function Header() {
             ))}
           </nav>
 
-          <button
-            className={`${styles.hamburger} ${menuOpen ? styles.open : ''}`}
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="메뉴 열기"
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+          <div className={styles.headerRight}>
+            {isLoggedIn ? (
+              <div className={styles.userMenu} ref={userMenuRef}>
+                <button
+                  className={styles.userAvatar}
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  aria-label="사용자 메뉴"
+                >
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt="" />
+                  ) : (
+                    <span>{(profile?.display_name || user?.email || '?')[0].toUpperCase()}</span>
+                  )}
+                </button>
+                {userMenuOpen && (
+                  <div className={styles.userDropdown}>
+                    <div className={styles.userDropdownHeader}>
+                      <strong>{profile?.display_name || '사용자'}</strong>
+                      <small>{user?.email}</small>
+                    </div>
+                    <Link to="/mypage" className={styles.userDropdownItem}>마이페이지</Link>
+                    {isAdmin && (
+                      <Link to="/admin" className={styles.userDropdownItem}>관리자</Link>
+                    )}
+                    <button className={styles.userDropdownItem} onClick={handleSignOut}>
+                      로그아웃
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className={styles.loginBtn}>로그인</Link>
+            )}
+
+            <button
+              className={`${styles.hamburger} ${menuOpen ? styles.open : ''}`}
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="메뉴 열기"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -78,6 +136,35 @@ export default function Header() {
             {item.label}
           </NavLink>
         ))}
+        <div style={{ borderTop: '1px solid rgba(10, 25, 41, 0.08)', marginTop: '8px', paddingTop: '8px' }}>
+          {isLoggedIn ? (
+            <>
+              <Link to="/mypage" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
+                <span className={styles.mobileIcon}>👤</span>
+                마이페이지
+              </Link>
+              {isAdmin && (
+                <Link to="/admin" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
+                  <span className={styles.mobileIcon}>⚙️</span>
+                  관리자
+                </Link>
+              )}
+              <button
+                className={styles.mobileLink}
+                onClick={() => { handleSignOut(); setMenuOpen(false); }}
+                style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', font: 'inherit' }}
+              >
+                <span className={styles.mobileIcon}>🚪</span>
+                로그아웃
+              </button>
+            </>
+          ) : (
+            <Link to="/login" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
+              <span className={styles.mobileIcon}>🔑</span>
+              로그인
+            </Link>
+          )}
+        </div>
       </div>
     </>
   );

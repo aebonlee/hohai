@@ -1,0 +1,458 @@
+/* ============================================
+   Auth Styles — Login / Register / MyPage
+   (www.dreamitbiz.com과 동일한 구조, 好海 테마 적용)
+   ============================================ */
+
+.auth-fullpage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  padding: calc(var(--header-height) + 40px) 16px 60px;
+  box-sizing: border-box;
+}
+
+.auth-center-wrapper {
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-card-google {
+  background: white;
+  border: 1px solid rgba(7, 26, 51, 0.1);
+  border-radius: 12px;
+  padding: 48px 40px 36px;
+  box-shadow: 0 1px 3px rgba(7, 26, 51, 0.08);
+}
+
+.auth-logo-area {
+  text-align: center;
+  margin-bottom: 16px;
+  font-family: var(--font-logo);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.auth-heading {
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.auth-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* Method Selection Buttons */
+.auth-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.auth-method-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(7, 26, 51, 0.15);
+  background: white;
+  color: var(--text-primary);
+}
+
+.auth-method-btn:hover {
+  background: var(--bg-primary);
+  border-color: rgba(7, 26, 51, 0.25);
+}
+
+.auth-method-btn svg {
+  flex-shrink: 0;
+}
+
+.auth-method-btn.kakao {
+  background: #FEE500;
+  border-color: #FEE500;
+  color: #3C1E1E;
+}
+
+.auth-method-btn.kakao:hover {
+  background: #F5DC00;
+  border-color: #F5DC00;
+}
+
+/* Email Form (step 2) */
+.auth-email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.auth-input-group input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(7, 26, 51, 0.15);
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--text-primary);
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  font-family: var(--font-sans);
+}
+
+.auth-input-group input:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 3px rgba(10, 61, 122, 0.1);
+}
+
+.auth-form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.auth-back-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--accent-gold);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.auth-back-btn:hover {
+  background: rgba(10, 61, 122, 0.06);
+}
+
+.auth-next-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent-gold);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-next-btn:hover {
+  opacity: 0.9;
+}
+
+.auth-next-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-btn-full {
+  display: block;
+  width: 100%;
+  padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+/* Bottom Link */
+.auth-bottom-link {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(7, 26, 51, 0.08);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.auth-bottom-link a {
+  color: var(--accent-gold);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-bottom-link a:hover {
+  text-decoration: underline;
+}
+
+/* Error / Message */
+.auth-error {
+  padding: 10px 14px;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-left: 4px solid #dc2626;
+  border-radius: 6px;
+  color: #dc2626;
+  font-size: 13px;
+}
+
+.auth-message {
+  padding: 10px 14px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-left: 4px solid #22c55e;
+  border-radius: 6px;
+  color: #16a34a;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+/* Sign Up Success */
+.auth-success {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.auth-success svg {
+  color: #22c55e;
+  margin-bottom: 16px;
+}
+
+.auth-success h2 {
+  margin-bottom: 8px;
+}
+
+.auth-success p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+/* ── Auth Section (MyPage) ── */
+.auth-section {
+  padding: 80px 0;
+  min-height: 50vh;
+}
+
+.auth-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.auth-form-group input {
+  padding: 10px 12px;
+  border: 1px solid rgba(7, 26, 51, 0.15);
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: var(--font-sans);
+}
+
+.auth-form-group input:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 3px rgba(10, 61, 122, 0.1);
+}
+
+/* ── MyPage ── */
+.mypage-card {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  border: 1px solid rgba(7, 26, 51, 0.1);
+  border-radius: 12px;
+  padding: 40px;
+}
+
+.mypage-avatar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.mypage-avatar img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(7, 26, 51, 0.1);
+}
+
+.mypage-avatar-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  color: white;
+  font-size: 32px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mypage-info {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.mypage-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.mypage-email {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.mypage-provider {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.mypage-role-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(10, 61, 122, 0.1);
+  color: var(--accent-gold);
+}
+
+.mypage-edit-form {
+  max-width: 300px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.mypage-edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.mypage-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.mypage-link-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border: 1px solid rgba(7, 26, 51, 0.1);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.mypage-link-card:hover {
+  border-color: var(--accent-gold);
+  background: rgba(10, 61, 122, 0.04);
+}
+
+.mypage-link-card svg {
+  color: var(--accent-gold);
+  flex-shrink: 0;
+}
+
+.mypage-footer {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid rgba(7, 26, 51, 0.08);
+}
+
+.mypage-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-sans);
+}
+
+.mypage-btn.primary {
+  background: var(--accent-gold);
+  color: white;
+}
+
+.mypage-btn.danger {
+  background: none;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+.mypage-btn.danger:hover {
+  background: #fef2f2;
+}
+
+.mypage-btn.ghost {
+  background: none;
+  color: var(--text-muted);
+  border: 1px solid rgba(7, 26, 51, 0.15);
+}
+
+/* Loading spinner */
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(7, 26, 51, 0.1);
+  border-top-color: var(--accent-gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .auth-fullpage {
+    padding: calc(var(--header-height) + 20px) 12px 40px;
+  }
+
+  .auth-card-google {
+    padding: 32px 24px 28px;
+  }
+
+  .mypage-card {
+    margin: 0 16px;
+    padding: 28px 20px;
+  }
+}

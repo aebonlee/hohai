@@ -92,6 +92,110 @@
   font-weight: 600;
 }
 
+/* Header right area */
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.loginBtn {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid rgba(10, 61, 122, 0.2);
+  transition: all var(--transition);
+}
+
+.loginBtn:hover {
+  background: rgba(10, 61, 122, 0.06);
+}
+
+/* User avatar & dropdown */
+.userMenu {
+  position: relative;
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid rgba(10, 61, 122, 0.15);
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+
+.userAvatar:hover {
+  border-color: var(--accent-gold);
+}
+
+.userAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.userDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 220px;
+  background: white;
+  border: 1px solid rgba(7, 26, 51, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(7, 26, 51, 0.15);
+  z-index: 200;
+  overflow: hidden;
+}
+
+.userDropdownHeader {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(7, 26, 51, 0.08);
+}
+
+.userDropdownHeader strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.userDropdownHeader small {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.userDropdownItem {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition);
+  font-family: var(--font-sans);
+  text-decoration: none;
+}
+
+.userDropdownItem:hover {
+  background: rgba(10, 61, 122, 0.04);
+  color: var(--text-primary);
+}
+
 .hamburger {
   display: none;
   flex-direction: column;

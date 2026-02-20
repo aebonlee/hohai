@@ -546,7 +546,99 @@ z-index 5: heroContent (텍스트), scrollHint, 최전면 파도
 ### 남은 작업
 - [x] Supabase에 migration.sql 실행 (테이블 생성) ✅
 - [x] `.env.local`에 실제 Supabase URL/Key 설정 ✅
-- [ ] GitHub Secrets에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` 추가 (gh CLI 미설치 → GitHub 웹에서 수동 설정 필요)
+- [x] GitHub Secrets에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` 추가 ✅
+- [x] Supabase 한글 데이터 인코딩 수정 (UTF-8 파일 방식으로 재삽입) ✅
+- [ ] 실제 시/노래 콘텐츠 입력
+- [ ] 프로필 사진 업로드
+- [ ] YouTube 노래 영상의 실제 youtube_id로 교체
+
+---
+
+## 2026-02-20 (Day 1, 12차) — www 로그인 시스템 통합
+
+### 배경
+- `aebonlee/www` (www.dreamitbiz.com)과 동일한 Supabase 인스턴스를 공유
+- 로그인, 결제 등 공통 기능을 양 사이트에서 동일하게 사용하기 위해 www의 인증 시스템을 hohai에 이식
+
+### 변경 내역
+
+#### 1. AuthContext 기반 인증 시스템 구축 (www와 동일)
+
+**새 파일들**:
+- `src/contexts/AuthContext.tsx` — AuthProvider + useAuth hook (TypeScript 변환)
+  - user, profile, loading, isLoggedIn, isAdmin 상태 관리
+  - Supabase auth 세션 리스너
+  - user_profiles 테이블에서 프로필 로드
+  - ADMIN_EMAILS: `aebon@kakao.com`, `aebon@kyonggi.ac.kr`
+- `src/lib/auth.ts` — Auth 유틸리티 함수 (www auth.js → TypeScript)
+  - signInWithGoogle(), signInWithKakao() — OAuth 로그인
+  - signInWithEmail() — 이메일/비밀번호 로그인
+  - signUp() — 회원가입
+  - signOut() — 로그아웃
+  - getProfile() / updateProfile() — user_profiles CRUD
+  - resetPassword() — 비밀번호 재설정 메일
+
+#### 2. 인증 페이지 (www와 동일한 2단계 로그인 플로우)
+
+- `src/pages/LoginPage.tsx` — 로그인 페이지
+  - Step 1: 방법 선택 (Google, Kakao, Email 버튼)
+  - Step 2: 이메일/비밀번호 입력 폼
+  - 로그인 후 원래 페이지로 리다이렉트
+- `src/pages/RegisterPage.tsx` — 회원가입 페이지
+  - 이름, 이메일, 비밀번호, 비밀번호 확인
+  - 비밀번호 검증 (6자 이상, 확인 일치)
+  - 성공 시 이메일 인증 안내
+- `src/pages/ForgotPasswordPage.tsx` — 비밀번호 찾기
+  - 이메일 입력 → 재설정 링크 전송
+- `src/pages/MyPagePage.tsx` — 마이페이지
+  - 아바타, 이름, 이메일 표시
+  - 프로필 수정 (이름 변경)
+  - 관리자 배지, 로그아웃
+- `src/styles/auth.css` — 인증 관련 스타일 (好海 딥블루 테마 적용)
+
+#### 3. 라우트 가드 (www와 동일)
+
+- `src/components/layout/AuthGuard.tsx` — 로그인 필요 페이지 보호
+- `src/components/layout/AdminGuard.tsx` — 관리자 전용 페이지 보호
+
+#### 4. 기존 파일 수정
+
+- **`src/main.tsx`** — `AuthProvider` 래핑 추가
+- **`src/App.tsx`** — 라우팅 전면 변경:
+  - `/login`, `/register`, `/forgot-password` 추가
+  - `/mypage` (AuthGuard 적용)
+  - `/admin` (AdminGuard로 변경, 기존 ProtectedRoute 대체)
+  - `/admin/login` 경로 제거 (통합 로그인 사용)
+- **`src/components/layout/Header.tsx`** — 유저 메뉴 추가:
+  - 로그인 상태: 아바타 버튼 + 드롭다운 (마이페이지, 관리자, 로그아웃)
+  - 미로그인 상태: "로그인" 버튼
+  - 모바일 메뉴에도 로그인/마이페이지/관리자 메뉴 추가
+- **`src/components/layout/Header.module.css`** — 유저 메뉴 스타일 추가
+- **`src/hooks/useAuth.ts`** — AuthContext에서 re-export (하위 호환)
+- `AdminLoginPage.tsx`, `AdminLoginPage.module.css` 삭제 (LoginPage로 대체)
+
+### 인증 플로우 (www와 동일)
+
+```
+[사용자] → /login → [Google/Kakao/Email 선택]
+  → OAuth: Supabase → 제공자 → 콜백 → 세션 설정
+  → Email: 이메일/PW 입력 → signInWithPassword → 세션 설정
+→ AuthContext가 세션 감지 → user/profile 로드
+→ Header 유저 아바타 표시
+
+[관리자 접근]
+→ /admin → AdminGuard → isAdmin 확인 → AdminPage
+→ 미로그인 시 /login으로 리다이렉트 (referrer 보존)
+```
+
+### 빌드 결과
+- TypeScript 타입체크 통과
+- Vite 빌드 성공 (11.26s)
+- CSS: 46.27 kB (gzip 9.60 kB), JS: 612.54 kB (gzip 182.10 kB)
+
+### 남은 작업
+- [ ] Supabase에 Google/Kakao OAuth 프로바이더 설정 (대시보드에서 활성화 필요)
+- [ ] user_profiles 테이블이 없으면 생성 필요 (www와 공유)
 - [ ] 실제 시/노래 콘텐츠 입력
 - [ ] 프로필 사진 업로드
 - [ ] YouTube 노래 영상의 실제 youtube_id로 교체
