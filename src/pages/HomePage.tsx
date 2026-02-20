@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -11,6 +11,14 @@ import { useFeaturedPoems } from '../hooks/usePoems';
 import { useFeaturedSong } from '../hooks/useSongs';
 import { SITE } from '../lib/constants';
 import styles from './HomePage.module.css';
+
+const HERO_IMAGES = [
+  '/images/hero-lighthouse-1.png',
+  '/images/hero-sunset-a.png',
+  '/images/hero-forest.png',
+  '/images/hero-lighthouse-3.png',
+  '/images/hero-lighthouse-2.png',
+];
 
 const SLIDES = [
   { quote: '파도가 밀려오듯\n시가 가슴에 닿고\n바다가 노래합니다', author: '— 호해 이성헌' },
@@ -28,9 +36,31 @@ export default function HomePage() {
   const { poems, loading: poemsLoading } = useFeaturedPoems();
   const { song, loading: songLoading } = useFeaturedSong();
   const [active, setActive] = useState(0);
+  const [heroReady, setHeroReady] = useState(false);
+  const preloadedRef = useRef(false);
 
   const goTo = useCallback((i: number) => {
     setActive(((i % SLIDES.length) + SLIDES.length) % SLIDES.length);
+  }, []);
+
+  // Preload hero images — first image triggers heroReady for instant display
+  useEffect(() => {
+    if (preloadedRef.current) return;
+    preloadedRef.current = true;
+
+    const first = new Image();
+    first.src = HERO_IMAGES[0];
+    first.onload = () => setHeroReady(true);
+    // Fallback: show hero after 2s even if image fails
+    const fallback = setTimeout(() => setHeroReady(true), 2000);
+
+    // Preload remaining images in background
+    HERO_IMAGES.slice(1).forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+
+    return () => clearTimeout(fallback);
   }, []);
 
   useEffect(() => {
@@ -43,10 +73,13 @@ export default function HomePage() {
       <Helmet>
         <title>{SITE.title}</title>
         <meta name="description" content={SITE.description} />
+        {HERO_IMAGES.slice(1).map(src => (
+          <link key={src} rel="preload" as="image" href={src} />
+        ))}
       </Helmet>
 
       {/* 히어로 캐러셀 */}
-      <section className={styles.hero}>
+      <section className={`${styles.hero} ${heroReady ? styles.heroReady : ''}`}>
         {/* 슬라이드 1: 빨간 등대 (밤바다 사진) */}
         <div className={`${styles.slide} ${styles.slideLighthouse1} ${active === 0 ? styles.slideActive : ''}`}>
           <div className={styles.lighthouseImg1} />

@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 
 /* ============================================================
    HeroEffects — Canvas‑based ambient effects per hero slide
+   7 slides: lighthouse1, sunset, forest, twilight, city, nightSea, lighthouse2
    ============================================================ */
 
 interface Props {
@@ -65,7 +66,7 @@ function drawLighthouse(
   }
 }
 
-// ---- 2. Sunset — soft golden god‑rays + gentle water shimmer + warm floating dust ----
+// ---- 2. Sunset — gentle water shimmer + warm floating dust (no god-rays, no halos) ----
 function drawSunset(
   ctx: CanvasRenderingContext2D,
   w: number,
@@ -75,32 +76,6 @@ function drawSunset(
   PARTICLE_COUNT: number,
 ) {
   ctx.clearRect(0, 0, w, h);
-
-  // Soft golden god‑rays from horizon center (wide, gentle, warm)
-  const cx = w / 2, cy = h * 0.42;
-  const rayCount = 8;
-  for (let i = 0; i < rayCount; i++) {
-    // Rays fan out in upper half only (downward from horizon)
-    const baseAngle = -Math.PI * 0.8 + (Math.PI * 0.6 / rayCount) * i;
-    const angle = baseAngle + Math.sin(t * 0.00006 + i * 0.9) * 0.02;
-    const len = h * 0.9 + Math.sin(t * 0.0008 + i * 1.5) * 40;
-    const spread = 0.06 + 0.02 * Math.sin(t * 0.001 + i * 1.1);
-    const alpha = 0.015 + 0.01 * Math.sin(t * 0.0012 + i * 2);
-
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(cx + Math.cos(angle - spread) * len, cy + Math.sin(angle - spread) * len);
-    ctx.lineTo(cx + Math.cos(angle + spread) * len, cy + Math.sin(angle + spread) * len);
-    ctx.closePath();
-
-    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, len);
-    grad.addColorStop(0, `rgba(255,210,130,${alpha * 2.5})`);
-    grad.addColorStop(0.3, `rgba(255,180,90,${alpha * 1.5})`);
-    grad.addColorStop(0.7, `rgba(255,150,60,${alpha * 0.6})`);
-    grad.addColorStop(1, 'rgba(255,140,50,0)');
-    ctx.fillStyle = grad;
-    ctx.fill();
-  }
 
   // Gentle water surface shimmer (bottom 35%) — soft horizontal lines
   const waterY = h * 0.65;
@@ -128,7 +103,7 @@ function drawSunset(
     ctx.stroke();
   }
 
-  // Warm floating dust / light particles — very gentle, slow drift
+  // Warm floating dust particles — gentle, slow drift
   for (let i = 0; i < PARTICLE_COUNT; i++) {
     const idx = i * 4;
     let px = particles[idx];
@@ -136,44 +111,22 @@ function drawSunset(
     const sz = particles[idx + 2];
     const phase = particles[idx + 3];
 
-    // Slow organic float upward + horizontal sway
     py -= 0.12 + Math.sin(t * 0.0006 + phase) * 0.08;
     px += Math.sin(t * 0.0004 + phase * 1.7) * 0.2;
     if (py < -10) { py = h + 10; px = rand(w * 0.15, w * 0.85); }
     particles[idx] = px;
     particles[idx + 1] = py;
 
-    const glow = 0.3 + 0.7 * Math.pow(Math.max(0, Math.sin(t * 0.0015 + phase * 2.8)), 2);
-    const r = sz * (0.6 + glow * 0.5);
-
-    // Soft warm halo
-    const haloGrad = ctx.createRadialGradient(px, py, 0, px, py, r * 6);
-    haloGrad.addColorStop(0, `rgba(255,220,140,${glow * 0.12})`);
-    haloGrad.addColorStop(0.5, `rgba(255,190,100,${glow * 0.04})`);
-    haloGrad.addColorStop(1, 'rgba(255,180,80,0)');
-    ctx.fillStyle = haloGrad;
+    const flicker = 0.4 + 0.6 * Math.sin(t * 0.0015 + phase * 2.8);
+    const alpha = (0.1 + flicker * 0.15) * (sz / 3);
     ctx.beginPath();
-    ctx.arc(px, py, r * 6, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Warm core
-    ctx.beginPath();
-    ctx.arc(px, py, r * 0.6, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255,240,200,${glow * 0.3})`;
+    ctx.arc(px, py, sz * 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,230,180,${alpha})`;
     ctx.fill();
   }
-
-  // Horizon glow band — soft warm light along the horizon
-  const horizonGrad = ctx.createLinearGradient(0, cy - 40, 0, cy + 60);
-  horizonGrad.addColorStop(0, 'rgba(255,200,100,0)');
-  horizonGrad.addColorStop(0.4, `rgba(255,190,90,${0.03 + 0.02 * Math.sin(t * 0.0008)})`);
-  horizonGrad.addColorStop(0.6, `rgba(255,170,70,${0.025 + 0.015 * Math.sin(t * 0.001)})`);
-  horizonGrad.addColorStop(1, 'rgba(255,150,50,0)');
-  ctx.fillStyle = horizonGrad;
-  ctx.fillRect(0, cy - 40, w, 100);
 }
 
-// ---- 3. Forest — dark mystical: bright fireflies + falling leaves + mist + light shafts ----
+// ---- 3. Forest — light shafts + dust + fireflies + falling leaves (no mist) ----
 function drawForest(
   ctx: CanvasRenderingContext2D,
   w: number,
@@ -222,33 +175,7 @@ function drawForest(
     ctx.fill();
   }
 
-  // Layered mist (darker, more atmospheric)
-  for (let layer = 0; layer < 4; layer++) {
-    const baseY = h * (0.4 + layer * 0.12);
-    const speed = 0.00015 * (layer + 1);
-    const amplitude = 15 + layer * 8;
-    const alpha = 0.07 - layer * 0.012;
-
-    ctx.beginPath();
-    ctx.moveTo(-50, baseY + 90);
-    for (let x = -50; x <= w + 50; x += 6) {
-      const y = baseY + Math.sin(x * 0.003 + t * speed) * amplitude +
-                Math.sin(x * 0.008 + t * speed * 1.5) * amplitude * 0.4;
-      ctx.lineTo(x, y);
-    }
-    ctx.lineTo(w + 50, baseY + 90);
-    ctx.closePath();
-
-    const grad = ctx.createLinearGradient(0, baseY - 30, 0, baseY + 90);
-    grad.addColorStop(0, 'rgba(100,140,120,0)');
-    grad.addColorStop(0.3, `rgba(100,140,120,${alpha})`);
-    grad.addColorStop(0.7, `rgba(80,120,100,${alpha})`);
-    grad.addColorStop(1, 'rgba(80,120,100,0)');
-    ctx.fillStyle = grad;
-    ctx.fill();
-  }
-
-  // Fireflies — first 45 particles (bright yellow-green with large glow halos)
+  // Fireflies — first 45 particles (bright yellow-green with glow halos)
   const fireflyCount = Math.min(45, PARTICLE_COUNT);
   for (let i = 0; i < fireflyCount; i++) {
     const idx = i * 4;
@@ -257,7 +184,6 @@ function drawForest(
     const sz = particles[idx + 2];
     const phase = particles[idx + 3];
 
-    // Gentle organic drift
     px += Math.sin(t * 0.0008 + phase) * 0.4;
     py += Math.cos(t * 0.0006 + phase * 1.3) * 0.3;
     px += Math.sin(t * 0.0003 + phase * 2.5) * 0.15;
@@ -268,7 +194,6 @@ function drawForest(
     particles[idx] = px;
     particles[idx + 1] = py;
 
-    // Bioluminescent glow pattern — slow pulse with random phase
     const glow = 0.2 + 0.8 * Math.pow(Math.max(0, Math.sin(t * 0.002 + phase * 3.7)), 2.5);
     const r = sz * (0.7 + glow * 0.8);
 
@@ -306,10 +231,9 @@ function drawForest(
     const idx = i * 4;
     let px = particles[idx];
     let py = particles[idx + 1];
-    const sz = particles[idx + 2]; // used as leaf size
+    const sz = particles[idx + 2];
     const phase = particles[idx + 3];
 
-    // Fall + drift
     py += 0.3 + Math.sin(t * 0.001 + phase) * 0.15;
     px += Math.sin(t * 0.0005 + phase * 2) * 0.5 + 0.1;
     if (py > h + 20) { py = -20; px = rand(0, w); }
@@ -322,7 +246,6 @@ function drawForest(
     ctx.save();
     ctx.translate(px, py);
     ctx.rotate(rotation);
-    // Simple leaf shape
     ctx.beginPath();
     ctx.ellipse(0, 0, sz * 2, sz * 0.8, 0, 0, Math.PI * 2);
     const leafColor = i % 3 === 0 ? `rgba(80,120,60,${leafAlpha})` :
@@ -334,7 +257,66 @@ function drawForest(
   }
 }
 
-// ---- 4. City Rain — realistic rain streaks + splashes + lightning + neon glow ----
+// ---- 4. Twilight Lighthouse — warm dusk water shimmer + golden floating motes ----
+function drawTwilight(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  t: number,
+  particles: Float64Array,
+  PARTICLE_COUNT: number,
+) {
+  ctx.clearRect(0, 0, w, h);
+
+  // Warm dusk water shimmer (bottom 40%) — amber/golden tones
+  const waterY = h * 0.6;
+  for (let i = 0; i < 20; i++) {
+    const y = waterY + (h - waterY) * (i / 20);
+    const amplitude = 1.8 + i * 0.35;
+    const freq = 0.003 + i * 0.00025;
+    const speed = t * (0.00035 + i * 0.00005);
+
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    for (let x = 0; x <= w; x += 6) {
+      const yOff = Math.sin(x * freq + speed) * amplitude +
+                   Math.sin(x * freq * 1.6 + speed * 0.8) * amplitude * 0.4;
+      ctx.lineTo(x, y + yOff);
+    }
+    const fade = 1 - (i / 20);
+    const r = Math.round(255 - fade * 15);
+    const g = Math.round(190 - (1 - fade) * 40);
+    const b = Math.round(120 - (1 - fade) * 50);
+    const alpha = 0.025 + fade * 0.035;
+    ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
+    ctx.lineWidth = 0.9;
+    ctx.stroke();
+  }
+
+  // Gentle warm floating motes — golden twilight atmosphere
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const idx = i * 4;
+    let px = particles[idx];
+    let py = particles[idx + 1];
+    const sz = particles[idx + 2];
+    const spd = particles[idx + 3];
+
+    py -= spd * 0.5;
+    px += Math.sin(t * 0.0008 + i * 1.3) * 0.2;
+    if (py < -10) { py = h + 10; px = rand(0, w); }
+    particles[idx] = px;
+    particles[idx + 1] = py;
+
+    const flicker = 0.4 + 0.6 * Math.sin(t * 0.002 + i * 2.5);
+    const alpha = (0.12 + flicker * 0.18) * (sz / 3);
+    ctx.beginPath();
+    ctx.arc(px, py, sz, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,210,140,${alpha})`;
+    ctx.fill();
+  }
+}
+
+// ---- 5. City Rain — realistic rain streaks + splashes + lightning + neon glow ----
 function drawCity(
   ctx: CanvasRenderingContext2D,
   w: number,
@@ -418,7 +400,6 @@ function drawCity(
       ctx.fillStyle = `rgba(200,200,255,${extra.lightning.alpha})`;
       ctx.fillRect(0, 0, w, h);
 
-      // Lightning bolt
       if (extra.lightning.alpha > 0.1) {
         ctx.strokeStyle = `rgba(220,220,255,${extra.lightning.alpha * 2})`;
         ctx.lineWidth = 1.5;
@@ -438,7 +419,7 @@ function drawCity(
   }
 }
 
-// ---- 5. Night Sea — shooting stars + aurora + glowing plankton ----
+// ---- 6. Night Sea — shooting stars + aurora + glowing plankton ----
 function drawNightSea(
   ctx: CanvasRenderingContext2D,
   w: number,
@@ -455,10 +436,10 @@ function drawNightSea(
   for (let layer = 0; layer < auroraLayers; layer++) {
     const baseY = h * (0.05 + layer * 0.08);
     const colors = [
-      [100, 255, 180], // green
-      [80, 200, 255],  // blue-cyan
-      [150, 100, 255], // purple
-      [100, 255, 200], // teal
+      [100, 255, 180],
+      [80, 200, 255],
+      [150, 100, 255],
+      [100, 255, 200],
     ];
     const c = colors[layer];
     const speed = 0.00015 * (layer + 1);
@@ -523,7 +504,6 @@ function drawNightSea(
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Head glow
     ctx.beginPath();
     ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(255,255,255,${alpha})`;
@@ -565,14 +545,14 @@ function drawNightSea(
   }
 }
 
-// ---- 6. Lighthouse 2 — water reflection columns + sweep beam ----
+// ---- 7. Lighthouse 2 — water reflection columns + light shimmer (no floating mist) ----
 function drawLighthouse2(
   ctx: CanvasRenderingContext2D,
   w: number,
   h: number,
   t: number,
   particles: Float64Array,
-  PARTICLE_COUNT: number,
+  _PARTICLE_COUNT: number,
 ) {
   ctx.clearRect(0, 0, w, h);
 
@@ -612,23 +592,24 @@ function drawLighthouse2(
     ctx.stroke();
   }
 
-  // Floating mist particles
-  for (let i = 0; i < PARTICLE_COUNT; i++) {
+  // Gentle warm floating motes (reuse particles for subtle ambience)
+  for (let i = 0; i < Math.min(20, particles.length / 4); i++) {
     const idx = i * 4;
     let px = particles[idx];
     let py = particles[idx + 1];
     const sz = particles[idx + 2];
     const spd = particles[idx + 3];
 
-    px += Math.sin(t * 0.0006 + spd) * 0.25;
-    py -= 0.15;
+    px += Math.sin(t * 0.0006 + spd) * 0.15;
+    py -= 0.1;
     if (py < -20) { py = h + 20; px = rand(0, w); }
     particles[idx] = px;
     particles[idx + 1] = py;
 
-    const alpha = (0.08 + 0.12 * Math.sin(t * 0.002 + spd * 2)) * (sz / 3);
+    const flicker = 0.4 + 0.6 * Math.sin(t * 0.002 + spd * 2);
+    const alpha = (0.08 + flicker * 0.1) * (sz / 3);
     ctx.beginPath();
-    ctx.arc(px, py, sz * 1.5, 0, Math.PI * 2);
+    ctx.arc(px, py, sz * 0.8, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(200,220,255,${alpha})`;
     ctx.fill();
   }
@@ -640,8 +621,8 @@ function initLighthouseParticles(w: number, h: number, count: number): Float64Ar
   for (let i = 0; i < count; i++) {
     p[i * 4] = rand(0, w);
     p[i * 4 + 1] = rand(0, h);
-    p[i * 4 + 2] = rand(1, 3); // size
-    p[i * 4 + 3] = rand(0.2, 0.8); // speed
+    p[i * 4 + 2] = rand(1, 3);
+    p[i * 4 + 3] = rand(0.2, 0.8);
   }
   return p;
 }
@@ -649,30 +630,39 @@ function initLighthouseParticles(w: number, h: number, count: number): Float64Ar
 function initSunsetParticles(w: number, h: number, count: number): Float64Array {
   const p = new Float64Array(count * 4);
   for (let i = 0; i < count; i++) {
-    p[i * 4] = rand(w * 0.15, w * 0.85);  // concentrated in center
-    p[i * 4 + 1] = rand(0, h);             // full height spread
-    p[i * 4 + 2] = rand(1, 2.8);           // size
-    p[i * 4 + 3] = rand(0, Math.PI * 2);   // phase
+    p[i * 4] = rand(w * 0.15, w * 0.85);
+    p[i * 4 + 1] = rand(0, h);
+    p[i * 4 + 2] = rand(1, 2.8);
+    p[i * 4 + 3] = rand(0, Math.PI * 2);
   }
   return p;
 }
 
 function initForestParticles(w: number, h: number, count: number): Float64Array {
   const p = new Float64Array(count * 4);
-  // First 45: fireflies spread across scene
   const fireflyCount = Math.min(45, count);
   for (let i = 0; i < fireflyCount; i++) {
     p[i * 4] = rand(0, w);
     p[i * 4 + 1] = rand(h * 0.1, h * 0.9);
-    p[i * 4 + 2] = rand(1.5, 3.5); // size
-    p[i * 4 + 3] = rand(0, Math.PI * 2); // phase
+    p[i * 4 + 2] = rand(1.5, 3.5);
+    p[i * 4 + 3] = rand(0, Math.PI * 2);
   }
-  // Rest: falling leaves from above
   for (let i = fireflyCount; i < count; i++) {
     p[i * 4] = rand(0, w);
     p[i * 4 + 1] = rand(-h, h);
-    p[i * 4 + 2] = rand(2, 4); // leaf size
-    p[i * 4 + 3] = rand(0, Math.PI * 2); // phase/rotation
+    p[i * 4 + 2] = rand(2, 4);
+    p[i * 4 + 3] = rand(0, Math.PI * 2);
+  }
+  return p;
+}
+
+function initTwilightParticles(w: number, h: number, count: number): Float64Array {
+  const p = new Float64Array(count * 4);
+  for (let i = 0; i < count; i++) {
+    p[i * 4] = rand(0, w);
+    p[i * 4 + 1] = rand(0, h);
+    p[i * 4 + 2] = rand(1, 2.5);
+    p[i * 4 + 3] = rand(0.15, 0.6);
   }
   return p;
 }
@@ -682,8 +672,8 @@ function initCityParticles(w: number, h: number, count: number): Float64Array {
   for (let i = 0; i < count; i++) {
     p[i * 4] = rand(-20, w + 20);
     p[i * 4 + 1] = rand(-100, h);
-    p[i * 4 + 2] = rand(12, 25); // length
-    p[i * 4 + 3] = rand(6, 18); // speed
+    p[i * 4 + 2] = rand(12, 25);
+    p[i * 4 + 3] = rand(6, 18);
   }
   return p;
 }
@@ -693,8 +683,8 @@ function initNightSeaParticles(w: number, h: number, count: number): Float64Arra
   for (let i = 0; i < count; i++) {
     p[i * 4] = rand(0, w);
     p[i * 4 + 1] = rand(0, h * 0.35);
-    p[i * 4 + 2] = rand(1, 2.5); // size
-    p[i * 4 + 3] = rand(0, Math.PI * 2); // phase
+    p[i * 4 + 2] = rand(1, 2.5);
+    p[i * 4 + 3] = rand(0, Math.PI * 2);
   }
   return p;
 }
@@ -708,13 +698,13 @@ export default function HeroEffects({ activeSlide, isActive }: Props) {
   const prevSlideRef = useRef<number>(-1);
 
   const PARTICLE_COUNTS: Record<number, number> = {
-    0: 40, // lighthouse motes
-    1: 35, // sunset warm dust
-    2: 60, // forest fireflies + falling leaves
-    3: 40, // lighthouse3 (twilight) motes
+    0: 40,  // lighthouse motes
+    1: 35,  // sunset warm dust
+    2: 60,  // forest fireflies + leaves
+    3: 40,  // twilight lighthouse motes
     4: 200, // city rain
-    5: 50, // night sea plankton
-    6: 35, // lighthouse2 mist
+    5: 50,  // night sea plankton
+    6: 30,  // lighthouse2 motes
   };
 
   const initParticles = useCallback((slide: number, w: number, h: number) => {
@@ -723,7 +713,7 @@ export default function HeroEffects({ activeSlide, isActive }: Props) {
       case 0: return initLighthouseParticles(w, h, count);
       case 1: return initSunsetParticles(w, h, count);
       case 2: return initForestParticles(w, h, count);
-      case 3: return initLighthouseParticles(w, h, count);
+      case 3: return initTwilightParticles(w, h, count);
       case 4: return initCityParticles(w, h, count);
       case 5: return initNightSeaParticles(w, h, count);
       case 6: return initLighthouseParticles(w, h, count);
@@ -749,7 +739,6 @@ export default function HeroEffects({ activeSlide, isActive }: Props) {
       canvas.style.height = `${rect.height}px`;
       ctx.scale(dpr, dpr);
 
-      // Re-init particles on resize
       particlesRef.current = initParticles(activeSlide, rect.width, rect.height);
       prevSlideRef.current = activeSlide;
     };
@@ -757,13 +746,11 @@ export default function HeroEffects({ activeSlide, isActive }: Props) {
     resize();
     window.addEventListener('resize', resize);
 
-    // Re‑init particles when slide changes
     if (prevSlideRef.current !== activeSlide) {
       const parent = canvas.parentElement;
       if (parent) {
         const rect = parent.getBoundingClientRect();
         particlesRef.current = initParticles(activeSlide, rect.width, rect.height);
-        // Reset extra data
         if (activeSlide === 4) {
           extraRef.current = { lightning: { active: false, alpha: 0, nextAt: performance.now() + rand(4000, 8000) } };
         } else if (activeSlide === 5) {
@@ -796,7 +783,7 @@ export default function HeroEffects({ activeSlide, isActive }: Props) {
         case 0: drawLighthouse(ctx, w, h, t, particles, count); break;
         case 1: drawSunset(ctx, w, h, t, particles, count); break;
         case 2: drawForest(ctx, w, h, t, particles, count); break;
-        case 3: drawLighthouse(ctx, w, h, t, particles, count); break;
+        case 3: drawTwilight(ctx, w, h, t, particles, count); break;
         case 4: drawCity(ctx, w, h, t, particles, count, extraRef.current as never); break;
         case 5: drawNightSea(ctx, w, h, t, particles, count, extraRef.current as never); break;
         case 6: drawLighthouse2(ctx, w, h, t, particles, count); break;

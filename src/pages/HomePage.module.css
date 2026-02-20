@@ -13,6 +13,23 @@
   background: #0a1628;
 }
 
+/* 이미지 로딩 전 슬라이드 숨김 → 로딩 완료 시 fade-in */
+.hero .slide,
+.hero .heroContent,
+.hero .carouselControls,
+.hero .scrollHint {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.heroReady .slide { transition: opacity 1.2s ease; }
+.heroReady .slideActive { opacity: 1; }
+.heroReady .heroContent,
+.heroReady .carouselControls,
+.heroReady .scrollHint {
+  opacity: 1;
+}
+
 /* --- 슬라이드 공통 --- */
 .slide {
   position: absolute;
@@ -109,25 +126,9 @@
   display: none;
 }
 
-/* CSS 안개 레이어 (어두운 숲 분위기) */
+/* 안개/연기 효과 제거 */
 .slideForest .forestMistLayer {
-  position: absolute;
-  bottom: 10%;
-  left: -5%;
-  right: -5%;
-  height: 40%;
-  background:
-    radial-gradient(ellipse 80% 40% at 20% 60%, rgba(60,100,80,0.12), transparent 70%),
-    radial-gradient(ellipse 70% 35% at 70% 50%, rgba(50,90,70,0.1), transparent 60%),
-    radial-gradient(ellipse 90% 30% at 50% 70%, rgba(70,110,90,0.08), transparent 65%);
-  animation: mistDrift 18s ease-in-out infinite alternate;
-  z-index: 3;
-  pointer-events: none;
-}
-
-@keyframes mistDrift {
-  0% { transform: translateX(-20px); opacity: 0.5; }
-  100% { transform: translateX(20px); opacity: 1; }
+  display: none;
 }
 
 .slideForest .forestOverlay {
@@ -335,7 +336,7 @@
   100% { opacity: 0.6; }
 }
 
-/* 달 */
+/* 달 — 글로우/반사 효과 제거, 깨끗한 달 */
 .slideNightSea .nightSeaMoon {
   position: absolute;
   top: 10%;
@@ -344,37 +345,7 @@
   height: 85px;
   border-radius: 50%;
   background: radial-gradient(circle at 40% 40%, #fffff8 0%, #f5ecd0 35%, #d8cfa8 65%, transparent 72%);
-  box-shadow:
-    0 0 30px 15px rgba(240, 230, 180, 0.35),
-    0 0 80px 40px rgba(240, 230, 180, 0.15),
-    0 0 160px 80px rgba(200, 190, 140, 0.06);
   z-index: 2;
-}
-
-/* 달빛 반사 기둥 (수면 위) */
-.slideNightSea .nightSeaMoon::after {
-  content: '';
-  position: absolute;
-  top: 350%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 8px;
-  height: 300px;
-  background: linear-gradient(
-    180deg,
-    rgba(240, 230, 180, 0.3) 0%,
-    rgba(240, 230, 180, 0.15) 20%,
-    rgba(240, 230, 180, 0.08) 50%,
-    rgba(240, 230, 180, 0.03) 80%,
-    transparent 100%
-  );
-  filter: blur(10px);
-  animation: moonReflection 3s ease-in-out infinite alternate;
-}
-
-@keyframes moonReflection {
-  0% { width: 8px; opacity: 0.8; }
-  100% { width: 18px; opacity: 1; }
 }
 
 /* 밤바다 파도 */
