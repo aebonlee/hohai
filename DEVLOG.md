@@ -346,3 +346,77 @@ D:/hohai/
 - `new Image()` JS 프리로드: 나머지 이미지 백그라운드 다운로드
 - `heroReady` 상태: 첫 이미지 로딩 완료 시 fade-in 트리거
 - 2초 폴백 타이머: 네트워크 느린 환경 대응
+
+---
+
+## 2026-02-22 (Day 4) — LyricsPlayer 무드 기반 배경 + Canvas 시각 효과
+
+### 배경
+
+- LyricsPlayer 풀스크린 오버레이가 단일 네이비 그라디언트(#071A33→#0A3D7A→#1466A8→#0D5699)만 사용
+- 사용자 요청: 노래 태그(무드)에 따라 배경색을 다르게 + JS 시각 효과 추가
+- 기존 `HeroEffects.tsx` Canvas 파티클 시스템 아키텍처 재활용
+
+### 무드 분류 체계
+
+기존 9개 카테고리(`CATEGORY_COLORS`)와 `song.tags`를 활용한 무드 감지.
+
+| 무드 | 그라디언트 톤 | Canvas 효과 |
+|------|-------------|------------|
+| 사랑 | 따뜻한 코랄/레드 (#2A0F0D~#8B3A30) | 떠다니는 하트 + 꽃잎 |
+| 그리움 | 쿨 블루 (#071A33~#1A5276) | 느린 비 + 수면 물결 |
+| 작별 | 뮤트 모브/핑크 (#1F0F1A~#6B3060) | 흩날리는 꽃잎 (→ fade out) |
+| 추억 | 따뜻한 피치/앰버 (#2A1A0A~#7A4C28) | 따뜻한 보케 빛 (radialGradient) |
+| 인생 | 딥 오션 블루 (#051525~#104575) | 동심원 물결 파장 |
+| 가족 | 소프트 그린 (#0A1F10~#2A6040) | 따뜻한 반딧불 (글로우 헤일로) |
+| 자연 | 틸 (#081A1C~#1A5858) | 낙엽 + 반짝이 점 |
+| 세상 | 뮤트 퍼플 (#1A101A~#503060) | 기하학적 도형 (삼각형/사각형/육각형) |
+| 의지 | 골든 앰버 (#1F1808~#705020) | 상승하는 불꽃/불씨 |
+| default | 네이비 (기존 유지) | 부유하는 빛 입자 |
+
+### 변경 내역
+
+#### 1. `src/lib/mood.ts` (신규)
+
+- `MoodKey` 타입: 9개 카테고리 + `'default'`
+- `detectMood(tags)`: tags에서 첫 매칭 카테고리 반환, 없으면 `'default'`
+- `MOOD_GRADIENTS`: 무드별 4색 그라디언트 (어두운 톤, 흰 텍스트 가독성 확보)
+- `MOOD_PARTICLE_COLORS`: 무드별 파티클 RGB 색상 (primary + secondary)
+
+#### 2. `src/components/ui/LyricsEffects.tsx` (신규)
+
+- `HeroEffects.tsx`와 동일 아키텍처: `Float64Array` 파티클, `requestAnimationFrame`, DPR 대응
+- 10개 무드별 draw 함수: `drawLove`, `drawLonging`, `drawFarewell`, `drawMemory`, `drawLife`, `drawFamily`, `drawNature`, `drawWorld`, `drawWill`, `drawDefault`
+- Props: `{ mood: MoodKey, isActive: boolean }`
+- 파티클 수: 40개 (무드 공통)
+- `pointer-events: none` — 클릭 가로채지 않음
+
+#### 3. `src/components/ui/LyricsPlayer.module.css` (수정)
+
+- `.overlay` 배경: 하드코딩 → CSS custom properties (`var(--mood-c1)` ~ `var(--mood-c4)`)
+- `.content`: `position: relative; z-index: 2` 추가 (canvas 위에 콘텐츠 표시)
+
+#### 4. `src/components/ui/LyricsPlayer.tsx` (수정)
+
+- `detectMood`, `MOOD_GRADIENTS` import
+- `LyricsEffects` import
+- `const mood = detectMood(song.tags)` → 무드 감지
+- overlay div에 `style={{ '--mood-c1': gradient.c1, ... }}` 인라인 설정
+- `<LyricsEffects mood={mood} isActive={isOpen} />` — overlay 첫 번째 자식으로 렌더
+
+### 파일 변경 요약
+
+```
+ src/lib/mood.ts                          | 50+ (신규)
+ src/components/ui/LyricsEffects.tsx      | 380+ (신규)
+ src/components/ui/LyricsPlayer.module.css |  8 (CSS 변수 + z-index)
+ src/components/ui/LyricsPlayer.tsx       | 12 (mood 통합)
+ 4 files changed, ~450 insertions(+), ~3 deletions(-)
+```
+
+### 기술적 특이사항
+
+- CSS + Canvas 혼합 방식: CSS 그라디언트 애니메이션(배경) + Canvas 파티클 오버레이(시각 효과)
+- 무드 전환 시 파티클 자동 재초기화
+- 메모리 관리: `cancelAnimationFrame` + `removeEventListener`로 cleanup
+- 모바일 대응: DPR 제한(max 2), resize 핸들링

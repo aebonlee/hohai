@@ -2,6 +2,8 @@ import { useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Song } from '../../types/song';
+import { detectMood, MOOD_GRADIENTS } from '../../lib/mood';
+import LyricsEffects from './LyricsEffects';
 import styles from './LyricsPlayer.module.css';
 
 /** suno_url에서 song ID를 추출하여 embed URL 반환 */
@@ -26,6 +28,9 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
   const hasSuno = !!song.suno_url;
   const hasLyrics = !!song.lyrics;
   const hasTags = song.tags && song.tags.length > 0;
+
+  const mood = detectMood(song.tags);
+  const gradient = MOOD_GRADIENTS[mood];
 
   // ESC 키 핸들러
   const handleKeyDown = useCallback(
@@ -104,7 +109,15 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }}
+          style={{
+            '--mood-c1': gradient.c1,
+            '--mood-c2': gradient.c2,
+            '--mood-c3': gradient.c3,
+            '--mood-c4': gradient.c4,
+          } as React.CSSProperties}
         >
+          <LyricsEffects mood={mood} isActive={isOpen} />
+
           {/* 닫기 버튼 */}
           <motion.button
             ref={closeBtnRef}

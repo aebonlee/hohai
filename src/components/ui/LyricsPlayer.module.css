@@ -12,7 +12,12 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: linear-gradient(135deg, #071A33, #0A3D7A, #1466A8, #0D5699);
+  background: linear-gradient(135deg,
+    var(--mood-c1, #071A33),
+    var(--mood-c2, #0A3D7A),
+    var(--mood-c3, #1466A8),
+    var(--mood-c4, #0D5699)
+  );
   background-size: 300% 300%;
   animation: gradientShift 12s ease infinite;
   display: flex;
@@ -51,6 +56,8 @@
 
 /* 콘텐츠 그리드 */
 .content {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 32px;
