@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Song, SongInsert, SongUpdate } from '../types/song';
 
-export function useSongs(seriesId?: string) {
+export function useSongs(seriesId?: string, featuredOnly?: boolean) {
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -20,10 +20,14 @@ export function useSongs(seriesId?: string) {
       query = query.eq('series_id', seriesId);
     }
 
+    if (featuredOnly) {
+      query = query.eq('is_featured', true);
+    }
+
     const { data } = await query;
     setSongs((data as Song[]) || []);
     setLoading(false);
-  }, [seriesId]);
+  }, [seriesId, featuredOnly]);
 
   useEffect(() => {
     fetchSongs();

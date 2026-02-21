@@ -1141,3 +1141,118 @@ CREATE TABLE hohai_reviews (
 - `/poems` 페이지: 추천 체크된 시만 표시
 - `/poem-series/:slug` 페이지: 기존처럼 시집 내 모든 시 표시 (영향 없음)
 - 추천 시가 0편일 때 "아직 추천 시가 없습니다" 빈 상태 메시지 확인
+
+---
+
+## 2026-02-21 (7차) — Suno 노래 229곡 앨범 등록 + 추천 노래 필터링
+
+### 배경
+- 好海 이성헌 시인이 Suno AI로 만든 229곡이 `scripts/suno_songs.json`에 추출되어 있음
+- 노래들을 7개 앨범(시리즈)으로 분류하여 DB에 일괄 등록 필요
+- "추천 노래" 페이지가 모든 노래를 표시 중 → `is_featured=true` 필터링 필요
+- DB `hohai_songs.youtube_id`가 `NOT NULL` → Suno 전용 곡은 youtube_id 없이 등록해야 함
+- 229곡 중 중복(Suno가 2버전 생성)이 26쌍 → 중복 제거 후 ~203곡 등록
+
+### 7개 앨범 구성
+
+| # | 앨범명 | slug | 설명 | 분류 기준 |
+|---|--------|------|------|----------|
+| 1 | 바다의 노래 | sea-songs-album | 바다, 파도, 해변 관련 곡 | 바다/파도/수평선/갈매기/방파제 등 키워드 |
+| 2 | 가슴에 핀 사랑 | love-songs-album | 사랑, 연모, 그리움의 노래 | 사랑/가슴/그대/키스/불나비 등 키워드 |
+| 3 | 사계의 풍경 | nature-songs-album | 자연, 계절, 꽃과 나무의 노래 | 꽃/나무/풍경/노을/가을/겨울 등 키워드 |
+| 4 | 지나온 길 | life-songs-album | 인생 성찰, 회고, 추억의 노래 | 기본 카테고리 (키워드 미매칭 시) |
+| 5 | Across Borders | intl-songs-album | 영어/프랑스어 번역곡 | ID 기반 명시적 분류 (14곡) |
+| 6 | 한국의 풍경 | korean-life-album | 지역, 일상, 사회를 노래하다 | 고양시/부산/제주/순천/퇴근/출근 등 키워드 |
+| 7 | 꿈과 혁신 | dream-innovation-album | AI, 꿈, 학교, 혁신의 노래 | AI/혁신/꿈/대학/인공지능 등 키워드 |
+
+### 변경 내역
+
+#### 1. DB 스키마 변경 — `youtube_id` nullable + `suno_url` 컬럼
+
+**`dev_md/migration.sql`**:
+- `youtube_id TEXT NOT NULL` → `youtube_id TEXT DEFAULT ''`
+- `suno_url TEXT` 컬럼 추가
+
+**수동 실행 필요** (Supabase Dashboard SQL):
+```sql
+ALTER TABLE hohai_songs ALTER COLUMN youtube_id DROP NOT NULL;
+ALTER TABLE hohai_songs ALTER COLUMN youtube_id SET DEFAULT '';
+ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS suno_url TEXT;
+```
+
+#### 2. `src/data/suno-songs.ts` (신규 — 229곡 데이터 + 7개 앨범 분류)
+
+**구조**:
+- `SUNO_ALBUM_DEFS`: 7개 앨범 정의 배열 (name, slug, description, order)
+- `RAW_SONGS`: 229개 원본 곡 데이터 (id, title, url)
+- `cleanTitle()`: 제목 정리 (`/好海 이성헌` 접미사 제거, 앞 특수문자 제거, 공백 정리)
+- `classifySong()`: 앨범 분류 (명시적 ID 매핑 + 키워드 기반)
+- `SUNO_SONGS`: 중복 제거 + 정리된 최종 곡 배열 (SunoSongEntry[])
+
+**중복 제거 방식**:
+- 같은 제목의 곡이 여러 개 있을 때 첫 번째 곡만 사용 (Set 기반)
+- 229곡 → ~203곡으로 축소
+
+**분류 방식**:
+1. 국제곡(intl): Suno ID 기반 명시적 매핑 (14곡)
+2. 꿈/혁신: AI/혁신/꿈/대학 키워드 매칭
+3. 한국/일상: 지역명/퇴근/출근/별다방 등 키워드 매칭
+4. 바다: 바다/파도/수평선/갈매기 등 키워드 매칭
+5. 사랑: 사랑/가슴/그대 등 키워드 매칭
+6. 자연: 꽃/나무/풍경/노을 등 키워드 매칭
+7. 인생(기본): 위 분류에 미매칭된 곡
+
+#### 3. `src/hooks/useSongs.ts` — `featuredOnly` 파라미터 추가
+
+- `useSongs(seriesId?, featuredOnly?)` 두 번째 인자 추가
+- `featuredOnly === true`이면 `.eq('is_featured', true)` 필터 추가
+- `useCallback` 의존성 배열에 `featuredOnly` 추가
+
+#### 4. `src/pages/FeaturedSongsPage.tsx` — 추천 노래만 조회
+
+- `useSongs()` → `useSongs(undefined, true)` 변경
+- 빈 상태 메시지: "아직 등록된 노래가 없습니다" → "아직 추천 노래가 없습니다"
+
+#### 5. `src/pages/AdminPage.tsx` — 대폭 개선
+
+**SongsAdmin 컴포넌트**:
+- 노래 목록 테이블에 "추천" 컬럼 추가 (⭐ 표시)
+
+**DbInitAdmin 컴포넌트** — `handleSeedSongs` 함수 추가:
+1. 7개 앨범 시리즈 생성 (upsert, onConflict: 'slug')
+2. 중복 제거된 ~203곡을 20개씩 배치 insert
+3. 각 곡: `title`, `suno_url`, `youtube_id=''`, `series_id=앨범ID`, `is_published=true`, `is_featured=false`
+4. 앨범별 등록 현황 + 성공/실패 통계 로그 출력
+5. "노래 N곡 일괄 등록" 버튼 (보라색 배경)
+
+**DB_SCHEMA.md** 업데이트:
+- `hohai_songs` 테이블에 `suno_url TEXT` 컬럼 추가 반영
+- `youtube_id` 기본값 변경 반영
+
+### 파일 변경 요약
+```
+ dev_md/migration.sql          | 3~ (youtube_id nullable + suno_url 추가)
+ dev_md/DB_SCHEMA.md           | 6~ (스키마 문서 업데이트)
+ src/data/suno-songs.ts        | 350+ (신규 — 229곡 데이터 + 7개 앨범 분류)
+ src/hooks/useSongs.ts         | 6+ (featuredOnly 파라미터 + 필터 + 의존성)
+ src/pages/FeaturedSongsPage.tsx | 2~ (featuredOnly=true + 빈 상태 메시지)
+ src/pages/AdminPage.tsx       | 80+ (handleSeedSongs + 추천 컬럼)
+ 6 files changed
+```
+
+### 수동 작업 (사용자)
+1. Supabase Dashboard에서 SQL 실행:
+   ```sql
+   ALTER TABLE hohai_songs ALTER COLUMN youtube_id DROP NOT NULL;
+   ALTER TABLE hohai_songs ALTER COLUMN youtube_id SET DEFAULT '';
+   ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS suno_url TEXT;
+   ```
+2. 코드 배포 후 Admin → DB 초기화 탭 → "노래 N곡 일괄 등록" 클릭
+3. Admin → 노래 관리에서 추천할 곡에 ⭐ 체크
+
+### 검증 시나리오
+- Admin → DB초기화 → "노래 N곡 일괄 등록" → 7개 앨범 + ~203곡 등록 확인
+- Admin → 노래 관리 → 일부 곡 "추천" 체크
+- `/songs` 페이지(추천 노래): 추천 체크된 곡만 표시
+- `/songs/series/:slug` (앨범 상세): 앨범별 곡 정상 표시
+- SongCard에서 Suno embed 재생 확인

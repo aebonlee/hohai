@@ -13,6 +13,7 @@ import { POEM_CLASSIFICATIONS, CATEGORY_LIST } from '../data/poem-categories';
 import type { PoemInsert } from '../types/poem';
 import type { SongInsert } from '../types/song';
 import type { SeriesInsert } from '../types/series';
+import { SUNO_ALBUM_DEFS, SUNO_SONGS } from '../data/suno-songs';
 import styles from './AdminPage.module.css';
 
 type Tab = 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'categories' | 'reviews' | 'db-init';
@@ -530,6 +531,7 @@ function SongsAdmin() {
               <th>제목</th>
               <th>앨범</th>
               <th>소스</th>
+              <th>추천</th>
               <th>상태</th>
               <th>순서</th>
               <th>작업</th>
@@ -543,6 +545,9 @@ function SongsAdmin() {
                 <td style={{ fontSize: '0.75rem' }}>
                   {song.youtube_id && <span style={{ display: 'block', color: '#c00' }}>YouTube</span>}
                   {song.suno_url && <span style={{ display: 'block', color: '#6366f1' }}>Suno</span>}
+                </td>
+                <td style={{ textAlign: 'center', fontSize: '1.1rem' }}>
+                  {song.is_featured ? '⭐' : ''}
                 </td>
                 <td>
                   <span className={`${styles.statusBadge} ${song.is_published ? styles.published : styles.draft}`}>
@@ -1314,6 +1319,83 @@ function DbInitAdmin() {
     }
   };
 
+  const handleSeedSongs = async () => {
+    if (!window.confirm(`Suno 노래 ${SUNO_SONGS.length}곡을 7개 앨범으로 일괄 등록하시겠습니까?`)) return;
+    setRunning(true);
+    setLog([]);
+    addLog(`Suno 노래 일괄 등록 시작 (${SUNO_SONGS.length}곡, 7개 앨범)...`);
+
+    // 1. 7개 앨범(시리즈) 생성
+    addLog('앨범 7개 생성 중...');
+    const albumIdMap: Record<string, string> = {};
+    for (const album of SUNO_ALBUM_DEFS) {
+      const { data, error } = await supabase.from('hohai_series').upsert({
+        name: album.name,
+        slug: album.slug,
+        description: album.description,
+        type: 'song',
+        display_order: album.order,
+        is_published: true,
+      }, { onConflict: 'slug' }).select('id, slug').single();
+
+      if (error) {
+        addLog(`앨범 "${album.name}" 생성 실패: ${error.message}`);
+      } else if (data) {
+        albumIdMap[album.slug] = data.id;
+        addLog(`  ✓ ${album.name} (${album.slug})`);
+      }
+    }
+    addLog(`앨범 ${Object.keys(albumIdMap).length}개 등록 완료`);
+
+    if (Object.keys(albumIdMap).length === 0) {
+      addLog('앨범 생성 실패 — 중단');
+      setRunning(false);
+      return;
+    }
+
+    // 2. 노래 일괄 등록 (20개씩 배치)
+    addLog(`노래 ${SUNO_SONGS.length}곡 등록 시작...`);
+    const BATCH_SIZE = 20;
+    let successCount = 0;
+    let errorCount = 0;
+
+    // 앨범별 통계
+    const albumStats: Record<string, number> = {};
+
+    for (let i = 0; i < SUNO_SONGS.length; i += BATCH_SIZE) {
+      const batch = SUNO_SONGS.slice(i, i + BATCH_SIZE).map((s, idx) => {
+        const seriesId = albumIdMap[s.albumSlug] || null;
+        albumStats[s.albumSlug] = (albumStats[s.albumSlug] || 0) + 1;
+        return {
+          title: s.title,
+          suno_url: s.suno_url,
+          youtube_id: '',
+          series_id: seriesId,
+          display_order: i + idx,
+          is_featured: false,
+          is_published: true,
+        } satisfies SongInsert;
+      });
+
+      const { error: batchErr } = await supabase.from('hohai_songs').insert(batch);
+      if (batchErr) {
+        addLog(`배치 ${Math.floor(i / BATCH_SIZE) + 1} 실패: ${batchErr.message}`);
+        errorCount += batch.length;
+      } else {
+        successCount += batch.length;
+      }
+      addLog(`진행: ${Math.min(i + BATCH_SIZE, SUNO_SONGS.length)} / ${SUNO_SONGS.length}`);
+    }
+
+    // 3. 결과 출력
+    addLog('--- 앨범별 등록 현황 ---');
+    for (const album of SUNO_ALBUM_DEFS) {
+      addLog(`  ${album.name}: ${albumStats[album.slug] || 0}곡`);
+    }
+    addLog(`\n등록 완료! 성공: ${successCount}곡, 실패: ${errorCount}곡`);
+    setRunning(false);
+  };
+
   return (
     <>
       <div className={styles.header}>
@@ -1336,6 +1418,14 @@ function DbInitAdmin() {
           style={{ padding: '10px 20px', fontSize: '0.95rem' }}
         >
           시 177편 일괄 등록
+        </button>
+        <button
+          className={styles.addBtn}
+          onClick={handleSeedSongs}
+          disabled={running}
+          style={{ padding: '10px 20px', fontSize: '0.95rem', background: '#6366f1' }}
+        >
+          노래 {SUNO_SONGS.length}곡 일괄 등록
         </button>
       </div>
 
@@ -1384,6 +1474,8 @@ function DbInitAdmin() {
             <strong>전체 데이터 삭제</strong>: 시, 노래, 시리즈, 카테고리 전부 삭제
             <br />
             <strong>시 177편 일괄 등록</strong>: 카테고리 9개 + 시집 + 177편 시 (분류 포함) 자동 등록
+            <br />
+            <strong>노래 일괄 등록</strong>: Suno AI 곡 7개 앨범으로 분류 + 중복 제거 후 일괄 등록
             <br />
             <strong>카테고리/태그 일괄 업데이트</strong>: 기존 등록된 시의 카테고리/태그만 일괄 변경
             <br />

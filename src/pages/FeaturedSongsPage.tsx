@@ -5,7 +5,7 @@ import { useSongs } from '../hooks/useSongs';
 import styles from './FeaturedSongsPage.module.css';
 
 export default function FeaturedSongsPage() {
-  const { songs, loading } = useSongs();
+  const { songs, loading } = useSongs(undefined, true);
 
   return (
     <PageTransition>
@@ -30,7 +30,7 @@ export default function FeaturedSongsPage() {
               ))}
             </div>
           ) : (
-            <p className={styles.empty}>아직 등록된 노래가 없습니다.</p>
+            <p className={styles.empty}>아직 추천 노래가 없습니다.</p>
           )}
         </div>
       </div>

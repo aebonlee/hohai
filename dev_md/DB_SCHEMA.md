@@ -28,10 +28,12 @@
 | id | UUID | gen_random_uuid() | PK |
 | title | TEXT | NOT NULL | 곡 제목 |
 | description | TEXT | NULL | 곡 설명 |
-| youtube_id | TEXT | NOT NULL | 유튜브 영상 ID |
+| youtube_id | TEXT | '' | 유튜브 영상 ID (빈 문자열 허용) |
+| suno_url | TEXT | NULL | Suno AI 곡 URL |
 | lyrics | TEXT | NULL | 가사 |
+| series_id | UUID | NULL | 앨범(시리즈) FK |
 | display_order | INTEGER | 0 | 표시 순서 |
-| is_featured | BOOLEAN | FALSE | 대표곡 여부 |
+| is_featured | BOOLEAN | FALSE | 추천곡 여부 |
 | is_published | BOOLEAN | TRUE | 공개 여부 |
 | recorded_date | DATE | NULL | 녹음/업로드일 |
 | created_at | TIMESTAMPTZ | NOW() | 생성 시각 |

@@ -1,0 +1,334 @@
+// ============================================================
+// Suno AI 노래 229곡 데이터 + 7개 앨범 분류
+// 好海 이성헌 시인의 Suno AI 작곡 모음
+// ============================================================
+
+export interface SunoSongEntry {
+  id: string;
+  title: string;
+  suno_url: string;
+  albumSlug: string;
+}
+
+export interface SunoAlbumDef {
+  name: string;
+  slug: string;
+  description: string;
+  order: number;
+}
+
+// ── 7개 앨범 정의 ──────────────────────────────────────────
+export const SUNO_ALBUM_DEFS: SunoAlbumDef[] = [
+  { name: '바다의 노래', slug: 'sea-songs-album', description: '바다, 파도, 해변 — 好海의 바다 사랑을 담은 곡', order: 1 },
+  { name: '가슴에 핀 사랑', slug: 'love-songs-album', description: '사랑, 연모, 그리움의 노래', order: 2 },
+  { name: '사계의 풍경', slug: 'nature-songs-album', description: '자연, 계절, 꽃과 나무의 노래', order: 3 },
+  { name: '지나온 길', slug: 'life-songs-album', description: '인생 성찰, 회고, 추억의 노래', order: 4 },
+  { name: 'Across Borders', slug: 'intl-songs-album', description: '영어/프랑스어 번역곡 — 시의 국경을 넘다', order: 5 },
+  { name: '한국의 풍경', slug: 'korean-life-album', description: '지역, 일상, 사회를 노래하다', order: 6 },
+  { name: '꿈과 혁신', slug: 'dream-innovation-album', description: 'AI, 꿈, 학교, 혁신의 노래', order: 7 },
+];
+
+// ── Raw 229곡 데이터 (suno_songs.json 원본) ────────────────
+interface RawSong { id: string; title: string; url: string; }
+
+const RAW_SONGS: RawSong[] = [
+  { id: 'b852ac26-b9bd-4f1a-885c-439fd5215388', title: '축복을 빌어야 하는 이유/好海 이성헌', url: 'https://suno.com/song/b852ac26-b9bd-4f1a-885c-439fd5215388' },
+  { id: '684782d7-eaf2-4944-8675-4adac2f4255b', title: '소꿉동무/好海 이성헌', url: 'https://suno.com/song/684782d7-eaf2-4944-8675-4adac2f4255b' },
+  { id: 'c93f349c-c19d-4538-ba43-ec205b31ae80', title: 'ㅣOn the Breakwater – II', url: 'https://suno.com/song/c93f349c-c19d-4538-ba43-ec205b31ae80' },
+  { id: 'ce534087-6f93-4986-a74f-d371eb6661b3', title: 'Sur la jetée – II', url: 'https://suno.com/song/ce534087-6f93-4986-a74f-d371eb6661b3' },
+  { id: '8c7eb20c-b62a-4cea-988e-efc28e89c52a', title: '처음으로 돌아가는 길에는.../好海 이성헌', url: 'https://suno.com/song/8c7eb20c-b62a-4cea-988e-efc28e89c52a' },
+  { id: '89aee283-8f2a-489f-ba12-8f5b9b87ff51', title: '한 번씩만 더!/好海 이성헌', url: 'https://suno.com/song/89aee283-8f2a-489f-ba12-8f5b9b87ff51' },
+  { id: 'a10c9fe3-8e9e-4ee3-92b9-ecac884bc895', title: '품이 그리운 이들이여.../好海 이성헌', url: 'https://suno.com/song/a10c9fe3-8e9e-4ee3-92b9-ecac884bc895' },
+  { id: 'f2835f32-9e29-423a-9e99-a57ce300bd8b', title: '작아질수록 커져만 가는데.../好海 이성헌', url: 'https://suno.com/song/f2835f32-9e29-423a-9e99-a57ce300bd8b' },
+  { id: 'daad2659-6c83-4e09-a2ff-e05811b7888d', title: "Prendre soin d'un jour, comme on compose", url: 'https://suno.com/song/daad2659-6c83-4e09-a2ff-e05811b7888d' },
+  { id: '6726dd8e-61b2-4543-9fab-4eac27fd9aaa', title: '하루를 차리다/好海 이성헌', url: 'https://suno.com/song/6726dd8e-61b2-4543-9fab-4eac27fd9aaa' },
+  { id: '9efdf846-18d1-437b-b1d0-71d79174cf7f', title: '가위손/好海 이성헌', url: 'https://suno.com/song/9efdf846-18d1-437b-b1d0-71d79174cf7f' },
+  { id: 'cc3dcfc8-40ec-4dab-8bbf-3ce2b5bda7ec', title: 'La Chanson des Feuilles Pourpres', url: 'https://suno.com/song/cc3dcfc8-40ec-4dab-8bbf-3ce2b5bda7ec' },
+  { id: 'cb904b53-ea0a-428f-a7ed-9c57e4f948a6', title: 'Song of the Crimson Leaves', url: 'https://suno.com/song/cb904b53-ea0a-428f-a7ed-9c57e4f948a6' },
+  { id: '3b84c4f6-e53e-4b39-9a2f-eb76557d983f', title: '단풍의 노래/好海 이성헌', url: 'https://suno.com/song/3b84c4f6-e53e-4b39-9a2f-eb76557d983f' },
+  { id: '6c39d55a-9771-43e6-9e58-da5273ce9006', title: 'Au carrefour du libre arbitre', url: 'https://suno.com/song/6c39d55a-9771-43e6-9e58-da5273ce9006' },
+  { id: '10c7ff05-5889-4271-8d8a-27a15dafa8c4', title: '자유의지의 갈림길에서/好海 이성헌', url: 'https://suno.com/song/10c7ff05-5889-4271-8d8a-27a15dafa8c4' },
+  { id: 'fd682120-19c1-4cff-a3ce-cd887dc54616', title: 'Les cheveux blanchis', url: 'https://suno.com/song/fd682120-19c1-4cff-a3ce-cd887dc54616' },
+  { id: '3d5779aa-1fc8-448a-acab-912889ffd9cd', title: '반백의 머리칼./好海 이성헌', url: 'https://suno.com/song/3d5779aa-1fc8-448a-acab-912889ffd9cd' },
+  { id: '0936edca-3f60-4f7b-a3f3-018a059be283', title: '미루나무/好海 이성헌', url: 'https://suno.com/song/0936edca-3f60-4f7b-a3f3-018a059be283' },
+  { id: '5b8b1b61-e392-4ba2-9249-2a24f2305102', title: '모성애/好海 이성헌', url: 'https://suno.com/song/5b8b1b61-e392-4ba2-9249-2a24f2305102' },
+  { id: '6116fe54-39da-42f4-8469-a738688f963d', title: '밤바다/好海 이성헌', url: 'https://suno.com/song/6116fe54-39da-42f4-8469-a738688f963d' },
+  { id: '0b54cfbf-de71-4ec2-89db-add4ad685e8b', title: 'Amour enseveli dans mon cœur', url: 'https://suno.com/song/0b54cfbf-de71-4ec2-89db-add4ad685e8b' },
+  { id: '188efe55-d6c9-425b-8f3c-422b8126d256', title: '가슴에 걸어 두고픈 그림./好海 이성헌', url: 'https://suno.com/song/188efe55-d6c9-425b-8f3c-422b8126d256' },
+  { id: '31519af8-f65a-453a-9481-4f4331dab340', title: '체념의 길모퉁이에 서서.../好海 이성헌', url: 'https://suno.com/song/31519af8-f65a-453a-9481-4f4331dab340' },
+  { id: 'c5f7e4f7-af3f-4df7-a5b1-7d87dff96a1b', title: '불꽃으로...스러지다./好海 이성헌', url: 'https://suno.com/song/c5f7e4f7-af3f-4df7-a5b1-7d87dff96a1b' },
+  { id: 'ed1180d3-4114-4043-aa29-3467ee961d21', title: '가슴에 묻힌 사랑,/好海 이성헌', url: 'https://suno.com/song/ed1180d3-4114-4043-aa29-3467ee961d21' },
+  { id: 'aa2e1006-8ff6-4a67-8a0d-84f2241037e8', title: 'The Fallen Flower (낙화)', url: 'https://suno.com/song/aa2e1006-8ff6-4a67-8a0d-84f2241037e8' },
+  { id: '70a1e839-e29f-492d-932d-dbc3f6dd1a65', title: 'La Fleur Tombée (낙화)', url: 'https://suno.com/song/70a1e839-e29f-492d-932d-dbc3f6dd1a65' },
+  { id: '3010f8ba-1b83-4226-bc0b-984355a44124', title: 'Now they say the time has come.', url: 'https://suno.com/song/3010f8ba-1b83-4226-bc0b-984355a44124' },
+  { id: '2794e683-1e5d-43e7-8804-a8a2351cd0fa', title: '낙화/好海 이성헌', url: 'https://suno.com/song/2794e683-1e5d-43e7-8804-a8a2351cd0fa' },
+  { id: '63464836-7008-4620-9c19-fcdf2b24f9e2', title: '가슴에 핀 꽃/好海 이성헌', url: 'https://suno.com/song/63464836-7008-4620-9c19-fcdf2b24f9e2' },
+  { id: '2781e276-64d3-4364-84d0-116b5f66e361', title: '카타르시스/好海 이성헌', url: 'https://suno.com/song/2781e276-64d3-4364-84d0-116b5f66e361' },
+  { id: '1d1c5826-4c2c-418f-b583-54ec47d19f06', title: '은둔/好海 이성헌', url: 'https://suno.com/song/1d1c5826-4c2c-418f-b583-54ec47d19f06' },
+  { id: '6feca914-d23a-4b0f-ae97-04657f86aa71', title: '진주 조개/好海 이성헌', url: 'https://suno.com/song/6feca914-d23a-4b0f-ae97-04657f86aa71' },
+  { id: '347c4b76-9f0f-4391-9c9c-90efc03c202a', title: '내 속엔 우체부가 산다/好海 이성헌', url: 'https://suno.com/song/347c4b76-9f0f-4391-9c9c-90efc03c202a' },
+  { id: 'dfcf735f-30b3-4e04-a712-2c60eff50085', title: '이 봄이 슬프다/好海 이성헌', url: 'https://suno.com/song/dfcf735f-30b3-4e04-a712-2c60eff50085' },
+  { id: '18ef0b8a-60f2-4e46-95f5-ba9268f001bb', title: '너를 사랑하고도/好海 이성헌', url: 'https://suno.com/song/18ef0b8a-60f2-4e46-95f5-ba9268f001bb' },
+  { id: '9cb7baa4-8a57-475b-9e9b-87d2f54f27b9', title: '강 건너 있는 그대/好海 이성헌', url: 'https://suno.com/song/9cb7baa4-8a57-475b-9e9b-87d2f54f27b9' },
+  { id: 'd3aa33ac-0121-45ff-843c-08ad9fd6d685', title: '바다, 나를 안아 주세요/好海 이성헌', url: 'https://suno.com/song/d3aa33ac-0121-45ff-843c-08ad9fd6d685' },
+  { id: '76ae4dbe-5040-4769-a6b3-61440e5980ef', title: '바다, 나를 안아 주세요/好海 이성헌', url: 'https://suno.com/song/76ae4dbe-5040-4769-a6b3-61440e5980ef' },
+  { id: '43f270d3-87d3-4e89-a1f2-411898a09dd9', title: '불나비 사랑 /好海 이성헌', url: 'https://suno.com/song/43f270d3-87d3-4e89-a1f2-411898a09dd9' },
+  { id: 'b4d0b0cb-042d-484a-add9-c3a86a7028a2', title: '책갈피/好海 이성헌', url: 'https://suno.com/song/b4d0b0cb-042d-484a-add9-c3a86a7028a2' },
+  { id: '04cac38f-eebd-4b2b-9c23-7c610f341860', title: '파 도/好海 이성헌', url: 'https://suno.com/song/04cac38f-eebd-4b2b-9c23-7c610f341860' },
+  { id: '7b3d0b04-89a1-4ab4-9105-a323f09659b8', title: '수평선/好海 이성헌', url: 'https://suno.com/song/7b3d0b04-89a1-4ab4-9105-a323f09659b8' },
+  { id: 'da874ad1-204b-493c-b4d6-3cf2c01151e4', title: '넝쿨장미/好海 이성헌', url: 'https://suno.com/song/da874ad1-204b-493c-b4d6-3cf2c01151e4' },
+  { id: '9d7ec07f-a761-4ca9-89ab-a1b20be63d53', title: '마주 앉아 보고 싶군요!/好海 이성헌', url: 'https://suno.com/song/9d7ec07f-a761-4ca9-89ab-a1b20be63d53' },
+  { id: 'ecf406a5-bc77-4960-9d56-f23ce5375a2a', title: '옷 한 벌 입고 간 길!/好海 이성헌', url: 'https://suno.com/song/ecf406a5-bc77-4960-9d56-f23ce5375a2a' },
+  { id: 'c5bdb4d5-3eb8-45f3-95e2-252da4a71848', title: '눈꽃/好海 이성헌', url: 'https://suno.com/song/c5bdb4d5-3eb8-45f3-95e2-252da4a71848' },
+  { id: 'c59f9ce0-e352-4312-a06c-fc348259e2ad', title: '매일 같이 처음 보는 사람처럼./好海 이성헌', url: 'https://suno.com/song/c59f9ce0-e352-4312-a06c-fc348259e2ad' },
+  { id: '13f71e7c-2f46-4d39-b2b5-fc05314abe70', title: '지나고 보니 사랑이었네!/好海 이성헌', url: 'https://suno.com/song/13f71e7c-2f46-4d39-b2b5-fc05314abe70' },
+  { id: '0d49abf7-9f47-4d17-a57d-94320e3324b8', title: '미리미리 내려놓기/好海 이성헌', url: 'https://suno.com/song/0d49abf7-9f47-4d17-a57d-94320e3324b8' },
+  { id: '20bc2836-1838-42fd-8b53-b38ef2d17dd6', title: '첫눈 오는 날 / 好海 이성헌', url: 'https://suno.com/song/20bc2836-1838-42fd-8b53-b38ef2d17dd6' },
+  { id: 'd1f191f4-9bfa-47c0-8b7f-8d3b098f88d3', title: '마물다 떠난 영혼들 / 好海 이성헌', url: 'https://suno.com/song/d1f191f4-9bfa-47c0-8b7f-8d3b098f88d3' },
+  { id: '757ae3a9-090b-410f-bc9c-40fb59ffb6fc', title: '생각 자르기/好海 이성헌', url: 'https://suno.com/song/757ae3a9-090b-410f-bc9c-40fb59ffb6fc' },
+  { id: '897bfd3f-1553-4b86-94cf-3bfa80c6bdb2', title: '동행의 조건/好海 이성헌', url: 'https://suno.com/song/897bfd3f-1553-4b86-94cf-3bfa80c6bdb2' },
+  { id: '244102b3-3fd7-471f-ac63-64c9f5bfe096', title: '사계/好海 이성헌', url: 'https://suno.com/song/244102b3-3fd7-471f-ac63-64c9f5bfe096' },
+  { id: '9f25f20f-eff4-465d-b940-e305acbf243a', title: '여백/好海 이성헌', url: 'https://suno.com/song/9f25f20f-eff4-465d-b940-e305acbf243a' },
+  { id: '16e7c1d9-e432-4fa2-92cd-2cbca230e42f', title: '짐이 되는 사람이 되지는 말아야 /好海 이성헌', url: 'https://suno.com/song/16e7c1d9-e432-4fa2-92cd-2cbca230e42f' },
+  { id: 'e30441fa-d0ca-4301-984f-665954590bc0', title: '물안개/好海 이성헌', url: 'https://suno.com/song/e30441fa-d0ca-4301-984f-665954590bc0' },
+  { id: '837f4dbb-ccc8-4d13-8054-354b9ecbd17a', title: '삼원색 조화/好海 이성헌', url: 'https://suno.com/song/837f4dbb-ccc8-4d13-8054-354b9ecbd17a' },
+  { id: 'fe789405-9cc1-4a08-9dd2-44d226c8302e', title: '기다려 주기/好海 이성헌', url: 'https://suno.com/song/fe789405-9cc1-4a08-9dd2-44d226c8302e' },
+  { id: '95e78cce-44d7-41a2-943d-e90eaefd7383', title: '두물머리/好海 이성헌', url: 'https://suno.com/song/95e78cce-44d7-41a2-943d-e90eaefd7383' },
+  { id: '14fae6a3-db47-4414-9134-0a838b556cfe', title: '색종이 사랑/好海 이성헌', url: 'https://suno.com/song/14fae6a3-db47-4414-9134-0a838b556cfe' },
+  { id: '682932e4-eba5-4562-8554-5f638bbd51fe', title: '억새풀 꽃/好海 이성헌', url: 'https://suno.com/song/682932e4-eba5-4562-8554-5f638bbd51fe' },
+  { id: '0cc031b3-25ec-4728-bb4e-341e52ee358a', title: '마냥 새하얗던 날에/好海 이성헌', url: 'https://suno.com/song/0cc031b3-25ec-4728-bb4e-341e52ee358a' },
+  { id: 'dfb1a9d4-d02a-407a-a5c7-19376e17fa1e', title: '하조대 바닷가/好海 이성헌', url: 'https://suno.com/song/dfb1a9d4-d02a-407a-a5c7-19376e17fa1e' },
+  { id: 'e04814cf-89cb-4016-aaaf-31c8f90821e0', title: '풍경/好海 이성헌', url: 'https://suno.com/song/e04814cf-89cb-4016-aaaf-31c8f90821e0' },
+  { id: '32b700e7-288a-459e-b2b5-0f2177d10e8b', title: '사모 추모(思母 追慕)/好海 이성헌.', url: 'https://suno.com/song/32b700e7-288a-459e-b2b5-0f2177d10e8b' },
+  { id: 'd0f249ce-e5c2-482b-a13f-326910e8ba37', title: '바다가 내려다보이는 집/好海 이성헌', url: 'https://suno.com/song/d0f249ce-e5c2-482b-a13f-326910e8ba37' },
+  { id: '0828fbd1-a3c8-49d9-bb73-dfbb9178f024', title: '숨은 사랑/好海 이성헌', url: 'https://suno.com/song/0828fbd1-a3c8-49d9-bb73-dfbb9178f024' },
+  { id: '97f05adc-a766-4549-b45a-7ec3de738fb4', title: '돌비(石碑)사랑/好海 이성헌', url: 'https://suno.com/song/97f05adc-a766-4549-b45a-7ec3de738fb4' },
+  { id: 'a2a83481-84bc-4bf5-a8a5-da903fc628cd', title: '피아니스트/好海 이성헌', url: 'https://suno.com/song/a2a83481-84bc-4bf5-a8a5-da903fc628cd' },
+  { id: 'fd76c910-72fc-453e-994c-3a888fa2ce9a', title: '꽃길/好海 이성헌', url: 'https://suno.com/song/fd76c910-72fc-453e-994c-3a888fa2ce9a' },
+  { id: 'c5a2726e-4d9d-4faa-b837-26ae61c74e51', title: '회고록/好海 이성헌', url: 'https://suno.com/song/c5a2726e-4d9d-4faa-b837-26ae61c74e51' },
+  { id: 'd867eede-c41b-4f5b-ba12-363e4d86a308', title: '사랑해서 미안해!/好海 이성헌', url: 'https://suno.com/song/d867eede-c41b-4f5b-ba12-363e4d86a308' },
+  { id: '29c325a7-1f83-45bd-aebb-f36ae94a19a9', title: '노을/好海 이성헌', url: 'https://suno.com/song/29c325a7-1f83-45bd-aebb-f36ae94a19a9' },
+  { id: 'b5ebfc0e-2adb-4202-af90-7adee94accb5', title: '바닷새/好海 이성헌', url: 'https://suno.com/song/b5ebfc0e-2adb-4202-af90-7adee94accb5' },
+  { id: '5899e12b-ba71-44f2-b714-91270a36ed05', title: '회상/好海 이성헌', url: 'https://suno.com/song/5899e12b-ba71-44f2-b714-91270a36ed05' },
+  { id: '5dcfa98f-1ba7-435f-90c7-3987d1fda91b', title: '그대는.../好海 이성헌', url: 'https://suno.com/song/5dcfa98f-1ba7-435f-90c7-3987d1fda91b' },
+  { id: 'b78f9fd9-1aee-4f64-a841-91cc76b0bfdd', title: "'민낯'의 새 삶/好海 이성헌", url: 'https://suno.com/song/b78f9fd9-1aee-4f64-a841-91cc76b0bfdd' },
+  { id: 'd8b921e7-1188-43ba-928f-4434bc6c2c16', title: '해 떨어지는 줄 모르던 때/好海 이성헌', url: 'https://suno.com/song/d8b921e7-1188-43ba-928f-4434bc6c2c16' },
+  { id: '860fb48b-1ca6-46d2-bdca-13037733b680', title: 'he Saddest Thing _ Melanie Safka/好海 이성헌', url: 'https://suno.com/song/860fb48b-1ca6-46d2-bdca-13037733b680' },
+  { id: '83d38e83-787d-46d1-95a7-bd2bee66f33b', title: '회한/好海 이성헌', url: 'https://suno.com/song/83d38e83-787d-46d1-95a7-bd2bee66f33b' },
+  { id: '511adcf6-506e-4d54-8ed1-a0c670164b11', title: '곁에 있을게../好海 이성헌', url: 'https://suno.com/song/511adcf6-506e-4d54-8ed1-a0c670164b11' },
+  { id: 'f6653870-c239-4967-9185-39e59c51b27b', title: '사랑한다, 전보다 더 아프게.../好海 이성헌', url: 'https://suno.com/song/f6653870-c239-4967-9185-39e59c51b27b' },
+  { id: 'cc5d1c49-407a-400d-a6d5-d32de5d623ff', title: '징검다리/好海 이성헌', url: 'https://suno.com/song/cc5d1c49-407a-400d-a6d5-d32de5d623ff' },
+  { id: 'd74d4c64-ca60-45c9-a419-84f4d72b6506', title: '첫 마음 준 그대여.../好海 이성헌', url: 'https://suno.com/song/d74d4c64-ca60-45c9-a419-84f4d72b6506' },
+  { id: 'e3d9010a-19ca-4475-aaee-4135cb2fbf2b', title: '석류/好海 이성헌', url: 'https://suno.com/song/e3d9010a-19ca-4475-aaee-4135cb2fbf2b' },
+  { id: '620b827f-8683-45b9-a94a-c5e8671ac6d6', title: '잔상(殘像)/好海 이성헌', url: 'https://suno.com/song/620b827f-8683-45b9-a94a-c5e8671ac6d6' },
+  { id: '7677fa7c-f279-41d8-9665-ed97aabd34a9', title: '갈매기/好海 이성헌', url: 'https://suno.com/song/7677fa7c-f279-41d8-9665-ed97aabd34a9' },
+  { id: '0ff7fc99-c5a4-4c0d-bd17-7eb4728f0074', title: '망각/好海 이성헌', url: 'https://suno.com/song/0ff7fc99-c5a4-4c0d-bd17-7eb4728f0074' },
+  { id: '2734a0d3-df72-4b52-be06-7e1c33f20f08', title: '가슴 안 당신/好海 이성헌', url: 'https://suno.com/song/2734a0d3-df72-4b52-be06-7e1c33f20f08' },
+  { id: '54fbb245-4750-419c-934b-26ae77d2102b', title: '모르포 나비/好海 이성헌', url: 'https://suno.com/song/54fbb245-4750-419c-934b-26ae77d2102b' },
+  { id: 'fb99558f-694f-4164-b4b9-46772d29d21d', title: '하나만 남겨두고.../好海 이성헌', url: 'https://suno.com/song/fb99558f-694f-4164-b4b9-46772d29d21d' },
+  { id: '135b8c7a-de59-402c-b356-c6ae5c34658b', title: '꽃밭/好海 이성헌', url: 'https://suno.com/song/135b8c7a-de59-402c-b356-c6ae5c34658b' },
+  { id: '7596d251-5c41-43f3-89ec-8476d37efad9', title: '그냥 ...떠나고 싶다/好海 이성헌', url: 'https://suno.com/song/7596d251-5c41-43f3-89ec-8476d37efad9' },
+  { id: '9c1d6a43-75cd-4d8b-ba8a-c7d2babdd5df', title: '충주호에서/好海 이성헌', url: 'https://suno.com/song/9c1d6a43-75cd-4d8b-ba8a-c7d2babdd5df' },
+  { id: '4626e5c8-9f9a-490d-aab6-73441204fd90', title: "쌍곡선 ')('/好海 이성헌", url: 'https://suno.com/song/4626e5c8-9f9a-490d-aab6-73441204fd90' },
+  { id: 'dfc74354-ccdd-45d0-9c9d-0f88eff5d9dc', title: '짐이 되는 사람이 되지는 말아야 /好海 이성헌', url: 'https://suno.com/song/dfc74354-ccdd-45d0-9c9d-0f88eff5d9dc' },
+  { id: 'b1c0e6ab-ccba-453a-a7e2-b34bd3d2e149', title: '금광호 카페/好海 이성헌', url: 'https://suno.com/song/b1c0e6ab-ccba-453a-a7e2-b34bd3d2e149' },
+  { id: '704e147b-6c72-47c0-86d7-e24994af50fa', title: '그대 아직도 날 사랑하고 있나요/好海 이성헌', url: 'https://suno.com/song/704e147b-6c72-47c0-86d7-e24994af50fa' },
+  { id: '6c8a32d2-34cb-4af1-b473-ee3480f6b332', title: '앨범을 들척이며.../好海 이성헌', url: 'https://suno.com/song/6c8a32d2-34cb-4af1-b473-ee3480f6b332' },
+  { id: 'aa9003ce-056e-493d-879c-8d19226b6a2e', title: '삼베옷/好海 이성헌', url: 'https://suno.com/song/aa9003ce-056e-493d-879c-8d19226b6a2e' },
+  { id: '73de35ee-e39e-4880-a5ef-20d7a3c2a812', title: '나무뿐일까.../好海 이성헌', url: 'https://suno.com/song/73de35ee-e39e-4880-a5ef-20d7a3c2a812' },
+  { id: 'b96f0e8c-6e64-40c3-a561-c35700087aff', title: '가슴에 핀 동심초/好海 이성헌', url: 'https://suno.com/song/b96f0e8c-6e64-40c3-a561-c35700087aff' },
+  { id: '2a0f4c9b-ab2a-4f32-a945-6fb2769fc769', title: '거제 바다/好海 이성헌', url: 'https://suno.com/song/2a0f4c9b-ab2a-4f32-a945-6fb2769fc769' },
+  { id: 'c042a723-1946-4114-a8b0-d66f2bb38b0b', title: '연서 2/好海 이성헌', url: 'https://suno.com/song/c042a723-1946-4114-a8b0-d66f2bb38b0b' },
+  { id: 'c0a3c3f1-ba45-4469-8878-883e3e4737e6', title: '너를 사랑하고도/好海 이성헌', url: 'https://suno.com/song/c0a3c3f1-ba45-4469-8878-883e3e4737e6' },
+  { id: 'd94dc0c8-5e4f-48d7-8e59-1ac77eb1f4e7', title: '사우의 밤,/好海 이성헌', url: 'https://suno.com/song/d94dc0c8-5e4f-48d7-8e59-1ac77eb1f4e7' },
+  { id: '0ecbdcc6-1c37-4db2-b730-f283dc9a73c2', title: '튤립2/好海 이성헌', url: 'https://suno.com/song/0ecbdcc6-1c37-4db2-b730-f283dc9a73c2' },
+  { id: '7ce98c86-fa51-4d60-9e78-cc1cadc4000b', title: '그대와 나란히 걷던 길/好海 이성헌', url: 'https://suno.com/song/7ce98c86-fa51-4d60-9e78-cc1cadc4000b' },
+  { id: '7da97966-645e-495e-9386-74436c90c5b7', title: '식어 간 커피/好海 이성헌', url: 'https://suno.com/song/7da97966-645e-495e-9386-74436c90c5b7' },
+  { id: 'c069efab-cc7b-4b7a-b47b-8038d435c275', title: '손잡이에 걸어 둔 마음./好海 이성헌', url: 'https://suno.com/song/c069efab-cc7b-4b7a-b47b-8038d435c275' },
+  { id: '5f15840f-21ba-4323-86b7-bc020766f6e3', title: '늘 노을은 붉다./好海 이성헌', url: 'https://suno.com/song/5f15840f-21ba-4323-86b7-bc020766f6e3' },
+  { id: 'c1d67ccb-b867-4763-858f-ff144f23948c', title: '떠난 자, 남은 자/好海 이성헌', url: 'https://suno.com/song/c1d67ccb-b867-4763-858f-ff144f23948c' },
+  { id: '9e2b57af-5e76-4604-b9be-298a7fc91133', title: '단순 살기, 욕심껏 살기/好海 이성헌', url: 'https://suno.com/song/9e2b57af-5e76-4604-b9be-298a7fc91133' },
+  { id: '6a26e24d-df91-405a-8a01-b4ad8fa3c4bd', title: '고향땅 여름밤! /好海 이성헌', url: 'https://suno.com/song/6a26e24d-df91-405a-8a01-b4ad8fa3c4bd' },
+  { id: 'be82113e-724e-4691-a6c1-623a9b23c3fe', title: '방사선의 하루/好海 이성헌', url: 'https://suno.com/song/be82113e-724e-4691-a6c1-623a9b23c3fe' },
+  { id: 'e9bfa4eb-b68f-4c15-a35c-c0366eb8fefe', title: '다시 돌아갈 수는 없겠지.../好海 이성헌', url: 'https://suno.com/song/e9bfa4eb-b68f-4c15-a35c-c0366eb8fefe' },
+  { id: 'fed93ec2-e00f-4a8a-9d65-9ed9336772d6', title: '퇴근길 사람들/好海 이성헌', url: 'https://suno.com/song/fed93ec2-e00f-4a8a-9d65-9ed9336772d6' },
+  { id: '635ce4d2-8250-4ed4-8ddf-29888f1e5b87', title: '트라우마/好海 이성헌', url: 'https://suno.com/song/635ce4d2-8250-4ed4-8ddf-29888f1e5b87' },
+  { id: '228891f1-e2af-4eba-990e-d2a226d4ac21', title: '하늘, 수줍은 소녀를 보았네../好海 이성헌', url: 'https://suno.com/song/228891f1-e2af-4eba-990e-d2a226d4ac21' },
+  { id: '5dde861c-d994-4228-879f-2aea976f7b9f', title: '눈 감고 있어 보면.../好海 이성헌', url: 'https://suno.com/song/5dde861c-d994-4228-879f-2aea976f7b9f' },
+  { id: '2bd3867e-42ad-42f9-bf18-422d747005c9', title: '차창밖엔 비 내리고/好海 이성헌', url: 'https://suno.com/song/2bd3867e-42ad-42f9-bf18-422d747005c9' },
+  { id: 'd95feba2-ce1d-4033-865a-2c54a5b85f42', title: '사람 사람마다 나름의 카리스마', url: 'https://suno.com/song/d95feba2-ce1d-4033-865a-2c54a5b85f42' },
+  { id: '1332fcbe-8202-49e4-8548-53b56307dcc0', title: '새벽 삼척 바다/好海 이성헌', url: 'https://suno.com/song/1332fcbe-8202-49e4-8548-53b56307dcc0' },
+  { id: '2d218bb8-898f-47fe-a331-02c4ba4b76a7', title: '비상하라/好海 이성헌', url: 'https://suno.com/song/2d218bb8-898f-47fe-a331-02c4ba4b76a7' },
+  { id: '7eba336d-58cc-4090-aa8a-503d7c6c9716', title: '재회의 바다/好海 이성헌', url: 'https://suno.com/song/7eba336d-58cc-4090-aa8a-503d7c6c9716' },
+  { id: 'e62ed826-0ccc-42db-b111-a9947f136c3f', title: '우리네 삶의 모습은.../好海 이성헌', url: 'https://suno.com/song/e62ed826-0ccc-42db-b111-a9947f136c3f' },
+  { id: '3f3734c4-5292-4020-9f9d-f33c1341d16c', title: '완행열차 밖으로는.../好海 이성헌', url: 'https://suno.com/song/3f3734c4-5292-4020-9f9d-f33c1341d16c' },
+  { id: '61a89948-81f7-4704-8f1e-9e21cbd808c4', title: '"상처풀이" 처방/好海 이성헌', url: 'https://suno.com/song/61a89948-81f7-4704-8f1e-9e21cbd808c4' },
+  { id: 'a2b95db6-7492-4d65-a00d-3b640a8e02b0', title: '발자국 헤아리며.../好海 이성헌', url: 'https://suno.com/song/a2b95db6-7492-4d65-a00d-3b640a8e02b0' },
+  { id: 'ecfd12fa-5a85-40f1-9b9b-5026a69e49d7', title: '지나보낸 날들.../好海 이성헌', url: 'https://suno.com/song/ecfd12fa-5a85-40f1-9b9b-5026a69e49d7' },
+  { id: '7de8c0e0-4463-4f44-9990-2c5bf34ed3c7', title: '기꺼이 마음의 문을 열고.../好海 이성헌', url: 'https://suno.com/song/7de8c0e0-4463-4f44-9990-2c5bf34ed3c7' },
+  { id: '4179db55-ebcc-4947-a5ef-61e50ca1ed18', title: '비어진 자리/好海 이성헌', url: 'https://suno.com/song/4179db55-ebcc-4947-a5ef-61e50ca1ed18' },
+  { id: 'cd4a9930-c373-42df-bed1-5763abcb4f39', title: '방파제 달빛 회고/好海 이성헌', url: 'https://suno.com/song/cd4a9930-c373-42df-bed1-5763abcb4f39' },
+  { id: 'f59bf89c-3e2c-4594-8803-7d48061ec7a3', title: '가까이에서 늘 볼 수는 없겠지만/好海 이성헌', url: 'https://suno.com/song/f59bf89c-3e2c-4594-8803-7d48061ec7a3' },
+  { id: '627df482-f1e7-4fda-8b16-2bd041b2a610', title: '그대 모르게 놓고 갑니다./好海 이성헌', url: 'https://suno.com/song/627df482-f1e7-4fda-8b16-2bd041b2a610' },
+  { id: 'ee62769c-be5f-4956-87e0-3606b075057d', title: '가까이에서 늘 볼 수는 없겠지만/好海 이성헌', url: 'https://suno.com/song/ee62769c-be5f-4956-87e0-3606b075057d' },
+  { id: '1dd9bd8c-f60b-47d7-95ec-35ec1ccb7ef6', title: '둥지/好海 이성헌', url: 'https://suno.com/song/1dd9bd8c-f60b-47d7-95ec-35ec1ccb7ef6' },
+  { id: '8be36f82-12c1-4b1c-a82b-cb2907cf788c', title: '늘 좋은 말만 하기/好海 이성헌', url: 'https://suno.com/song/8be36f82-12c1-4b1c-a82b-cb2907cf788c' },
+  { id: '82079ea1-8c99-4720-a24a-f58e286823e3', title: '내 그대 영혼처럼 사랑하고 있음은.../好海 이성헌', url: 'https://suno.com/song/82079ea1-8c99-4720-a24a-f58e286823e3' },
+  { id: '61d0e564-3148-4c36-8d0b-28ffe6f4fb92', title: '그대 생각/好海 이성헌', url: 'https://suno.com/song/61d0e564-3148-4c36-8d0b-28ffe6f4fb92' },
+  { id: '2ac22b35-69c0-445d-b247-95f184057242', title: '개화/好海 이성헌', url: 'https://suno.com/song/2ac22b35-69c0-445d-b247-95f184057242' },
+  { id: 'd4b7cabe-5a16-4cfd-bd83-acafbfe58885', title: '멜랑꼴리맨/好海 이성헌', url: 'https://suno.com/song/d4b7cabe-5a16-4cfd-bd83-acafbfe58885' },
+  { id: '2bb2c64d-8afe-4c6e-ab23-6b2512727917', title: '바닷가 언덕에서/好海 이성헌', url: 'https://suno.com/song/2bb2c64d-8afe-4c6e-ab23-6b2512727917' },
+  { id: '76100970-6d40-427f-9190-549c6236aff6', title: '호숫가 거닐며./好海 이성헌', url: 'https://suno.com/song/76100970-6d40-427f-9190-549c6236aff6' },
+  { id: '6c9f94ef-c3ee-48c2-b37f-16e1ccf3d28b', title: '혼자만의 사연/好海 이성헌', url: 'https://suno.com/song/6c9f94ef-c3ee-48c2-b37f-16e1ccf3d28b' },
+  { id: '8633c692-0b97-4623-a695-77f712c827d0', title: '바람 지나는 길에 서서/好海 이성헌', url: 'https://suno.com/song/8633c692-0b97-4623-a695-77f712c827d0' },
+  { id: '9c5a77dd-4ae4-495b-92f5-017d02305e2d', title: '마지막 추억(묘비에 새길 시.)/好海 이성헌', url: 'https://suno.com/song/9c5a77dd-4ae4-495b-92f5-017d02305e2d' },
+  { id: '792e94dd-499c-4b15-9b06-f6362937bbc5', title: '단심가(丹心歌)/好海 이성헌', url: 'https://suno.com/song/792e94dd-499c-4b15-9b06-f6362937bbc5' },
+  { id: '44b3f5f0-9e41-4d6d-98dd-2340a15d5ca9', title: '시간 위에 그린 그림/好海 이성헌', url: 'https://suno.com/song/44b3f5f0-9e41-4d6d-98dd-2340a15d5ca9' },
+  { id: 'f4031c44-622e-4133-9dee-939caa75f629', title: '노을빛 산등성에서는.../好海 이성헌', url: 'https://suno.com/song/f4031c44-622e-4133-9dee-939caa75f629' },
+  { id: 'd1eb6b69-c6f6-46a9-ad37-d37d88ae21b5', title: '불가리 향수/好海 이성헌', url: 'https://suno.com/song/d1eb6b69-c6f6-46a9-ad37-d37d88ae21b5' },
+  { id: '85a545a0-2340-42e1-a5d1-3b0d80a646f4', title: '가을, 그 준비 없는 고별/好海 이성헌', url: 'https://suno.com/song/85a545a0-2340-42e1-a5d1-3b0d80a646f4' },
+  { id: 'b3ea2539-d259-4cac-8d10-3eafdfc86090', title: '호숫가 벤치/好海 이성헌', url: 'https://suno.com/song/b3ea2539-d259-4cac-8d10-3eafdfc86090' },
+  { id: '65cb890e-fefe-4bcd-b5a5-692b4f3eeb9d', title: '기억 지나는 길목에는.../好海 이성헌', url: 'https://suno.com/song/65cb890e-fefe-4bcd-b5a5-692b4f3eeb9d' },
+  { id: '9c2addfc-ee97-47f7-b87b-8bd4c0f4d5d4', title: '기억 중심에 머물러 있는 그대./好海 이성헌', url: 'https://suno.com/song/9c2addfc-ee97-47f7-b87b-8bd4c0f4d5d4' },
+  { id: '4e3491b0-5831-44be-be51-690dd28e2978', title: '조용하고 차분하고 아늑한.../好海 이성헌', url: 'https://suno.com/song/4e3491b0-5831-44be-be51-690dd28e2978' },
+  { id: 'a855ec63-6901-49a5-b28a-b670a7e41046', title: '海松/好海 이성헌', url: 'https://suno.com/song/a855ec63-6901-49a5-b28a-b670a7e41046' },
+  { id: '38df1f60-1ebe-48fa-8a7b-475219b1c5d2', title: '너와 나 둘만 남았구나/好海 이성헌', url: 'https://suno.com/song/38df1f60-1ebe-48fa-8a7b-475219b1c5d2' },
+  { id: '01a3e264-7c74-4b04-91ba-346fed096a5b', title: '그리운 이들을.../好海 이성헌', url: 'https://suno.com/song/01a3e264-7c74-4b04-91ba-346fed096a5b' },
+  { id: '4fb7533e-7e68-48f8-9ceb-7fe17dca2d3c', title: '겨울나무에 바람 일렁이다/好海 이성헌', url: 'https://suno.com/song/4fb7533e-7e68-48f8-9ceb-7fe17dca2d3c' },
+  { id: '8940ecd9-9da4-4ae1-b63f-99e64ecc6d2b', title: '바다가 거기에 있었다/好海 이성헌', url: 'https://suno.com/song/8940ecd9-9da4-4ae1-b63f-99e64ecc6d2b' },
+  { id: '0eec0737-6706-455b-91b1-f8e2f3708928', title: '.강가 나무그늘에는.../好海 이성헌', url: 'https://suno.com/song/0eec0737-6706-455b-91b1-f8e2f3708928' },
+  { id: 'f73892a2-8931-434c-9d27-8c81a75e5b07', title: '유채꽃 사랑/好海 이성헌', url: 'https://suno.com/song/f73892a2-8931-434c-9d27-8c81a75e5b07' },
+  { id: '0ff47c6e-fd12-4ede-a595-df667fe99fc3', title: '연탄 두 장/好海 이성헌', url: 'https://suno.com/song/0ff47c6e-fd12-4ede-a595-df667fe99fc3' },
+  { id: 'cbd1d4f6-78ff-414e-b95b-29a0f176218d', title: '옹달샘으로/好海 이성헌', url: 'https://suno.com/song/cbd1d4f6-78ff-414e-b95b-29a0f176218d' },
+  { id: '9c811bd7-f00a-4703-8f80-f1eac50d06b7', title: '가 을 비/好海 이성헌', url: 'https://suno.com/song/9c811bd7-f00a-4703-8f80-f1eac50d06b7' },
+  { id: 'a3852ae1-ecaa-4b08-8a8c-1e4886560576', title: '만(灣)', url: 'https://suno.com/song/a3852ae1-ecaa-4b08-8a8c-1e4886560576' },
+  { id: 'ed49010c-d3d6-41de-952c-b01a5b20d0bd', title: '석화(石化)/好海 이성헌', url: 'https://suno.com/song/ed49010c-d3d6-41de-952c-b01a5b20d0bd' },
+  { id: 'da4b251c-e2eb-4132-a72c-4e1b5f2e73cb', title: '추억 쌓기/好海 이성헌', url: 'https://suno.com/song/da4b251c-e2eb-4132-a72c-4e1b5f2e73cb' },
+  { id: '72b4c831-df40-4329-8a4e-a5a16e9c3889', title: '튤립/好海 이성헌', url: 'https://suno.com/song/72b4c831-df40-4329-8a4e-a5a16e9c3889' },
+  { id: '7165aaae-a6d6-4148-8eca-fe01638d90d3', title: '라일락/好海 이성헌', url: 'https://suno.com/song/7165aaae-a6d6-4148-8eca-fe01638d90d3' },
+  { id: 'eb861219-0489-43ce-b6f2-a2a263beefbe', title: '마음과 마음이.../好海 이성헌', url: 'https://suno.com/song/eb861219-0489-43ce-b6f2-a2a263beefbe' },
+  { id: 'c28033a7-b5ba-4416-b944-f20220376cf3', title: '썰물바위(干出巖)', url: 'https://suno.com/song/c28033a7-b5ba-4416-b944-f20220376cf3' },
+  { id: '6b386640-5b2c-4035-98f7-0aade9467d3b', title: '방파제에서 2/好海 이성헌', url: 'https://suno.com/song/6b386640-5b2c-4035-98f7-0aade9467d3b' },
+  { id: '0b67d744-2898-4875-8041-cb9ec2a414c8', title: '소꿉장난/好海 이성헌', url: 'https://suno.com/song/0b67d744-2898-4875-8041-cb9ec2a414c8' },
+  { id: '53cea689-c5c7-42fe-91dd-f32f5bbc6b2b', title: '석수(石手)/好海 이성헌', url: 'https://suno.com/song/53cea689-c5c7-42fe-91dd-f32f5bbc6b2b' },
+  { id: '63e35155-8053-472d-aeee-2c0e43027e5a', title: '금낭화/好海 이성헌', url: 'https://suno.com/song/63e35155-8053-472d-aeee-2c0e43027e5a' },
+  { id: '8b63ae3e-de62-42cf-8469-f8f9bef5268a', title: '행복의 여름 밤/好海 이성헌', url: 'https://suno.com/song/8b63ae3e-de62-42cf-8469-f8f9bef5268a' },
+  { id: '2f1e2599-1111-4e87-b656-9e71f29ffe5d', title: '작별 2', url: 'https://suno.com/song/2f1e2599-1111-4e87-b656-9e71f29ffe5d' },
+  { id: '3da6805a-95e4-45c3-a3ae-6b84fcff86de', title: '첫 키스/好海 이성헌', url: 'https://suno.com/song/3da6805a-95e4-45c3-a3ae-6b84fcff86de' },
+  { id: 'b79f585c-16c6-44b1-8efb-fe4dd149f966', title: 'AI와 혁신의 춤', url: 'https://suno.com/song/b79f585c-16c6-44b1-8efb-fe4dd149f966' },
+  { id: '3cb50fa9-c076-4730-966c-314515a0c889', title: '혁신의 물결', url: 'https://suno.com/song/3cb50fa9-c076-4730-966c-314515a0c889' },
+  { id: '64eea33c-967d-4353-b01e-f8fd351be4a4', title: '여름의 추억', url: 'https://suno.com/song/64eea33c-967d-4353-b01e-f8fd351be4a4' },
+  { id: '060bb007-8c2e-442e-a5bd-26a4c306af01', title: '여름의 추억', url: 'https://suno.com/song/060bb007-8c2e-442e-a5bd-26a4c306af01' },
+  { id: '3cd53c81-f500-4206-9e35-8c00739fd14e', title: '고양시의 여름', url: 'https://suno.com/song/3cd53c81-f500-4206-9e35-8c00739fd14e' },
+  { id: '770393cf-07d8-4136-a35c-174ef8e92321', title: '고양시의 여름', url: 'https://suno.com/song/770393cf-07d8-4136-a35c-174ef8e92321' },
+  { id: '28140b38-53b3-46f1-b3b6-52b3afb7cb67', title: 'Caps in the Air', url: 'https://suno.com/song/28140b38-53b3-46f1-b3b6-52b3afb7cb67' },
+  { id: 'cf3c82e2-ea11-480d-827d-2b98595a1775', title: 'Caps in the Air', url: 'https://suno.com/song/cf3c82e2-ea11-480d-827d-2b98595a1775' },
+  { id: '5639381a-3d87-4d8f-92a7-9f734fceb610', title: '부산의 여름', url: 'https://suno.com/song/5639381a-3d87-4d8f-92a7-9f734fceb610' },
+  { id: 'f98a213c-d013-4cbb-bc9c-3ac0c7616845', title: '부산의 여름', url: 'https://suno.com/song/f98a213c-d013-4cbb-bc9c-3ac0c7616845' },
+  { id: '4be8517d-2087-47a4-94e9-f51bffd0f21e', title: '제주의 명물', url: 'https://suno.com/song/4be8517d-2087-47a4-94e9-f51bffd0f21e' },
+  { id: '9a0fd526-9168-4f03-825a-e8f6e22f7b1b', title: '제주의 명물', url: 'https://suno.com/song/9a0fd526-9168-4f03-825a-e8f6e22f7b1b' },
+  { id: '979a3e93-05eb-4d15-8298-62cc55553065', title: '한국항공대학교 꿈꾸는 대학생', url: 'https://suno.com/song/979a3e93-05eb-4d15-8298-62cc55553065' },
+  { id: 'c45df77d-7664-4765-b29d-ab8f4d45f2fe', title: '한국항공대학교 꿈꾸는 대학생', url: 'https://suno.com/song/c45df77d-7664-4765-b29d-ab8f4d45f2fe' },
+  { id: '2628bebe-cc31-4acd-8bd5-0dabfa4e4025', title: '매실의 속삭임', url: 'https://suno.com/song/2628bebe-cc31-4acd-8bd5-0dabfa4e4025' },
+  { id: '1fdb58dc-eb8f-4a2a-9399-f65ef5a0182d', title: '매실의 속삭임', url: 'https://suno.com/song/1fdb58dc-eb8f-4a2a-9399-f65ef5a0182d' },
+  { id: '30cb8162-11f8-424c-8271-85c0f87e7b81', title: '순천의 여름', url: 'https://suno.com/song/30cb8162-11f8-424c-8271-85c0f87e7b81' },
+  { id: '472d0576-4cc1-4cc4-ab87-f4ac22211585', title: '순천의 여름', url: 'https://suno.com/song/472d0576-4cc1-4cc4-ab87-f4ac22211585' },
+  { id: '70d1686c-d6f5-4548-8ba2-e05433c1f171', title: '꿈을 향해 (Towards the Dream)', url: 'https://suno.com/song/70d1686c-d6f5-4548-8ba2-e05433c1f171' },
+  { id: 'f6bb8dcd-a4e7-48ee-b1ee-d896e877490c', title: '꿈을 향해 (Towards the Dream)', url: 'https://suno.com/song/f6bb8dcd-a4e7-48ee-b1ee-d896e877490c' },
+  { id: '65ae4fe2-ef44-4826-80e1-a2f025d9ea2f', title: '우리들의 꿈을 향해서', url: 'https://suno.com/song/65ae4fe2-ef44-4826-80e1-a2f025d9ea2f' },
+  { id: '62c5e9f9-d4db-406d-beff-23c7809609fd', title: '우리들의 꿈을 향해서', url: 'https://suno.com/song/62c5e9f9-d4db-406d-beff-23c7809609fd' },
+  { id: 'c88efe13-7e0e-440c-9efb-db6b4dc1da85', title: '꿈을 향해 걷다', url: 'https://suno.com/song/c88efe13-7e0e-440c-9efb-db6b4dc1da85' },
+  { id: '7a04ee27-4848-4957-98cb-0c916adf076c', title: '꿈을 향해 걷다', url: 'https://suno.com/song/7a04ee27-4848-4957-98cb-0c916adf076c' },
+  { id: 'e9c59ce9-3331-428f-8b6b-09f13e5d2e1b', title: '장애인과 함께하는 평택시', url: 'https://suno.com/song/e9c59ce9-3331-428f-8b6b-09f13e5d2e1b' },
+  { id: 'c2b807c4-fb65-4a29-9d23-65ffe3258aea', title: '장애인과 함께하는 평택시', url: 'https://suno.com/song/c2b807c4-fb65-4a29-9d23-65ffe3258aea' },
+  { id: '40154c58-5373-4b1a-b0f9-67c1b085d91c', title: '별다방의 이야기', url: 'https://suno.com/song/40154c58-5373-4b1a-b0f9-67c1b085d91c' },
+  { id: '87d96252-bb19-4d85-b920-87e7891f40d5', title: '별다방의 이야기', url: 'https://suno.com/song/87d96252-bb19-4d85-b920-87e7891f40d5' },
+  { id: '0c6475e9-70ba-4038-bebb-7f2ca278b081', title: '별다방의 기억', url: 'https://suno.com/song/0c6475e9-70ba-4038-bebb-7f2ca278b081' },
+  { id: '94862e83-8bed-4306-8cc8-c94a775541a5', title: '별다방의 기억', url: 'https://suno.com/song/94862e83-8bed-4306-8cc8-c94a775541a5' },
+  { id: 'ffa5f7e7-59bc-4944-999c-4f943a4e8bc0', title: '봄날의 축제', url: 'https://suno.com/song/ffa5f7e7-59bc-4944-999c-4f943a4e8bc0' },
+  { id: '16fbe13d-0898-4d98-94a1-0f5fb11c2568', title: '봄날의 축제', url: 'https://suno.com/song/16fbe13d-0898-4d98-94a1-0f5fb11c2568' },
+  { id: '01a79fa7-5f80-4ee4-87be-dfbf40bb52d6', title: '공주대학교 공학전공 파이썬 학습', url: 'https://suno.com/song/01a79fa7-5f80-4ee4-87be-dfbf40bb52d6' },
+  { id: 'f5e2dcec-4ede-4477-b85f-4afec338eec5', title: '공주대학교 공학전공 파이썬 학습', url: 'https://suno.com/song/f5e2dcec-4ede-4477-b85f-4afec338eec5' },
+  { id: 'fa08ae1e-df1e-4a31-8d8c-4d25cdb00322', title: 'Always There', url: 'https://suno.com/song/fa08ae1e-df1e-4a31-8d8c-4d25cdb00322' },
+  { id: '2e2e9bdb-bcca-413b-b0f0-789a38d381eb', title: 'Always There', url: 'https://suno.com/song/2e2e9bdb-bcca-413b-b0f0-789a38d381eb' },
+  { id: '909e09db-f8df-4972-a198-3c3e9bafc9cf', title: '흐린 날의 기쁨', url: 'https://suno.com/song/909e09db-f8df-4972-a198-3c3e9bafc9cf' },
+  { id: 'ac813e8a-3815-49c5-baa0-347195b90b00', title: '흐린 날의 기쁨', url: 'https://suno.com/song/ac813e8a-3815-49c5-baa0-347195b90b00' },
+  { id: 'e9bc3208-6dec-4411-a116-2c99d8f9dfa3', title: '출근길 슬픈 직장인', url: 'https://suno.com/song/e9bc3208-6dec-4411-a116-2c99d8f9dfa3' },
+  { id: 'a7624a07-17a0-4600-ac28-3d578fde6763', title: '출근길 슬픈 직장인', url: 'https://suno.com/song/a7624a07-17a0-4600-ac28-3d578fde6763' },
+  { id: '79cf4dc9-908b-4f27-9e5f-ed616121f725', title: '겨울 동화', url: 'https://suno.com/song/79cf4dc9-908b-4f27-9e5f-ed616121f725' },
+  { id: '0e183c46-5f2c-410b-b4fc-3e80e981128e', title: '겨울 동화', url: 'https://suno.com/song/0e183c46-5f2c-410b-b4fc-3e80e981128e' },
+  { id: '7b7f1e70-9b9d-4716-93a3-1e484369f575', title: '강물에 비친 추억', url: 'https://suno.com/song/7b7f1e70-9b9d-4716-93a3-1e484369f575' },
+  { id: 'c570a06a-c305-4ccf-ad6e-a26db8e7d939', title: '강물에 비친 추억', url: 'https://suno.com/song/c570a06a-c305-4ccf-ad6e-a26db8e7d939' },
+  { id: '1a29fda0-2b50-43c5-b3bf-c5bede4c4fe9', title: '인공지능 혁명', url: 'https://suno.com/song/1a29fda0-2b50-43c5-b3bf-c5bede4c4fe9' },
+  { id: '8074b6c2-163f-42b0-9dd8-e3283a394df6', title: '인공지능 혁명', url: 'https://suno.com/song/8074b6c2-163f-42b0-9dd8-e3283a394df6' },
+];
+
+// ── 제목 정리 ──────────────────────────────────────────────
+function cleanTitle(raw: string): string {
+  return raw
+    .replace(/\s*[\/]\s*好海\s*이성헌\.?\s*$/, '')  // "/好海 이성헌" 제거
+    .replace(/\s*[\/]\s*好海\s*이성헌\s*$/, '')
+    .replace(/^[ㅣ.]\s*/, '')                         // 앞 특수문자 제거
+    .replace(/\s+/g, ' ')                              // 다중 공백 정리
+    .trim();
+}
+
+// ── 앨범 분류 (키워드 기반 + 명시적 오버라이드) ────────────
+const INTL_IDS = new Set([
+  'c93f349c-c19d-4538-ba43-ec205b31ae80', // On the Breakwater – II
+  'ce534087-6f93-4986-a74f-d371eb6661b3', // Sur la jetée – II
+  'daad2659-6c83-4e09-a2ff-e05811b7888d', // Prendre soin d'un jour
+  'cc3dcfc8-40ec-4dab-8bbf-3ce2b5bda7ec', // La Chanson des Feuilles Pourpres
+  'cb904b53-ea0a-428f-a7ed-9c57e4f948a6', // Song of the Crimson Leaves
+  '6c39d55a-9771-43e6-9e58-da5273ce9006', // Au carrefour du libre arbitre
+  'fd682120-19c1-4cff-a3ce-cd887dc54616', // Les cheveux blanchis
+  '0b54cfbf-de71-4ec2-89db-add4ad685e8b', // Amour enseveli dans mon cœur
+  'aa2e1006-8ff6-4a67-8a0d-84f2241037e8', // The Fallen Flower
+  '70a1e839-e29f-492d-932d-dbc3f6dd1a65', // La Fleur Tombée
+  '3010f8ba-1b83-4226-bc0b-984355a44124', // Now they say the time has come
+  '860fb48b-1ca6-46d2-bdca-13037733b680', // The Saddest Thing
+  '28140b38-53b3-46f1-b3b6-52b3afb7cb67', // Caps in the Air
+  'fa08ae1e-df1e-4a31-8d8c-4d25cdb00322', // Always There
+]);
+
+const SEA_KEYWORDS = /바다|파도|파 도|해변|수평선|갈매기|바닷|방파제|海松|해송|만\(灣\)|썰물|삼척|거제|하조대|밤바다/;
+const LOVE_KEYWORDS = /사랑|가슴에|그대|연서|키스|단심|동심초|불나비|숨은 사|마주 앉|혼자만의 사연|곁에 있|품이 그리운|강 건너|피아니스트|불꽃으로|마음과 마음|영혼처럼|걷던 길|너를|너와 나 둘|기억 중심에 머|가까이에서/;
+const NATURE_KEYWORDS = /꽃|나무|풍경|노을|눈꽃|가을|봄|겨울|물안개|바람 지나|사계|억새|미루나무|라일락|튤립|개화|나비|석류|진주 조개|넝쿨|유채|낙화|강가|옹달샘|가 을 비|하늘.*소녀|차창.*비|강물|눈 오는|겨울 동화|흐린 날/;
+const KOREAN_KEYWORDS = /고양시|부산|제주|순천|평택|충주|카페|금광호|별다방|퇴근|출근|직장|연탄|고향|방사선|소꿉장난|사우의 밤|삼베옷|여름의 추억|매실|사람.*카리스마|장애인|행복의 여름|봄날의 축제|여름 밤/;
+const DREAM_KEYWORDS = /AI|혁신|꿈|대학|학교|학습|파이썬|항공대|공주대|비상하라|인공지능/;
+
+function classifySong(id: string, cleaned: string): string {
+  // 명시적 국제곡
+  if (INTL_IDS.has(id)) return 'intl-songs-album';
+  // 키워드 매칭 (우선순위 순서)
+  if (DREAM_KEYWORDS.test(cleaned)) return 'dream-innovation-album';
+  if (KOREAN_KEYWORDS.test(cleaned)) return 'korean-life-album';
+  if (SEA_KEYWORDS.test(cleaned)) return 'sea-songs-album';
+  if (LOVE_KEYWORDS.test(cleaned)) return 'love-songs-album';
+  if (NATURE_KEYWORDS.test(cleaned)) return 'nature-songs-album';
+  // 기본: 인생 성찰
+  return 'life-songs-album';
+}
+
+// ── 중복 제거 + 분류 처리 ─────────────────────────────────
+function processRawSongs(): SunoSongEntry[] {
+  const seen = new Set<string>();
+  const result: SunoSongEntry[] = [];
+
+  for (const song of RAW_SONGS) {
+    const cleaned = cleanTitle(song.title);
+    if (seen.has(cleaned)) continue;
+    seen.add(cleaned);
+
+    result.push({
+      id: song.id,
+      title: cleaned,
+      suno_url: song.url,
+      albumSlug: classifySong(song.id, cleaned),
+    });
+  }
+
+  return result;
+}
+
+export const SUNO_SONGS = processRawSongs();
