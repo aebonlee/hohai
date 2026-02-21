@@ -13,7 +13,6 @@ import { POEM_CLASSIFICATIONS, CATEGORY_LIST } from '../data/poem-categories';
 import type { PoemInsert } from '../types/poem';
 import type { SongInsert } from '../types/song';
 import type { SeriesInsert } from '../types/series';
-import { SUNO_ALBUM_DEFS, SUNO_SONGS } from '../data/suno-songs';
 import styles from './AdminPage.module.css';
 
 type Tab = 'dashboard' | 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'poem-categories' | 'reviews' | 'batch-seed' | 'data-manage';
@@ -45,7 +44,7 @@ const MENU_ITEMS: { group: string; items: { tab: Tab; label: string; icon: strin
   {
     group: '도구',
     items: [
-      { tab: 'batch-seed', label: '일괄 등록', icon: '{}' },
+      { tab: 'batch-seed', label: '총괄 관리', icon: '{}' },
       { tab: 'data-manage', label: '데이터 관리', icon: '{}' },
     ],
   },
@@ -59,7 +58,7 @@ const TAB_LABELS: Record<Tab, string> = {
   songs: '노래 관리',
   'song-boards': '앨범 관리',
   reviews: '후기 관리',
-  'batch-seed': '일괄 등록',
+  'batch-seed': '총괄 관리',
   'data-manage': '데이터 관리',
 };
 
@@ -1198,77 +1197,7 @@ function BatchSeedAdmin() {
 
   const addLog = (msg: string) => setLog(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
 
-  const handleSeedPoems = async () => {
-    if (!window.confirm('177편의 시를 일괄 등록하시겠습니까?\n(시집 "3차 퇴고 완성작" 생성 후 시 등록)')) return;
-    setRunning(true);
-    setLog([]);
-    addLog('시 일괄 등록 시작...');
-
-    // 1. 카테고리 등록 (9개)
-    addLog('카테고리 9개 등록 중...');
-    const catRows = CATEGORY_LIST.map(c => ({
-      name: c.name, slug: c.slug, description: c.description, display_order: c.order,
-    }));
-    const { error: catErr } = await supabase.from('hohai_categories').upsert(catRows, { onConflict: 'slug' });
-    addLog(catErr ? `카테고리 등록 실패: ${catErr.message}` : `카테고리 ${catRows.length}개 등록 완료`);
-
-    // 2. 시집(시리즈) 등록
-    addLog('시집 등록 중...');
-    const { data: seriesData, error: serErr } = await supabase.from('hohai_series').insert({
-      name: '3차 퇴고 완성작',
-      slug: 'final-collection-2008',
-      description: '好海 이성헌 — 3차 퇴고 완성작 (2008년 8월 15일, 가나다 순)',
-      type: 'poem',
-      display_order: 1,
-      is_published: true,
-    }).select('id').single();
-    if (serErr) {
-      addLog(`시집 등록 실패: ${serErr.message}`);
-      setRunning(false);
-      return;
-    }
-    const seriesId = seriesData.id;
-    addLog(`시집 등록 완료 (ID: ${seriesId})`);
-
-    // 3. 시 데이터 로드 & 등록
-    addLog('177편의 시 등록 중...');
-    const { POEM_DATA } = await import('../data/poems');
-
-    const BATCH_SIZE = 20;
-    let successCount = 0;
-    let errorCount = 0;
-
-    for (let i = 0; i < POEM_DATA.length; i += BATCH_SIZE) {
-      const batch = POEM_DATA.slice(i, i + BATCH_SIZE).map((p, idx) => {
-        const cls = POEM_CLASSIFICATIONS[p.page];
-        return {
-          title: p.title,
-          content: p.content,
-          excerpt: p.content.split('\n').slice(0, 4).join('\n'),
-          category: cls?.category ?? '인생',
-          series_id: seriesId,
-          tags: cls?.tags ?? [],
-          bg_theme: (i + idx) % 8,
-          display_order: p.page,
-          is_featured: false,
-          is_published: true,
-          written_date: new Date().toISOString().split('T')[0],
-        };
-      });
-
-      const { error: batchErr } = await supabase.from('hohai_poems').insert(batch);
-      if (batchErr) {
-        addLog(`배치 ${Math.floor(i / BATCH_SIZE) + 1} 실패: ${batchErr.message}`);
-        errorCount += batch.length;
-      } else {
-        successCount += batch.length;
-      }
-      addLog(`진행: ${Math.min(i + BATCH_SIZE, POEM_DATA.length)} / ${POEM_DATA.length}`);
-    }
-
-    addLog(`시 등록 완료! 성공: ${successCount}편, 실패: ${errorCount}편`);
-    setRunning(false);
-  };
+  /* ── 시 관련 ── */
 
   const handleUpdateWrittenDates = async () => {
     const today = new Date().toISOString().split('T')[0];
@@ -1292,7 +1221,7 @@ function BatchSeedAdmin() {
   };
 
   const handleUpdateCategories = async () => {
-    if (!window.confirm('기존 시 177편의 카테고리/태그를 일괄 업데이트하시겠습니까?\n(기존 카테고리 삭제 후 9개 새 카테고리 등록 + 시 분류 업데이트)')) return;
+    if (!window.confirm('기존 시의 카테고리/태그를 일괄 업데이트하시겠습니까?\n(기존 카테고리 삭제 후 9개 새 카테고리 등록 + 시 분류 업데이트)')) return;
     setRunning(true);
     setLog([]);
     addLog('카테고리/태그 일괄 업데이트 시작...');
@@ -1403,133 +1332,141 @@ function BatchSeedAdmin() {
     }
   };
 
-  const handleSeedSongs = async () => {
-    if (!window.confirm(`Suno 노래 ${SUNO_SONGS.length}곡을 7개 앨범으로 일괄 등록하시겠습니까?`)) return;
+  /* ── 노래 가사/태그 일괄 등록 ── */
+
+  const handleSeedSongLyrics = async () => {
+    if (!window.confirm('DB에 있는 Suno 노래의 가사/태그를 일괄 등록하시겠습니까?\n(삭제된 곡은 건너뜁니다)')) return;
     setRunning(true);
     setLog([]);
-    addLog(`Suno 노래 일괄 등록 시작 (${SUNO_SONGS.length}곡, 7개 앨범)...`);
+    addLog('가사/태그 일괄 등록 시작...');
 
-    // 1. 7개 앨범(시리즈) 생성
-    addLog('앨범 7개 생성 중...');
-    const albumIdMap: Record<string, string> = {};
-    for (const album of SUNO_ALBUM_DEFS) {
-      const { data, error } = await supabase.from('hohai_series').upsert({
-        name: album.name,
-        slug: album.slug,
-        description: album.description,
-        type: 'song',
-        display_order: album.order,
-        is_published: true,
-      }, { onConflict: 'slug' }).select('id, slug').single();
+    // 1. DB에서 현재 존재하는 Suno 곡만 조회
+    addLog('DB에서 Suno 곡 조회 중...');
+    const { data: dbSongs, error: fetchErr } = await supabase
+      .from('hohai_songs')
+      .select('id, title, suno_url')
+      .not('suno_url', 'is', null)
+      .neq('suno_url', '');
 
-      if (error) {
-        addLog(`앨범 "${album.name}" 생성 실패: ${error.message}`);
-      } else if (data) {
-        albumIdMap[album.slug] = data.id;
-        addLog(`  \u2713 ${album.name} (${album.slug})`);
-      }
-    }
-    addLog(`앨범 ${Object.keys(albumIdMap).length}개 등록 완료`);
-
-    if (Object.keys(albumIdMap).length === 0) {
-      addLog('앨범 생성 실패 — 중단');
+    if (fetchErr || !dbSongs) {
+      addLog(`DB 조회 실패: ${fetchErr?.message}`);
       setRunning(false);
       return;
     }
+    addLog(`DB에 ${dbSongs.length}곡 존재`);
 
-    // 2. 노래 일괄 등록 (20개씩 배치)
-    addLog(`노래 ${SUNO_SONGS.length}곡 등록 시작...`);
-    const BATCH_SIZE = 20;
-    let successCount = 0;
-    let errorCount = 0;
+    // 2. 가사 데이터 로드
+    const { SUNO_LYRICS } = await import('../data/suno-lyrics');
+    addLog(`가사 데이터 ${Object.keys(SUNO_LYRICS).length}곡 로드 완료`);
 
-    // 앨범별 통계
-    const albumStats: Record<string, number> = {};
+    // 3. suno_url 기반 매칭 → lyrics + description(style) + tags UPDATE
+    let updated = 0;
+    let skipped = 0;
+    let noData = 0;
 
-    for (let i = 0; i < SUNO_SONGS.length; i += BATCH_SIZE) {
-      const batch = SUNO_SONGS.slice(i, i + BATCH_SIZE).map((s, idx) => {
-        const seriesId = albumIdMap[s.albumSlug] || null;
-        albumStats[s.albumSlug] = (albumStats[s.albumSlug] || 0) + 1;
-        return {
-          title: s.title,
-          suno_url: s.suno_url,
-          youtube_id: '',
-          series_id: seriesId,
-          display_order: i + idx,
-          is_featured: false,
-          is_published: true,
-        } satisfies SongInsert;
-      });
-
-      const { error: batchErr } = await supabase.from('hohai_songs').insert(batch);
-      if (batchErr) {
-        addLog(`배치 ${Math.floor(i / BATCH_SIZE) + 1} 실패: ${batchErr.message}`);
-        errorCount += batch.length;
-      } else {
-        successCount += batch.length;
+    for (const song of dbSongs) {
+      const lyricsData = SUNO_LYRICS[song.suno_url!];
+      if (!lyricsData) {
+        noData++;
+        continue;
       }
-      addLog(`진행: ${Math.min(i + BATCH_SIZE, SUNO_SONGS.length)} / ${SUNO_SONGS.length}`);
+
+      if (!lyricsData.lyrics && (!lyricsData.tags || lyricsData.tags.length === 0)) {
+        skipped++;
+        continue;
+      }
+
+      const updatePayload: Record<string, unknown> = {};
+      if (lyricsData.lyrics) updatePayload.lyrics = lyricsData.lyrics;
+      if (lyricsData.style) updatePayload.description = lyricsData.style;
+      if (lyricsData.tags && lyricsData.tags.length > 0) updatePayload.tags = lyricsData.tags;
+
+      const { error: upErr } = await supabase
+        .from('hohai_songs')
+        .update(updatePayload)
+        .eq('id', song.id);
+
+      if (upErr) {
+        addLog(`"${song.title}" 업데이트 실패: ${upErr.message}`);
+      } else {
+        updated++;
+      }
+
+      if (updated % 20 === 0 && updated > 0) {
+        addLog(`진행: ${updated}곡 업데이트 완료...`);
+      }
     }
 
-    // 3. 결과 출력
-    addLog('--- 앨범별 등록 현황 ---');
-    for (const album of SUNO_ALBUM_DEFS) {
-      addLog(`  ${album.name}: ${albumStats[album.slug] || 0}곡`);
+    // 4. 태그 통계
+    const tagStats: Record<string, number> = {};
+    for (const song of dbSongs) {
+      const d = SUNO_LYRICS[song.suno_url!];
+      if (d?.tags) {
+        for (const t of d.tags) {
+          tagStats[t] = (tagStats[t] || 0) + 1;
+        }
+      }
     }
-    addLog(`\n등록 완료! 성공: ${successCount}곡, 실패: ${errorCount}곡`);
+
+    addLog('--- 태그 분포 ---');
+    for (const [tag, count] of Object.entries(tagStats).sort((a, b) => b[1] - a[1])) {
+      addLog(`  #${tag}: ${count}곡`);
+    }
+
+    addLog(`\n업데이트 완료! 성공: ${updated}곡, 데이터없음: ${noData}곡, 스킵: ${skipped}곡`);
     setRunning(false);
   };
 
   return (
     <>
       <div className={styles.header}>
-        <h2>일괄 등록</h2>
+        <h2>총괄 관리</h2>
       </div>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
-        <button
-          className={styles.addBtn}
-          onClick={handleSeedPoems}
-          disabled={running}
-          style={{ padding: '10px 20px', fontSize: '0.95rem' }}
-        >
-          시 177편 일괄 등록
-        </button>
-        <button
-          className={styles.addBtn}
-          onClick={handleSeedSongs}
-          disabled={running}
-          style={{ padding: '10px 20px', fontSize: '0.95rem', background: '#6366f1' }}
-        >
-          노래 {SUNO_SONGS.length}곡 일괄 등록
-        </button>
+      {/* 시 관리 */}
+      <div style={{ marginBottom: 24 }}>
+        <h3 style={{ fontSize: '1rem', marginBottom: 10, color: 'var(--text-secondary)' }}>시 관리</h3>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <button
+            className={styles.saveBtn}
+            onClick={handleUpdateCategories}
+            disabled={running}
+            style={{ padding: '10px 20px', fontSize: '0.95rem' }}
+          >
+            카테고리/태그 일괄 업데이트
+          </button>
+          <button
+            className={styles.saveBtn}
+            onClick={handleUpdateWrittenDates}
+            disabled={running}
+            style={{ padding: '10px 20px', fontSize: '0.95rem' }}
+          >
+            작성일 → 오늘 날짜로 일괄 변경
+          </button>
+          <button
+            className={styles.editBtn}
+            onClick={handleShowStats}
+            disabled={running}
+            style={{ padding: '10px 20px', fontSize: '0.95rem' }}
+          >
+            카테고리 현황 보기
+          </button>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-        <button
-          className={styles.saveBtn}
-          onClick={handleUpdateCategories}
-          disabled={running}
-          style={{ padding: '10px 20px', fontSize: '0.95rem' }}
-        >
-          카테고리/태그 일괄 업데이트
-        </button>
-        <button
-          className={styles.saveBtn}
-          onClick={handleUpdateWrittenDates}
-          disabled={running}
-          style={{ padding: '10px 20px', fontSize: '0.95rem' }}
-        >
-          작성일 → 오늘 날짜로 일괄 변경
-        </button>
-        <button
-          className={styles.editBtn}
-          onClick={handleShowStats}
-          disabled={running}
-          style={{ padding: '10px 20px', fontSize: '0.95rem' }}
-        >
-          카테고리 현황 보기
-        </button>
+      {/* 노래 관리 */}
+      <div style={{ marginBottom: 24 }}>
+        <h3 style={{ fontSize: '1rem', marginBottom: 10, color: 'var(--text-secondary)' }}>노래 관리</h3>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <button
+            className={styles.addBtn}
+            onClick={handleSeedSongLyrics}
+            disabled={running}
+            style={{ padding: '10px 20px', fontSize: '0.95rem', background: '#6366f1' }}
+          >
+            가사/태그 일괄 등록
+          </button>
+        </div>
       </div>
 
       <div style={{
@@ -1547,13 +1484,17 @@ function BatchSeedAdmin() {
           <p style={{ color: 'var(--text-muted)' }}>
             버튼을 클릭하면 로그가 표시됩니다.
             <br /><br />
-            <strong>시 177편 일괄 등록</strong>: 카테고리 9개 + 시집 + 177편 시 (분류 포함) 자동 등록
+            <strong>시 관리</strong>
             <br />
-            <strong>노래 일괄 등록</strong>: Suno AI 곡 7개 앨범으로 분류 + 중복 제거 후 일괄 등록
+            &bull; 카테고리/태그 일괄 업데이트: 기존 등록된 시의 카테고리/태그만 일괄 변경
             <br />
-            <strong>카테고리/태그 일괄 업데이트</strong>: 기존 등록된 시의 카테고리/태그만 일괄 변경
+            &bull; 작성일 변경: 모든 시의 작성일을 오늘 날짜로 일괄 변경
             <br />
-            <strong>카테고리 현황 보기</strong>: 카테고리별 시 수 + 인기 태그 통계
+            &bull; 카테고리 현황: 카테고리별 시 수 + 인기 태그 통계
+            <br /><br />
+            <strong>노래 관리</strong>
+            <br />
+            &bull; 가사/태그 일괄 등록: Suno에서 크롤링한 가사 + 스타일 + 해시태그를 DB에 반영
           </p>
         ) : (
           log.map((line, i) => <div key={i}>{line}</div>)

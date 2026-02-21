@@ -5,6 +5,7 @@ export interface Song {
   youtube_id: string;
   suno_url: string | null;
   lyrics: string | null;
+  tags: string[];
   series_id: string | null;
   display_order: number;
   is_featured: boolean;
@@ -20,6 +21,7 @@ export interface SongInsert {
   suno_url?: string | null;
   description?: string | null;
   lyrics?: string | null;
+  tags?: string[];
   series_id?: string | null;
   display_order?: number;
   is_featured?: boolean;

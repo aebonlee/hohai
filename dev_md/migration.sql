@@ -188,6 +188,11 @@ ON CONFLICT (slug) DO NOTHING;
 -- ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS series_id UUID REFERENCES hohai_series(id) ON DELETE SET NULL;
 
 -- ============================================================
+-- hohai_songs 테이블에 tags 컬럼 추가 (v3 마이그레이션)
+-- ============================================================
+ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';
+
+-- ============================================================
 -- 6. hohai_reviews 테이블 (감상 후기 게시판)
 -- ============================================================
 CREATE TABLE IF NOT EXISTS hohai_reviews (

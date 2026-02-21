@@ -1382,3 +1382,78 @@ ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS suno_url TEXT;
 ### 빌드 결과
 - `npx tsc --noEmit` 통과
 - `npx vite build` 성공 (8.75s)
+
+---
+
+## 2026-02-21 (10차) — Suno 노래 가사/태그 자동 크롤링 + 총괄 관리 정리
+
+### 배경
+- Suno AI로 만든 ~229곡이 DB에 등록되어 있으나 `lyrics`(가사)와 `tags`(해시태그)가 비어 있음
+- Suno 페이지 HTML(React Server Components 페이로드)에서 `\"prompt\"` → 가사, `\"tags\"` → 스타일 추출 가능
+- 관리자 페이지의 "일괄 등록" 탭에 이미 완료된 1회성 버튼(시 177편, 노래 229곡)이 남아 있어 정리 필요
+
+### 변경 내역
+
+#### 1. Suno 가사 크롤링 스크립트 (`scripts/fetch-suno-lyrics.mjs`)
+- `scripts/suno_songs.json` (229곡)에서 각 Suno 페이지 fetch
+- React Server Components 페이로드에서 이중 이스케이프된 JSON 필드 추출
+  - `\"prompt\":\"...\"` → 가사 (lyrics)
+  - `\"tags\":\"...\"` → 스타일 (style)
+- 가사 전처리: 첫 줄 제목/작가명("好海 이성헌") 제거
+- 해시태그 자동 생성: 18개 카테고리 키워드 규칙 매칭
+  - 바다, 강호수, 자연, 계절, 사랑, 그리움, 이별, 인생, 지역, AI혁신, 꿈, 가족, 고향, 일상, 음악, 동행, 비상, 번역곡
+- 1초 rate limiting, 결과 229/229 성공
+- 출력: `scripts/suno-lyrics-data.json`
+
+#### 2. DB 스키마 업데이트
+- `dev_md/migration.sql`: `ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';`
+- `src/types/song.ts`: `Song` 인터페이스에 `tags: string[]`, `SongInsert`에 `tags?: string[]` 추가
+
+#### 3. 가사 데이터 파일 (`src/data/suno-lyrics.ts`)
+- 크롤링 결과 JSON → TypeScript export 변환
+- `SUNO_LYRICS: Record<string, SunoLyricsEntry>` (suno_url 키, 229개 엔트리)
+- 각 엔트리: `{ lyrics, style, tags }`
+
+#### 4. Admin "가사/태그 일괄 등록" 기능 (`src/pages/AdminPage.tsx`)
+- `handleSeedSongLyrics` 함수 추가:
+  1. DB에서 suno_url이 있는 현재 곡 조회 (삭제된 곡 자동 제외)
+  2. `SUNO_LYRICS` 데이터와 suno_url로 매칭
+  3. `lyrics`, `description`(스타일), `tags` 일괄 UPDATE
+  4. 태그 통계 출력
+
+#### 5. BatchSeedAdmin 총괄 관리 정리
+- **제거**: `handleSeedPoems` (시 177편 일괄 등록) — 이미 완료된 1회성 작업
+- **제거**: `handleSeedSongs` (노래 229곡 일괄 등록) — 이미 완료된 1회성 작업
+- **제거**: `SUNO_ALBUM_DEFS`, `SUNO_SONGS` import
+- 탭/메뉴 라벨: "일괄 등록" → "총괄 관리"
+- UI를 "시 관리"/"노래 관리" 서브섹션으로 구분
+
+### 기술적 이슈 & 해결
+
+| 이슈 | 원인 | 해결 |
+|------|------|------|
+| 가사 추출 전부 null | Suno HTML이 RSC 페이로드로 JSON 이중 이스케이프 (`\"prompt\":\"...\"`) | `extractField()` 인덱스 기반 스캐닝으로 재작성 |
+| 추출된 가사에 `\` 잔존 | HTML의 `\\n` (3글자)을 `/\\n/g` (2글자)로 매칭 | `/\\\\n/g`로 이중 이스케이프 패턴 수정 |
+
+### 수정 파일 요약
+
+| 파일 | 변경 |
+|------|------|
+| `scripts/fetch-suno-lyrics.mjs` | 신규 — Suno 크롤링 스크립트 |
+| `scripts/suno-lyrics-data.json` | 신규 — 크롤링 결과 (229곡) |
+| `src/data/suno-lyrics.ts` | 신규 — 가사/태그 TS export |
+| `src/types/song.ts` | `tags` 필드 추가 |
+| `dev_md/migration.sql` | `tags TEXT[]` 컬럼 ALTER SQL 추가 |
+| `src/pages/AdminPage.tsx` | 가사/태그 버튼 추가 + 1회성 버튼 제거 + 총괄 관리 정리 |
+
+### 빌드 결과
+- `npx tsc --noEmit` 통과
+- `npx vite build` 성공 (8.88s)
+- 출력: index.html 0.93kB, CSS 67.77kB (gzip 12.69kB), JS 994.55kB (gzip 282.45kB)
+  - `suno-lyrics` 청크 332.91kB (가사 데이터, dynamic import로 Admin에서만 로드)
+
+### 사용자 수동 작업
+- Supabase Dashboard에서 SQL 실행 필요:
+  ```sql
+  ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';
+  ```
