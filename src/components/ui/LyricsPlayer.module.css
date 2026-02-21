@@ -1,0 +1,244 @@
+/* ========================================
+   LyricsPlayer — 풀스크린 가사 플레이어 오버레이
+   ======================================== */
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg, #071A33, #0A3D7A, #1466A8, #0D5699);
+  background-size: 300% 300%;
+  animation: gradientShift 12s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* 닫기 버튼 */
+.closeBtn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1001;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+/* 콘텐츠 그리드 */
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  width: 100%;
+  max-width: 1200px;
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+}
+
+/* 왼쪽: 플레이어 패널 */
+.playerPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.playerWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  background: #000;
+  flex-shrink: 0;
+}
+
+.playerWrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.secondaryPlayer {
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.secondaryPlayer iframe {
+  width: 100%;
+  height: 160px;
+  border: none;
+}
+
+/* 노래 메타 정보 */
+.songMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.songTitle {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+}
+
+.songDescription {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+}
+
+.songTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.songTag {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* 오른쪽: 가사 패널 */
+.lyricsPanel {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  max-height: calc(100vh - 96px);
+}
+
+.lyricsHeader {
+  padding: 20px 24px 12px;
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.lyricsBody {
+  padding: 20px 24px 32px;
+  overflow-y: auto;
+  flex: 1;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 2.2;
+  white-space: pre-line;
+}
+
+/* 가사 패널 커스텀 스크롤바 */
+.lyricsBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lyricsBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.lyricsBody::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.lyricsBody::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* 가사 없음 */
+.noLyrics {
+  padding: 40px 24px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.95rem;
+}
+
+/* ========================================
+   모바일 반응형 (≤768px)
+   ======================================== */
+@media (max-width: 768px) {
+  .overlay {
+    padding: 16px;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .content {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-height: none;
+    overflow: visible;
+    padding-top: 48px;
+  }
+
+  .playerPanel {
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .lyricsPanel {
+    max-height: 50vh;
+  }
+
+  .songTitle {
+    font-size: 1.15rem;
+  }
+
+  .lyricsBody {
+    font-size: 0.95rem;
+    padding: 16px 20px 24px;
+  }
+
+  .closeBtn {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+  }
+}

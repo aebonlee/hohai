@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Song } from '../../types/song';
+import LyricsPlayer from './LyricsPlayer';
 import styles from './SongCard.module.css';
 
 /** suno_url에서 song ID를 추출하여 embed URL 반환 */
@@ -18,8 +19,12 @@ interface Props {
 export default function SongCard({ song, index = 0 }: Props) {
   const [ytPlaying, setYtPlaying] = useState(false);
   const [sunoPlaying, setSunoPlaying] = useState(false);
+  const [lyricsOpen, setLyricsOpen] = useState(false);
+  const [lyricsPlayerOpen, setLyricsPlayerOpen] = useState(false);
   const hasYoutube = !!song.youtube_id;
   const hasSuno = !!song.suno_url;
+  const hasLyrics = !!song.lyrics;
+  const hasTags = song.tags && song.tags.length > 0;
 
   return (
     <motion.article
@@ -108,7 +113,41 @@ export default function SongCard({ song, index = 0 }: Props) {
         {song.description && (
           <p className={styles.description}>{song.description}</p>
         )}
+        {hasTags && (
+          <div className={styles.tags}>
+            {song.tags.map((tag) => (
+              <span key={tag} className={styles.tag}>#{tag}</span>
+            ))}
+          </div>
+        )}
+        {hasLyrics && (
+          <>
+            <div className={styles.lyricsActions}>
+              <button
+                className={styles.lyricsToggle}
+                onClick={() => setLyricsOpen((v) => !v)}
+              >
+                {lyricsOpen ? '가사 접기 ▲' : '가사 보기 ▼'}
+              </button>
+              <button
+                className={styles.lyricsPlayerBtn}
+                onClick={() => setLyricsPlayerOpen(true)}
+              >
+                가사 플레이어
+              </button>
+            </div>
+            {lyricsOpen && (
+              <div className={styles.lyrics}>{song.lyrics}</div>
+            )}
+          </>
+        )}
       </div>
+
+      <LyricsPlayer
+        song={song}
+        isOpen={lyricsPlayerOpen}
+        onClose={() => setLyricsPlayerOpen(false)}
+      />
     </motion.article>
   );
 }

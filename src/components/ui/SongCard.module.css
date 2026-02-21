@@ -197,3 +197,78 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* 태그 */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.tag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: rgba(10, 25, 41, 0.06);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+/* 가사 액션 버튼 그룹 */
+.lyricsActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* 가사 토글 */
+.lyricsToggle {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--accent-gold);
+  font-weight: 500;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.lyricsToggle:hover {
+  opacity: 0.7;
+}
+
+/* 가사 플레이어 버튼 */
+.lyricsPlayerBtn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent-gold);
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.lyricsPlayerBtn:hover {
+  background: var(--accent-sage);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(10, 61, 122, 0.3);
+}
+
+/* 가사 */
+.lyrics {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 2;
+  white-space: pre-line;
+  padding: 16px 20px;
+  background: rgba(229, 237, 248, 0.6);
+  border-radius: var(--radius-sm);
+  margin-top: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+}
