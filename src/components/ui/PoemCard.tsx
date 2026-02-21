@@ -18,6 +18,11 @@ export default function PoemCard({ poem, index = 0 }: Props) {
 
   const excerpt = poem.excerpt || poem.content.split('\n').slice(0, 4).join('\n');
 
+  const handleTagClick = (e: React.MouseEvent, tag: string) => {
+    e.stopPropagation();
+    navigate(`/poems?tag=${encodeURIComponent(tag)}`);
+  };
+
   return (
     <motion.article
       className={styles.card}
@@ -34,7 +39,9 @@ export default function PoemCard({ poem, index = 0 }: Props) {
       <div className={styles.footer}>
         {poem.tags && poem.tags.length > 0 && (
           <span className={styles.tags}>
-            {poem.tags.slice(0, 3).map(t => `#${t}`).join(' ')}
+            {poem.tags.slice(0, 3).map(t => (
+              <span key={t} className={styles.tagLink} onClick={(e) => handleTagClick(e, t)}>#{t}</span>
+            ))}
           </span>
         )}
         {poem.written_date && (

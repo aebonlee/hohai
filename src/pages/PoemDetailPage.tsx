@@ -78,7 +78,7 @@ export default function PoemDetailPage() {
           {poem.tags && poem.tags.length > 0 && (
             <div className={styles.tags}>
               {poem.tags.map((tag) => (
-                <span key={tag} className={styles.tag}>#{tag}</span>
+                <Link key={tag} to={`/poems?tag=${encodeURIComponent(tag)}`} className={styles.tag}>#{tag}</Link>
               ))}
             </div>
           )}

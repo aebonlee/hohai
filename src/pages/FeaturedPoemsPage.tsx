@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/layout/PageTransition';
 import PoemCard from '../components/ui/PoemCard';
@@ -10,9 +11,25 @@ import type { Poem } from '../types/poem';
 import styles from './FeaturedPoemsPage.module.css';
 
 export default function FeaturedPoemsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tagParam = searchParams.get('tag') || '';
   const [selectedCategory, setSelectedCategory] = useState('');
   const { categories } = useCategories();
-  const { poems, loading } = usePoems(selectedCategory || undefined, undefined, true);
+  const { poems, loading } = usePoems(
+    tagParam ? undefined : selectedCategory || undefined,
+    undefined,
+    !tagParam,
+    tagParam || undefined,
+  );
+
+  const handleCategorySelect = (cat: string) => {
+    setSelectedCategory(cat);
+    if (tagParam) setSearchParams({});
+  };
+
+  const clearTag = () => {
+    setSearchParams({});
+  };
 
   // 카테고리별 그룹핑 (전체 보기일 때만)
   const groupedByCategory: { name: string; poems: Poem[] }[] = [];
@@ -56,8 +73,15 @@ export default function FeaturedPoemsPage() {
           <CategoryFilter
             categories={categories}
             selected={selectedCategory}
-            onSelect={setSelectedCategory}
+            onSelect={handleCategorySelect}
           />
+
+          {tagParam && (
+            <div className={styles.tagFilter}>
+              <span className={styles.tagFilterLabel}>#{tagParam}</span> 태그 시 {poems.length}편
+              <button className={styles.tagFilterClear} onClick={clearTag}>✕</button>
+            </div>
+          )}
 
           {/* 카테고리별 통계 요약 */}
           {!loading && !selectedCategory && groupedByCategory.length > 1 && (
@@ -128,9 +152,11 @@ export default function FeaturedPoemsPage() {
             )
           ) : (
             <p className={styles.empty}>
-              {selectedCategory
-                ? '이 카테고리에 추천 시가 없습니다.'
-                : '아직 추천 시가 없습니다.'}
+              {tagParam
+                ? `"#${tagParam}" 태그의 시가 없습니다.`
+                : selectedCategory
+                  ? '이 카테고리에 추천 시가 없습니다.'
+                  : '아직 추천 시가 없습니다.'}
             </p>
           )}
         </div>

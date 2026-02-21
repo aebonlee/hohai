@@ -1,5 +1,21 @@
 # 개발 변경 이력 (CHANGELOG)
 
+## 2026-02-22 — 해시태그 클릭 네비게이션 + 음악 동시재생 방지
+
+### 추가
+- `PlaybackContext` — 전역 음악 재생 상태 Context (currentId, play, stop)
+- PoemDetailPage 태그 클릭 → `/poems?tag=태그명` 네비게이션
+- PoemCard 태그 개별 클릭 지원 (카드 클릭과 분리)
+- FeaturedPoemsPage 태그 필터 배너 CSS 스타일
+
+### 변경
+- SongCard: 재생 버튼에 PlaybackContext 연동, 다른 곡 재생 시 자동 정지 (iframe 언마운트)
+- main.tsx: PlaybackProvider 추가
+- PoemDetailPage.module.css: `.tag` hover 효과 (색상 진해짐 + translateY)
+- PoemCard.module.css: `.tagLink` 스타일 (hover underline)
+
+---
+
 ## 2026-02-22 — 시(Poem) 무드 기반 배경 디자인
 
 ### 추가

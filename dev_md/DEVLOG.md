@@ -2,6 +2,54 @@
 
 ---
 
+## 2026-02-22 — 해시태그 클릭 네비게이션 + 음악 동시재생 방지
+
+### 배경
+
+1. 시를 보다가 해시태그를 클릭하면 해당 태그의 시 목록을 바로 볼 수 있도록 개선 필요.
+   기존에는 태그가 단순 텍스트로만 표시되어 상호작용 불가했음.
+2. 모바일에서 노래 카드를 연속 클릭하면 여러 곡이 동시에 재생되는 문제 발견.
+   YouTube/Suno iframe이 각 SongCard 내 독립 state로 관리되어 글로벌 제어 불가했음.
+
+### 기능 1: 해시태그 클릭 → 관련 시 목록
+
+- **PoemDetailPage** — `<span>` 태그를 `<Link to="/poems?tag=태그명">`으로 교체
+- **PoemCard** — 카드 전체 클릭(상세 이동)과 태그 클릭(필터 이동) 분리. `stopPropagation()`으로 이벤트 버블링 방지
+- **CSS** — 태그 hover 시 색상 진해짐 + 살짝 올라감 (PoemDetailPage), underline (PoemCard)
+- **FeaturedPoemsPage CSS** — 태그 필터 배너(`.tagFilter`) 스타일 추가. 기존 JS 로직은 이미 `?tag=` URL 파라미터 지원하고 있었으나 CSS가 빠져 있었음
+
+### 기능 2: 음악 동시재생 방지 (싱글 플레이백)
+
+- **PlaybackContext** (신규) — `currentId`로 현재 재생 곡 ID를 전역 추적. `play(songId)` 호출 시 자동으로 이전 곡 대체
+- **main.tsx** — `PlaybackProvider`로 앱 전체 감싸기
+- **SongCard** — 모든 재생 버튼(YouTube 재생, Suno 재생, 가사 플레이어 열기)에서 `play(song.id)` 호출. `useEffect`로 `currentId`가 다른 곡으로 변경되면 해당 카드의 iframe 자동 언마운트(정지)
+
+### 변경 파일
+
+| 파일 | 변경 유형 | 설명 |
+|------|----------|------|
+| `src/contexts/PlaybackContext.tsx` | 신규 | 전역 재생 상태 Context (currentId, play, stop) |
+| `src/main.tsx` | 수정 | PlaybackProvider 추가 |
+| `src/components/ui/SongCard.tsx` | 수정 | usePlayback 훅 연동, 재생 핸들러 분리, useEffect로 타 곡 재생 시 자동 정지 |
+| `src/pages/PoemDetailPage.tsx` | 수정 | 태그 `<span>` → `<Link>` 교체 |
+| `src/pages/PoemDetailPage.module.css` | 수정 | `.tag` hover 스타일 추가 |
+| `src/components/ui/PoemCard.tsx` | 수정 | 태그 개별 클릭 + stopPropagation 처리 |
+| `src/components/ui/PoemCard.module.css` | 수정 | `.tagLink` 스타일 추가 |
+| `src/pages/FeaturedPoemsPage.module.css` | 수정 | `.tagFilter`, `.tagFilterLabel`, `.tagFilterClear` 스타일 추가 |
+
+### 주요 기술 결정
+
+1. **React Context 패턴** — 음악 재생 상태를 props drilling 없이 전역 관리. 각 SongCard가 독립적으로 구독
+2. **iframe 언마운트 방식** — YouTube/Suno iframe은 postMessage API가 불안정하므로, state를 false로 전환하여 iframe 자체를 DOM에서 제거하는 방식으로 정지 처리
+3. **encodeURIComponent** — 한글 태그명을 URL 파라미터로 안전하게 전달
+4. **stopPropagation** — PoemCard 전체 클릭(navigate to detail)과 태그 클릭(navigate to filter)의 이벤트 충돌 방지
+
+### 검증 결과
+
+- `npx tsc --noEmit` — 통과
+
+---
+
 ## 2026-02-22 — 시(Poem) 무드 기반 배경 디자인
 
 ### 배경

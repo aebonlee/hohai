@@ -107,6 +107,15 @@
   background: color-mix(in srgb, var(--mood-accent, var(--bg-secondary)) 10%, white 90%);
   padding: 4px 12px;
   border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.tag:hover {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--mood-accent, var(--bg-secondary)) 25%, white 75%);
+  transform: translateY(-1px);
 }
 
 /* 이전/다음 네비게이션 */

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import type { Song } from '../../types/song';
+import { usePlayback } from '../../contexts/PlaybackContext';
 import LyricsPlayer from './LyricsPlayer';
 import styles from './SongCard.module.css';
 
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export default function SongCard({ song, index = 0 }: Props) {
+  const { currentId, play } = usePlayback();
   const [ytPlaying, setYtPlaying] = useState(false);
   const [sunoPlaying, setSunoPlaying] = useState(false);
   const [lyricsOpen, setLyricsOpen] = useState(false);
@@ -25,6 +27,30 @@ export default function SongCard({ song, index = 0 }: Props) {
   const hasSuno = !!song.suno_url;
   const hasLyrics = !!song.lyrics;
   const hasTags = song.tags && song.tags.length > 0;
+
+  // 다른 곡이 재생되면 이 카드의 플레이어를 정지 (iframe 언마운트)
+  useEffect(() => {
+    if (currentId && currentId !== song.id) {
+      setYtPlaying(false);
+      setSunoPlaying(false);
+      setLyricsPlayerOpen(false);
+    }
+  }, [currentId, song.id]);
+
+  const handleYtPlay = () => {
+    play(song.id);
+    setYtPlaying(true);
+  };
+
+  const handleSunoPlay = () => {
+    play(song.id);
+    setSunoPlaying(true);
+  };
+
+  const handleLyricsPlayerOpen = () => {
+    play(song.id);
+    setLyricsPlayerOpen(true);
+  };
 
   return (
     <motion.article
@@ -55,7 +81,7 @@ export default function SongCard({ song, index = 0 }: Props) {
               />
               <button
                 className={styles.playBtn}
-                onClick={() => setYtPlaying(true)}
+                onClick={handleYtPlay}
                 aria-label={`${song.title} 재생`}
               />
               {hasSuno && <span className={styles.sourceBadge}>YouTube</span>}
@@ -71,7 +97,7 @@ export default function SongCard({ song, index = 0 }: Props) {
               frameBorder="0"
             />
           ) : (
-            <div className={styles.sunoPlaceholder} onClick={() => setSunoPlaying(true)}>
+            <div className={styles.sunoPlaceholder} onClick={handleSunoPlay}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M9 18V5l12-2v13" strokeLinecap="round" strokeLinejoin="round" />
                 <circle cx="6" cy="18" r="3" />
@@ -96,7 +122,7 @@ export default function SongCard({ song, index = 0 }: Props) {
               frameBorder="0"
             />
           ) : (
-            <button className={styles.sunoBtn} onClick={() => setSunoPlaying(true)}>
+            <button className={styles.sunoBtn} onClick={handleSunoPlay}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9 18V5l12-2v13" strokeLinecap="round" strokeLinejoin="round" />
                 <circle cx="6" cy="18" r="3" />
@@ -131,7 +157,7 @@ export default function SongCard({ song, index = 0 }: Props) {
               </button>
               <button
                 className={styles.lyricsPlayerBtn}
-                onClick={() => setLyricsPlayerOpen(true)}
+                onClick={handleLyricsPlayerOpen}
               >
                 가사 플레이어
               </button>

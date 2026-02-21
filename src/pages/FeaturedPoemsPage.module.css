@@ -14,6 +14,41 @@
   margin-top: 8px;
 }
 
+/* 태그 필터 배너 */
+.tagFilter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  margin-bottom: 24px;
+  border-radius: var(--radius-md, 12px);
+  background: rgba(10, 25, 41, 0.04);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.tagFilterLabel {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tagFilterClear {
+  margin-left: auto;
+  border: none;
+  background: none;
+  font-size: 1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 50%;
+  transition: all var(--transition);
+}
+
+.tagFilterClear:hover {
+  background: rgba(10, 25, 41, 0.08);
+  color: var(--text-primary);
+}
+
 /* 카테고리 통계 바 */
 .statBar {
   display: flex;

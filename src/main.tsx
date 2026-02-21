@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { PlaybackProvider } from './contexts/PlaybackContext';
 import App from './App';
 import './styles/globals.css';
 
@@ -11,7 +12,9 @@ createRoot(document.getElementById('root')!).render(
     <HelmetProvider>
       <BrowserRouter>
         <AuthProvider>
-          <App />
+          <PlaybackProvider>
+            <App />
+          </PlaybackProvider>
         </AuthProvider>
       </BrowserRouter>
     </HelmetProvider>
