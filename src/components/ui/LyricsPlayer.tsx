@@ -1,7 +1,9 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Song } from '../../types/song';
+import { usePlayback } from '../../contexts/PlaybackContext';
+import { useYouTubePlayer } from '../../hooks/useYouTubePlayer';
 import { detectMood, MOOD_GRADIENTS } from '../../lib/mood';
 import LyricsEffects from './LyricsEffects';
 import styles from './LyricsPlayer.module.css';
@@ -20,6 +22,11 @@ interface Props {
 }
 
 export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
+  const {
+    onSongEnd, playlist, currentIndex,
+    hasNext, hasPrev, next, prev,
+  } = usePlayback();
+
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<Element | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -28,9 +35,25 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
   const hasSuno = !!song.suno_url;
   const hasLyrics = !!song.lyrics;
   const hasTags = song.tags && song.tags.length > 0;
+  const isInPlaylist = playlist !== null && currentIndex >= 0;
 
   const mood = detectMood(song.tags);
   const gradient = MOOD_GRADIENTS[mood];
+
+  // 유니크 컨테이너 ID
+  const uniqueId = useId();
+  const ytContainerId = `lp-yt-${uniqueId.replace(/:/g, '')}`;
+
+  // YouTube Player 훅 (종료 감지)
+  useYouTubePlayer({
+    containerId: ytContainerId,
+    videoId: song.youtube_id || null,
+    autoplay: false,
+    enabled: isOpen && hasYoutube,
+    onEnd: () => {
+      onSongEnd();
+    },
+  });
 
   // ESC 키 핸들러
   const handleKeyDown = useCallback(
@@ -144,12 +167,7 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
               {/* 메인 플레이어 */}
               <div className={styles.playerWrapper}>
                 {hasYoutube ? (
-                  <iframe
-                    src={`https://www.youtube.com/embed/${song.youtube_id}?rel=0`}
-                    title={song.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+                  <div id={ytContainerId} style={{ width: '100%', height: '100%' }} />
                 ) : hasSuno ? (
                   <iframe
                     src={getSunoEmbedUrl(song.suno_url!)}
@@ -167,6 +185,31 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
                     title={`${song.title} - Suno AI`}
                     allow="autoplay"
                   />
+                </div>
+              )}
+
+              {/* 플레이리스트 내비게이션 */}
+              {isInPlaylist && playlist && (
+                <div className={styles.playlistNav}>
+                  <button
+                    className={styles.navBtn}
+                    onClick={prev}
+                    disabled={!hasPrev}
+                    aria-label="이전 곡"
+                  >
+                    ⏮ 이전
+                  </button>
+                  <span className={styles.navPosition}>
+                    {currentIndex + 1} / {playlist.length}
+                  </span>
+                  <button
+                    className={styles.navBtn}
+                    onClick={next}
+                    disabled={!hasNext}
+                    aria-label="다음 곡"
+                  >
+                    다음 ⏭
+                  </button>
                 </div>
               )}
 

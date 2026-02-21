@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/layout/PageTransition';
 import PoemEffects from '../components/ui/PoemEffects';
-import { usePoemDetail } from '../hooks/usePoems';
+import PoemReaderMode from '../components/ui/PoemReaderMode';
+import { usePoemDetail, usePoems } from '../hooks/usePoems';
 import { CATEGORY_COLORS } from '../lib/constants';
 import type { MoodKey } from '../lib/mood';
 import { MOOD_LIGHT_GRADIENTS, MOOD_ACCENT_COLORS } from '../lib/mood';
@@ -11,6 +13,11 @@ import styles from './PoemDetailPage.module.css';
 export default function PoemDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { poem, loading, adjacentPoems } = usePoemDetail(id);
+  const [readerOpen, setReaderOpen] = useState(false);
+
+  // 시집에 속한 시일 때 같은 시리즈의 시 목록 로드
+  const { poems: seriesPoems } = usePoems(undefined, poem?.series_id || undefined);
+  const readerIndex = seriesPoems.findIndex((p) => p.id === id);
 
   if (loading) {
     return <div className={styles.loading}>불러오는 중...</div>;
@@ -83,6 +90,15 @@ export default function PoemDetailPage() {
             </div>
           )}
 
+          {poem.series_id && seriesPoems.length > 1 && (
+            <button
+              className={styles.readerBtn}
+              onClick={() => setReaderOpen(true)}
+            >
+              읽기 모드
+            </button>
+          )}
+
           <nav className={styles.nav}>
             {adjacentPoems.prev ? (
               <Link to={`/poems/${adjacentPoems.prev.id}`} className={styles.navItem}>
@@ -99,6 +115,15 @@ export default function PoemDetailPage() {
           </nav>
         </div>
       </div>
+
+      {poem.series_id && seriesPoems.length > 1 && (
+        <PoemReaderMode
+          poems={seriesPoems}
+          initialIndex={readerIndex >= 0 ? readerIndex : 0}
+          isOpen={readerOpen}
+          onClose={() => setReaderOpen(false)}
+        />
+      )}
     </PageTransition>
   );
 }

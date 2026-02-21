@@ -1,11 +1,27 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/layout/PageTransition';
 import SongCard from '../components/ui/SongCard';
+import LyricsPlayer from '../components/ui/LyricsPlayer';
 import { useSongs } from '../hooks/useSongs';
+import { usePlayback } from '../contexts/PlaybackContext';
 import styles from './FeaturedSongsPage.module.css';
 
 export default function FeaturedSongsPage() {
   const { songs, loading } = useSongs(undefined, true);
+  const {
+    setPlaylist, clearPlaylist,
+    playlist, currentIndex,
+    lyricsPlayerOpen, closeLyricsPlayer,
+  } = usePlayback();
+
+  // 플레이리스트 등록
+  useEffect(() => {
+    if (songs.length > 0) setPlaylist(songs);
+    return () => clearPlaylist();
+  }, [songs, setPlaylist, clearPlaylist]);
+
+  const currentSong = playlist && currentIndex >= 0 ? playlist[currentIndex] : null;
 
   return (
     <PageTransition>
@@ -34,6 +50,14 @@ export default function FeaturedSongsPage() {
           )}
         </div>
       </div>
+
+      {currentSong && (
+        <LyricsPlayer
+          song={currentSong}
+          isOpen={lyricsPlayerOpen}
+          onClose={closeLyricsPlayer}
+        />
+      )}
     </PageTransition>
   );
 }

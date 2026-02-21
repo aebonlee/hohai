@@ -81,6 +81,11 @@
   border: none;
 }
 
+.ytContainer {
+  width: 100%;
+  height: 100%;
+}
+
 /* Suno 플레이스홀더 (YouTube 없는 경우) */
 .sunoPlaceholder {
   width: 100%;
@@ -174,6 +179,45 @@
 
 .sunoBtn:hover {
   background: rgba(196, 149, 106, 0.08);
+}
+
+/* 플레이리스트 내비게이션 */
+.playlistNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(10, 61, 122, 0.06);
+  border-top: 1px solid rgba(10, 25, 41, 0.08);
+}
+
+.navBtn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all var(--transition);
+  color: var(--text-primary);
+}
+
+.navBtn:hover:not(:disabled) {
+  background: rgba(10, 61, 122, 0.1);
+}
+
+.navBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.navPosition {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 48px;
+  text-align: center;
 }
 
 .info {

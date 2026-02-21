@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/layout/PageTransition';
 import PoemCard from '../components/ui/PoemCard';
+import PoemReaderMode from '../components/ui/PoemReaderMode';
 import CategoryFilter from '../components/ui/CategoryFilter';
 import { usePoems } from '../hooks/usePoems';
 import { useCategories } from '../hooks/useCategories';
@@ -13,6 +14,8 @@ export default function PoemSeriesPage() {
   const { slug } = useParams<{ slug: string }>();
   const { series, loading: seriesLoading } = useSeriesDetail(slug);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [readerOpen, setReaderOpen] = useState(false);
+  const [readerInitialIndex, setReaderInitialIndex] = useState(0);
   const { categories } = useCategories();
   const { poems, loading } = usePoems(
     selectedCategory || undefined,
@@ -51,6 +54,15 @@ export default function PoemSeriesPage() {
             )}
           </div>
 
+          {poems.length > 0 && !loading && (
+            <button
+              className={styles.readerBtn}
+              onClick={() => { setReaderInitialIndex(0); setReaderOpen(true); }}
+            >
+              읽기 모드
+            </button>
+          )}
+
           <CategoryFilter
             categories={categories}
             selected={selectedCategory}
@@ -74,6 +86,14 @@ export default function PoemSeriesPage() {
           )}
         </div>
       </div>
+
+      <PoemReaderMode
+        poems={poems}
+        initialIndex={readerInitialIndex}
+        seriesName={series?.name}
+        isOpen={readerOpen}
+        onClose={() => setReaderOpen(false)}
+      />
     </PageTransition>
   );
 }

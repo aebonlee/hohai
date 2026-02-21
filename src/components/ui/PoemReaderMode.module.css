@@ -1,0 +1,300 @@
+/* ========================================
+   PoemReaderMode — 풀스크린 스와이프 리더 오버레이
+   ======================================== */
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes hintFade {
+  0% { opacity: 0; transform: translateY(10px); }
+  15% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg,
+    var(--mood-c1, #071A33),
+    var(--mood-c2, #0A3D7A),
+    var(--mood-c3, #1466A8),
+    var(--mood-c4, #0D5699)
+  );
+  background-size: 300% 300%;
+  animation: gradientShift 12s ease infinite;
+  transition: --mood-c1 0.8s, --mood-c2 0.8s, --mood-c3 0.8s, --mood-c4 0.8s;
+}
+
+/* 헤더 영역 */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.header > * {
+  pointer-events: auto;
+}
+
+.closeBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.seriesName {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+}
+
+.position {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* 스크롤 스냅 컨테이너 */
+.scrollContainer {
+  position: relative;
+  z-index: 2;
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+/* 각 시 슬라이드 */
+.slide {
+  min-height: 100vh;
+  min-height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 24px 48px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* 긴 시일 경우 상단 정렬 */
+.slideLong {
+  justify-content: flex-start;
+  padding-top: 80px;
+}
+
+.slideInner {
+  max-width: 600px;
+  width: 100%;
+}
+
+/* 시 메타 정보 */
+.poemCategory {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--mood-accent, rgba(255, 255, 255, 0.5));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.poemTitle {
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.poemDate {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 32px;
+}
+
+/* 시 본문 */
+.poemContent {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 2.2;
+  color: rgba(255, 255, 255, 0.88);
+  white-space: pre-line;
+}
+
+.stanza {
+  margin-bottom: 2em;
+}
+
+.stanza:last-child {
+  margin-bottom: 0;
+}
+
+/* 태그 */
+.poemTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.poemTag {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* 스와이프 힌트 */
+.hint {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1003;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  font-weight: 500;
+  animation: hintFade 2.5s ease-in-out forwards;
+  pointer-events: none;
+}
+
+.hintArrow {
+  display: inline-block;
+  font-size: 1rem;
+}
+
+/* 도트 인디케이터 (오른쪽 세로) */
+.dots {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1002;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.dotActive {
+  background: rgba(255, 255, 255, 0.85);
+  transform: scale(1.4);
+}
+
+/* ========================================
+   반응형
+   ======================================== */
+
+@media (max-width: 768px) {
+  .slide {
+    padding: 68px 20px 40px;
+  }
+
+  .slideLong {
+    padding-top: 72px;
+  }
+
+  .poemContent {
+    font-size: 0.95rem;
+    line-height: 2;
+  }
+
+  .dots {
+    right: 6px;
+    gap: 5px;
+  }
+
+  .dot {
+    width: 5px;
+    height: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .slide {
+    padding: 64px 16px 36px;
+  }
+
+  .poemTitle {
+    font-size: 1.25rem;
+  }
+}
+
+/* 도트가 너무 많을 때 (20+) 숨김 */
+@media (max-height: 500px) {
+  .dots {
+    display: none;
+  }
+}

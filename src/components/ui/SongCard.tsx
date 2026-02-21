@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import { motion } from 'framer-motion';
 import type { Song } from '../../types/song';
 import { usePlayback } from '../../contexts/PlaybackContext';
-import LyricsPlayer from './LyricsPlayer';
+import { useYouTubePlayer } from '../../hooks/useYouTubePlayer';
 import styles from './SongCard.module.css';
 
 /** suno_url에서 song ID를 추출하여 embed URL 반환 */
@@ -18,24 +18,60 @@ interface Props {
 }
 
 export default function SongCard({ song, index = 0 }: Props) {
-  const { currentId, play } = usePlayback();
+  const {
+    currentId, play, onSongEnd,
+    playlist, currentIndex, hasNext, hasPrev, next, prev,
+    autoPlayIntent, openLyricsPlayer,
+  } = usePlayback();
+
   const [ytPlaying, setYtPlaying] = useState(false);
   const [sunoPlaying, setSunoPlaying] = useState(false);
   const [lyricsOpen, setLyricsOpen] = useState(false);
-  const [lyricsPlayerOpen, setLyricsPlayerOpen] = useState(false);
+  const cardRef = useRef<HTMLElement>(null);
   const hasYoutube = !!song.youtube_id;
   const hasSuno = !!song.suno_url;
   const hasLyrics = !!song.lyrics;
   const hasTags = song.tags && song.tags.length > 0;
+  const isInPlaylist = playlist !== null;
+  const isCurrentInPlaylist = isInPlaylist && currentId === song.id && currentIndex >= 0;
 
-  // 다른 곡이 재생되면 이 카드의 플레이어를 정지 (iframe 언마운트)
+  // 유니크 컨테이너 ID
+  const uniqueId = useId();
+  const ytContainerId = `yt-${uniqueId.replace(/:/g, '')}`;
+
+  // 다른 곡이 재생되면 이 카드의 플레이어를 정지
   useEffect(() => {
     if (currentId && currentId !== song.id) {
       setYtPlaying(false);
       setSunoPlaying(false);
-      setLyricsPlayerOpen(false);
     }
   }, [currentId, song.id]);
+
+  // autoPlayIntent: 자동 전환 시 해당 카드로 스크롤 + 재생
+  useEffect(() => {
+    if (currentId === song.id && autoPlayIntent) {
+      if (hasYoutube) {
+        setYtPlaying(true);
+      } else if (hasSuno) {
+        setSunoPlaying(true);
+      }
+      // 카드가 보이도록 스크롤
+      requestAnimationFrame(() => {
+        cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+  }, [currentId, song.id, autoPlayIntent, hasYoutube, hasSuno]);
+
+  // YouTube Player 훅
+  useYouTubePlayer({
+    containerId: ytContainerId,
+    videoId: song.youtube_id || null,
+    autoplay: true,
+    enabled: ytPlaying && hasYoutube,
+    onEnd: () => {
+      onSongEnd();
+    },
+  });
 
   const handleYtPlay = () => {
     play(song.id);
@@ -49,11 +85,12 @@ export default function SongCard({ song, index = 0 }: Props) {
 
   const handleLyricsPlayerOpen = () => {
     play(song.id);
-    setLyricsPlayerOpen(true);
+    openLyricsPlayer();
   };
 
   return (
     <motion.article
+      ref={cardRef}
       className={styles.card}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -64,13 +101,7 @@ export default function SongCard({ song, index = 0 }: Props) {
       <div className={styles.thumbnail}>
         {hasYoutube ? (
           ytPlaying ? (
-            <iframe
-              className={styles.iframe}
-              src={`https://www.youtube.com/embed/${song.youtube_id}?autoplay=1&rel=0`}
-              title={song.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
+            <div id={ytContainerId} className={styles.ytContainer} />
           ) : (
             <>
               <img
@@ -134,6 +165,31 @@ export default function SongCard({ song, index = 0 }: Props) {
         </div>
       )}
 
+      {/* 플레이리스트 내비게이션 */}
+      {isCurrentInPlaylist && playlist && (
+        <div className={styles.playlistNav}>
+          <button
+            className={styles.navBtn}
+            onClick={prev}
+            disabled={!hasPrev}
+            aria-label="이전 곡"
+          >
+            ⏮
+          </button>
+          <span className={styles.navPosition}>
+            {currentIndex + 1} / {playlist.length}
+          </span>
+          <button
+            className={styles.navBtn}
+            onClick={next}
+            disabled={!hasNext}
+            aria-label="다음 곡"
+          >
+            ⏭
+          </button>
+        </div>
+      )}
+
       <div className={styles.info}>
         <h3 className={styles.title}>{song.title}</h3>
         {song.description && (
@@ -168,12 +224,6 @@ export default function SongCard({ song, index = 0 }: Props) {
           </>
         )}
       </div>
-
-      <LyricsPlayer
-        song={song}
-        isOpen={lyricsPlayerOpen}
-        onClose={() => setLyricsPlayerOpen(false)}
-      />
     </motion.article>
   );
 }

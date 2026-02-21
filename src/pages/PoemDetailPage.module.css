@@ -118,6 +118,33 @@
   transform: translateY(-1px);
 }
 
+.readerBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 40px;
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--mood-accent, var(--accent-gold));
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.readerBtn::before {
+  content: '📖';
+  font-size: 0.9rem;
+}
+
+.readerBtn:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(10, 61, 122, 0.2);
+}
+
 /* 이전/다음 네비게이션 */
 .nav {
   display: flex;

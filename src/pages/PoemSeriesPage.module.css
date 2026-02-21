@@ -28,6 +28,33 @@
   margin-top: 8px;
 }
 
+.readerBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto 24px;
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent-gold);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.readerBtn::before {
+  content: '📖';
+  font-size: 0.9rem;
+}
+
+.readerBtn:hover {
+  background: var(--accent-sage);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(10, 61, 122, 0.3);
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

@@ -1,15 +1,31 @@
+import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/layout/PageTransition';
 import SongCard from '../components/ui/SongCard';
+import LyricsPlayer from '../components/ui/LyricsPlayer';
 import { useSongs } from '../hooks/useSongs';
 import { useSeriesDetail } from '../hooks/useSeries';
+import { usePlayback } from '../contexts/PlaybackContext';
 import styles from './SongSeriesPage.module.css';
 
 export default function SongSeriesPage() {
   const { slug } = useParams<{ slug: string }>();
   const { series, loading: seriesLoading } = useSeriesDetail(slug);
   const { songs, loading } = useSongs(series?.id);
+  const {
+    setPlaylist, clearPlaylist,
+    playlist, currentIndex,
+    lyricsPlayerOpen, closeLyricsPlayer,
+  } = usePlayback();
+
+  // 플레이리스트 등록
+  useEffect(() => {
+    if (songs.length > 0) setPlaylist(songs);
+    return () => clearPlaylist();
+  }, [songs, setPlaylist, clearPlaylist]);
+
+  const currentSong = playlist && currentIndex >= 0 ? playlist[currentIndex] : null;
 
   if (seriesLoading) {
     return (
@@ -58,6 +74,14 @@ export default function SongSeriesPage() {
           )}
         </div>
       </div>
+
+      {currentSong && (
+        <LyricsPlayer
+          song={currentSong}
+          isOpen={lyricsPlayerOpen}
+          onClose={closeLyricsPlayer}
+        />
+      )}
     </PageTransition>
   );
 }

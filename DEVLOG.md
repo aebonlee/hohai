@@ -420,3 +420,120 @@ D:/hohai/
 - 무드 전환 시 파티클 자동 재초기화
 - 메모리 관리: `cancelAnimationFrame` + `removeEventListener`로 cleanup
 - 모바일 대응: DPR 제한(max 2), resize 핸들링
+
+---
+
+## 2026-02-22 (Day 4, 2차) — 시집 스와이프 읽기 + 앨범 연속재생
+
+### 배경
+
+사용자 건의 2건 반영:
+1. 모바일에서 시집의 시들을 손가락으로 위아래 스와이프하며 연속 읽기
+2. 앨범 내에서 한 곡이 끝나면 자동으로 다음 곡 재생 (동시재생 방지 유지)
+
+---
+
+### 기능 1: 시집 스와이프 읽기 (PoemReaderMode)
+
+#### 신규 파일
+- `src/components/ui/PoemReaderMode.tsx` — 풀스크린 스와이프 리더 오버레이
+- `src/components/ui/PoemReaderMode.module.css` — 스크롤 스냅 + 다크 배경 + 반응형 스타일
+
+#### 수정 파일
+- `src/pages/PoemSeriesPage.tsx` — "읽기 모드" 버튼 추가, PoemReaderMode 렌더
+- `src/pages/PoemSeriesPage.module.css` — 읽기 모드 버튼 스타일
+- `src/pages/PoemDetailPage.tsx` — 시집 내 시일 때 "읽기 모드" 버튼 추가
+- `src/pages/PoemDetailPage.module.css` — 읽기 모드 버튼 스타일
+
+#### 기술 스택
+- **CSS `scroll-snap-type: y mandatory`** — 네이티브 터치 스와이프, 마우스 휠, 키보드 모두 지원 (외부 라이브러리 불필요)
+- **`createPortal` + `AnimatePresence`** — LyricsPlayer와 동일한 포탈 오버레이 패턴
+- **IntersectionObserver** — 현재 보이는 시 감지 → 위치 표시기 + 무드 배경 전환
+- **LyricsEffects** 재사용 — 무드별 Canvas 파티클 효과
+- **MOOD_GRADIENTS** 재사용 — 카테고리별 다크 그라디언트 배경
+
+#### 주요 기능
+- 풀스크린 오버레이에서 시를 한 편씩 위아래 스와이프로 넘기기
+- 각 시의 카테고리(무드)에 따른 배경 그라디언트 + Canvas 효과 자동 전환
+- 우측 도트 인디케이터로 현재 위치 표시 및 빠른 이동
+- 긴 시는 슬라이드 내부 스크롤 가능 (내용 줄 수 20줄 초과 시)
+- ESC 키, 닫기 버튼, 브라우저 뒤로가기(popstate)로 닫기
+- 최초 열림 시 "↕ 위아래로 스와이프" 힌트 2.5초 표시
+- 접근성: 포커스 트랩, aria-modal, aria-label, 포커스 복원
+
+---
+
+### 기능 2: 앨범 연속재생
+
+#### 신규 파일
+- `src/types/youtube.d.ts` — YouTube IFrame Player API 타입 선언
+- `src/hooks/useYouTubePlayer.ts` — YT API 스크립트 로드 + 플레이어 생성/종료 감지 훅
+
+#### 수정 파일
+- `src/contexts/PlaybackContext.tsx` — 플레이리스트, next/prev, autoPlayIntent, lyricsPlayer 상태 추가
+- `src/components/ui/SongCard.tsx` — YT Player 훅 연동, auto-play, 이전/다음 컨트롤
+- `src/components/ui/SongCard.module.css` — 플레이리스트 내비 스타일, YT 컨테이너
+- `src/components/ui/LyricsPlayer.tsx` — Context 기반 현재곡, 이전/다음 컨트롤, YT 종료 감지
+- `src/components/ui/LyricsPlayer.module.css` — 재생 컨트롤 스타일
+- `src/pages/SongSeriesPage.tsx` — 플레이리스트 등록, 페이지 레벨 LyricsPlayer
+- `src/pages/FeaturedSongsPage.tsx` — 플레이리스트 등록, 페이지 레벨 LyricsPlayer
+
+#### PlaybackContext 확장
+```
+기존: currentId, play(), stop()
+신규: playlist, currentIndex, hasNext, hasPrev, setPlaylist(), clearPlaylist(),
+      next(), prev(), onSongEnd(), autoPlayIntent,
+      lyricsPlayerOpen, openLyricsPlayer(), closeLyricsPlayer()
+```
+
+#### useYouTubePlayer 훅
+- 전역 YouTube IFrame API 스크립트 1회 로드 (중복 방지)
+- `YT.Player` 인스턴스 생성/삭제 관리
+- `onStateChange`에서 `ENDED(0)` 감지시 `onEnd` 콜백 호출
+- `PLAYING(1)` 감지시 `onPlay` 콜백 호출
+- cleanup 시 `player.destroy()` 호출
+
+#### SongCard 변경사항
+- YouTube `<iframe>` → `<div id>` + `useYouTubePlayer` 훅 (종료 감지 가능)
+- `autoPlayIntent` 반응: 자동 전환 시 해당 카드 스크롤 + 자동 재생
+- 이전/다음 컨트롤: 재생 중 + 플레이리스트 활성 시 `⏮ / ⏭` 표시
+- LyricsPlayer 열기를 Context의 `openLyricsPlayer()` 로 위임
+
+#### LyricsPlayer 변경사항
+- Context에서 현재 곡 읽기 (곡 전환 시에도 모달 유지)
+- 이전/다음 버튼 + 위치 표시 추가
+- `useYouTubePlayer` 훅으로 종료 감지
+- 곡 전환 시 닫히지 않고 Context 기반 계속 열림
+
+#### Suno 곡 처리
+- Suno iframe은 종료 감지 불가 → 자동 다음곡 불가
+- 사용자가 "다음 ⏭" 버튼으로 수동 전환
+
+---
+
+### 파일 변경 요약
+
+```
+ 신규:
+  src/components/ui/PoemReaderMode.tsx         | 190+ (풀스크린 스와이프 리더)
+  src/components/ui/PoemReaderMode.module.css  | 200+ (스크롤 스냅 스타일)
+  src/types/youtube.d.ts                       |  55  (YT API 타입)
+  src/hooks/useYouTubePlayer.ts                | 100+ (YT 플레이어 훅)
+
+ 수정:
+  src/contexts/PlaybackContext.tsx              | 전면 개편 (39줄 → 130줄)
+  src/components/ui/SongCard.tsx               | 전면 개편 (YT 훅 + 플레이리스트)
+  src/components/ui/SongCard.module.css        | 40+ (네비 + 컨테이너 스타일)
+  src/components/ui/LyricsPlayer.tsx           | 전면 개편 (Context 기반 + YT 훅)
+  src/components/ui/LyricsPlayer.module.css    | 40+ (재생 컨트롤 스타일)
+  src/pages/PoemSeriesPage.tsx                 | 15+ (읽기 모드 버튼)
+  src/pages/PoemSeriesPage.module.css          | 20+ (버튼 스타일)
+  src/pages/PoemDetailPage.tsx                 | 20+ (읽기 모드 버튼)
+  src/pages/PoemDetailPage.module.css          | 20+ (버튼 스타일)
+  src/pages/SongSeriesPage.tsx                 | 전면 개편 (플레이리스트 등록)
+  src/pages/FeaturedSongsPage.tsx              | 전면 개편 (플레이리스트 등록)
+```
+
+### 검증
+- `npx tsc --noEmit` — 타입 체크 통과
+- `npx vite build` — 빌드 성공
