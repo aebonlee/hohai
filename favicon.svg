@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#E4EEF5"/>
+  <path d="M8 38c6-8 12-8 18 0s12 8 18 0 12-8 18 0" fill="none" stroke="#2C8E96" stroke-width="3" stroke-linecap="round" opacity="0.3"/>
+  <path d="M8 44c6-6 12-6 18 0s12 6 18 0 12-6 18 0" fill="none" stroke="#5ABAC4" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+  <text x="50%" y="48%" dominant-baseline="middle" text-anchor="middle" font-family="serif" font-size="28" font-weight="bold" fill="#1B3A5C">海</text>
+</svg>
