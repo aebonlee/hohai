@@ -6,12 +6,13 @@ import { useAllPoems } from '../hooks/usePoems';
 import { useAllSongs } from '../hooks/useSongs';
 import { useAllSeries } from '../hooks/useSeries';
 import { useAllCategories, type CategoryInsert } from '../hooks/useCategories';
+import { supabase } from '../lib/supabase';
 import type { PoemInsert } from '../types/poem';
 import type { SongInsert } from '../types/song';
 import type { SeriesInsert } from '../types/series';
 import styles from './AdminPage.module.css';
 
-type Tab = 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'categories';
+type Tab = 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'categories' | 'db-init';
 
 export default function AdminPage() {
   const { signOut } = useAuth();
@@ -65,6 +66,13 @@ export default function AdminPage() {
             >
               카테고리 관리
             </button>
+            <button
+              className={`${styles.tab} ${activeTab === 'db-init' ? styles.active : ''}`}
+              onClick={() => setActiveTab('db-init')}
+              style={{ color: activeTab === 'db-init' ? '#c0453a' : undefined }}
+            >
+              DB 초기화
+            </button>
           </div>
 
           {activeTab === 'poems' && <PoemsAdmin />}
@@ -72,6 +80,7 @@ export default function AdminPage() {
           {activeTab === 'songs' && <SongsAdmin />}
           {activeTab === 'song-boards' && <BoardSeriesAdmin seriesType="song" typeLabel="앨범" itemLabel="노래" />}
           {activeTab === 'categories' && <CategoriesAdmin />}
+          {activeTab === 'db-init' && <DbInitAdmin />}
         </div>
       </div>
     </>
@@ -883,6 +892,157 @@ function CategoriesAdmin() {
           </div>
         </div>
       )}
+    </>
+  );
+}
+
+/* ========================================
+   DB 초기화 & 시 일괄 등록 컴포넌트
+   ======================================== */
+function DbInitAdmin() {
+  const [log, setLog] = useState<string[]>([]);
+  const [running, setRunning] = useState(false);
+
+  const addLog = (msg: string) => setLog(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
+
+  const handleClearAll = async () => {
+    if (!window.confirm('정말 모든 데이터를 삭제하시겠습니까?\n(시, 노래, 시리즈, 카테고리 전부 삭제됩니다)')) return;
+    setRunning(true);
+    setLog([]);
+    addLog('데이터 삭제 시작...');
+
+    const { error: e1 } = await supabase.from('hohai_poems').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    addLog(e1 ? `시 삭제 실패: ${e1.message}` : '시 삭제 완료');
+
+    const { error: e2 } = await supabase.from('hohai_songs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    addLog(e2 ? `노래 삭제 실패: ${e2.message}` : '노래 삭제 완료');
+
+    const { error: e3 } = await supabase.from('hohai_series').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    addLog(e3 ? `시리즈 삭제 실패: ${e3.message}` : '시리즈 삭제 완료');
+
+    const { error: e4 } = await supabase.from('hohai_categories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    addLog(e4 ? `카테고리 삭제 실패: ${e4.message}` : '카테고리 삭제 완료');
+
+    addLog('전체 삭제 완료!');
+    setRunning(false);
+  };
+
+  const handleSeedPoems = async () => {
+    if (!window.confirm('177편의 시를 일괄 등록하시겠습니까?\n(시집 "3차 퇴고 완성작" 생성 후 시 등록)')) return;
+    setRunning(true);
+    setLog([]);
+    addLog('시 일괄 등록 시작...');
+
+    // 1. 카테고리 등록
+    addLog('카테고리 등록 중...');
+    const { error: catErr } = await supabase.from('hohai_categories').upsert(
+      [{ name: '시', slug: '시', description: '好海 이성헌의 시', display_order: 1 }],
+      { onConflict: 'slug' }
+    );
+    addLog(catErr ? `카테고리 등록 실패: ${catErr.message}` : '카테고리 등록 완료');
+
+    // 2. 시집(시리즈) 등록
+    addLog('시집 등록 중...');
+    const { data: seriesData, error: serErr } = await supabase.from('hohai_series').insert({
+      name: '3차 퇴고 완성작',
+      slug: 'final-collection-2008',
+      description: '好海 이성헌 — 3차 퇴고 완성작 (2008년 8월 15일, 가나다 순)',
+      type: 'poem',
+      display_order: 1,
+      is_published: true,
+    }).select('id').single();
+    if (serErr) {
+      addLog(`시집 등록 실패: ${serErr.message}`);
+      setRunning(false);
+      return;
+    }
+    const seriesId = seriesData.id;
+    addLog(`시집 등록 완료 (ID: ${seriesId})`);
+
+    // 3. 시 데이터 로드 & 등록
+    addLog('177편의 시 등록 중...');
+    const { POEM_DATA } = await import('../data/poems');
+
+    const BATCH_SIZE = 20;
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (let i = 0; i < POEM_DATA.length; i += BATCH_SIZE) {
+      const batch = POEM_DATA.slice(i, i + BATCH_SIZE).map((p, idx) => ({
+        title: p.title,
+        content: p.content,
+        excerpt: p.content.split('\n').slice(0, 4).join('\n'),
+        category: '시',
+        series_id: seriesId,
+        tags: [] as string[],
+        bg_theme: (i + idx) % 8,
+        display_order: p.page,
+        is_featured: false,
+        is_published: true,
+        written_date: '2008-08-15',
+      }));
+
+      const { error: batchErr } = await supabase.from('hohai_poems').insert(batch);
+      if (batchErr) {
+        addLog(`배치 ${Math.floor(i / BATCH_SIZE) + 1} 실패: ${batchErr.message}`);
+        errorCount += batch.length;
+      } else {
+        successCount += batch.length;
+      }
+      addLog(`진행: ${Math.min(i + BATCH_SIZE, POEM_DATA.length)} / ${POEM_DATA.length}`);
+    }
+
+    addLog(`시 등록 완료! 성공: ${successCount}편, 실패: ${errorCount}편`);
+    setRunning(false);
+  };
+
+  return (
+    <>
+      <div className={styles.header}>
+        <h2>DB 초기화 & 일괄 등록</h2>
+      </div>
+
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+        <button
+          className={styles.deleteBtn}
+          onClick={handleClearAll}
+          disabled={running}
+          style={{ padding: '10px 20px', fontSize: '0.95rem' }}
+        >
+          전체 데이터 삭제
+        </button>
+        <button
+          className={styles.addBtn}
+          onClick={handleSeedPoems}
+          disabled={running}
+          style={{ padding: '10px 20px', fontSize: '0.95rem' }}
+        >
+          시 177편 일괄 등록
+        </button>
+      </div>
+
+      <div style={{
+        background: 'var(--bg-secondary)',
+        borderRadius: 8,
+        padding: 16,
+        fontFamily: 'monospace',
+        fontSize: '0.85rem',
+        maxHeight: 400,
+        overflowY: 'auto',
+        lineHeight: 1.6,
+      }}>
+        {log.length === 0 ? (
+          <p style={{ color: 'var(--text-muted)' }}>
+            버튼을 클릭하면 로그가 표시됩니다.
+            <br /><br />
+            <strong>전체 데이터 삭제</strong>: 시, 노래, 시리즈, 카테고리 전부 삭제
+            <br />
+            <strong>시 177편 일괄 등록</strong>: 카테고리 + 시집 + 177편 시 자동 등록
+          </p>
+        ) : (
+          log.map((line, i) => <div key={i}>{line}</div>)
+        )}
+      </div>
     </>
   );
 }
