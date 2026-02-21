@@ -1,5 +1,24 @@
 # 개발 변경 이력 (CHANGELOG)
 
+## 2026-02-21 (3차) — 시 177편 카테고리 분류 + 해시태그 등록 + Admin 관리 강화
+
+### 추가
+- `src/data/poem-categories.ts` — 177편 전체 시 카테고리(9개) + 태그(3~5개) 분류 데이터
+- AdminPage 카테고리/태그 일괄 업데이트 버튼 — 기존 시의 분류만 일괄 변경
+- AdminPage 카테고리 현황 보기 — 카테고리별 시 수 통계 + 인기 태그 TOP 20
+- PoemsAdmin 카테고리 필터 + 제목/태그 검색 기능
+- PoemsAdmin 카테고리별 통계 바 (색상 배지, 클릭 필터)
+- PoemsAdmin 태그 컬럼 (시 목록에 해시태그 표시)
+- CategoryFilter 카테고리별 색상 dot + 활성 배경 색상
+- PoemCard, PoemDetailPage 카테고리 색상 적용
+
+### 변경
+- `CATEGORY_COLORS` 6개 → 9개 카테고리 (사랑, 그리움, 작별, 추억, 인생, 가족, 자연, 세상, 의지)
+- PoemsAdmin 카테고리 input → select 드롭다운 (오타 방지)
+- handleSeedPoems 시 등록 시 분류 데이터 자동 반영
+
+---
+
 ## 2026-02-21 (2차) — DB 초기화 + 시 177편 일괄 등록
 
 ### 추가

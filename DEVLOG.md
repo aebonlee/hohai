@@ -155,6 +155,82 @@
 
 ---
 
+## 2026-02-21 (Day 3, 2차) — 시 177편 카테고리 분류 + 해시태그 등록 + Admin 관리 강화
+
+### 배경
+
+- DB에 등록된 177편의 시가 모두 `category: '시'`, `tags: []` 상태
+- 사용자 요청: 사랑, 작별, 그리움, 기다림, 추억, 인생, 회한 등으로 분류 + 해시태그 등록
+
+### 9개 카테고리 체계
+
+| # | 카테고리 | 설명 | 시 수 | 색상 |
+|---|---------|------|-------|------|
+| 1 | 사랑 | 사랑, 연모, 애정을 노래한 시 | 34 | `#D4847A` |
+| 2 | 그리움 | 그리움, 기다림, 보고픔을 담은 시 | 22 | `#7BAFD4` |
+| 3 | 작별 | 이별, 작별, 떠남의 슬픔 | 7 | `#C88FA8` |
+| 4 | 추억 | 추억, 회상, 옛 시절을 돌아보는 시 | 16 | `#E8A87C` |
+| 5 | 인생 | 인생, 삶의 철학, 자아성찰 | 35 | `#4A90B8` |
+| 6 | 가족 | 부모, 형제, 가족애를 노래한 시 | 14 | `#8FC49A` |
+| 7 | 자연 | 자연, 바다, 계절 풍경 | 13 | `#5ABAC4` |
+| 8 | 세상 | 사회, 세태, 풍자, 비판 | 21 | `#A0889C` |
+| 9 | 의지 | 희망, 의지, 도전, 극복 | 15 | `#D4A85A` |
+
+### 변경 내역
+
+#### 1. `src/data/poem-categories.ts` (신규)
+- 177편 전체 시를 page 번호 기반으로 카테고리 + 태그 매핑
+- `CATEGORY_LIST`: 9개 카테고리 목록 (name, slug, description, order)
+- `POEM_CLASSIFICATIONS`: page → { category, tags } Record (각 시 3~5개 태그)
+
+#### 2. `src/lib/constants.ts` 업데이트
+- `CATEGORY_COLORS`: 기존 6개(사랑, 자연, 계절, 인생, 그리움, 기타) → 9개 카테고리 색상으로 교체
+- `CATEGORY_NAMES`: 카테고리 이름 배열 추가 (순서 보장)
+
+#### 3. `src/pages/AdminPage.tsx` — 대폭 강화
+
+**PoemsAdmin (시 관리)**:
+- 카테고리 `<input>` → `<select>` 드롭다운 변경 (오타 방지)
+- 카테고리별 통계 바 추가 (클릭하면 해당 카테고리 필터링)
+- 카테고리 필터 + 제목/태그 검색 기능 추가
+- 태그 컬럼 추가 (시 목록 테이블에 `#태그` 표시)
+- 카테고리 색상 배지 표시
+
+**DbInitAdmin (DB 초기화)**:
+- `handleSeedPoems` 수정: 시 등록 시 분류 데이터 자동 반영 (9개 카테고리 + 태그)
+- **카테고리/태그 일괄 업데이트** 버튼 추가: 기존 DB 시의 카테고리/태그만 일괄 변경
+- **카테고리 현황 보기** 버튼 추가: 카테고리별 시 수 + 인기 태그 TOP 20 통계
+
+#### 4. 프론트엔드 카테고리 색상 적용
+
+| 파일 | 변경 내용 |
+|------|----------|
+| `CategoryFilter.tsx` | 카테고리별 색상 dot + 활성 시 해당 색상 배경 |
+| `CategoryFilter.module.css` | `.dot` 스타일 추가 |
+| `PoemCard.tsx` | 카테고리 텍스트에 고유 색상 적용 |
+| `PoemDetailPage.tsx` | 카테고리 텍스트에 고유 색상 적용 |
+
+### 파일 변경 요약
+```
+ src/data/poem-categories.ts        | 200+ (신규 — 177편 분류 매핑)
+ src/lib/constants.ts               |  15  (9개 카테고리 색상)
+ src/pages/AdminPage.tsx            | 120+ (필터, 통계, 일괄 업데이트)
+ src/components/ui/CategoryFilter.tsx   |  18  (색상 dot + 활성 배경)
+ src/components/ui/CategoryFilter.module.css | 8 (dot 스타일)
+ src/components/ui/PoemCard.tsx     |   4  (카테고리 색상)
+ src/pages/PoemDetailPage.tsx       |   4  (카테고리 색상)
+ 7 files changed, ~370 insertions(+), ~30 deletions(-)
+```
+
+### 사용 방법
+1. `/admin` → **DB 초기화** 탭
+2. (신규 등록 시) **시 177편 일괄 등록**: 자동으로 9개 카테고리 + 태그 포함 등록
+3. (기존 데이터 업데이트 시) **카테고리/태그 일괄 업데이트**: 기존 시의 분류만 변경
+4. **카테고리 현황 보기**: 분류 결과 통계 확인
+5. **시 관리** 탭에서 카테고리 필터/검색으로 확인
+
+---
+
 ## 프로젝트 구조
 
 ```
@@ -211,11 +287,13 @@ D:/hohai/
 │   │   └── useAuth.ts              # 인증 훅
 │   ├── contexts/
 │   │   └── AuthContext.tsx          # 인증 컨텍스트
+│   ├── data/
+│   │   ├── poems.ts                # 177편 시 원본 데이터
+│   │   └── poem-categories.ts      # 177편 카테고리/태그 분류
 │   ├── lib/
 │   │   ├── supabase.ts             # Supabase 클라이언트
 │   │   ├── auth.ts                 # 인증 유틸
-│   │   ├── constants.ts            # 사이트 상수
-│   │   └── sampleData.ts           # 샘플 데이터
+│   │   └── constants.ts            # 사이트 상수 (9개 카테고리 색상)
 │   ├── types/
 │   │   ├── poem.ts                 # 시 타입
 │   │   ├── song.ts                 # 노래 타입 (YouTube + Suno)

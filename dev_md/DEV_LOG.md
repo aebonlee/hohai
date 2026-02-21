@@ -896,3 +896,110 @@ export type CategoryUpdate = Partial<CategoryInsert>
 3. **전체 데이터 삭제** → 기존 샘플 데이터 제거
 4. **시 177편 일괄 등록** → 카테고리 + 시집 + 177편 자동 등록
 5. **시 관리** 탭에서 등록된 시 확인 가능
+
+---
+
+## 2026-02-21 (3차) — 시 177편 카테고리 분류 + 해시태그 등록 + Admin 관리 강화
+
+### 배경
+- DB에 등록된 177편의 시가 모두 `category: '시'`, `tags: []` 상태
+- 사용자 요청: 사랑, 작별, 그리움, 기다림, 추억, 인생, 회한 등으로 분류 + 해시태그 등록
+- 기다림은 "그리움"에 통합, 회한은 맥락에 따라 "작별"/"인생"에 분산
+- 추가 카테고리: 가족, 자연, 세상, 의지
+
+### 9개 카테고리 체계
+
+| # | 카테고리 | 설명 | 시 수 | 색상 |
+|---|---------|------|-------|------|
+| 1 | 사랑 | 사랑, 연모, 애정을 노래한 시 | 34 | `#D4847A` |
+| 2 | 그리움 | 그리움, 기다림, 보고픔을 담은 시 | 22 | `#7BAFD4` |
+| 3 | 작별 | 이별, 작별, 떠남의 슬픔 | 7 | `#C88FA8` |
+| 4 | 추억 | 추억, 회상, 옛 시절을 돌아보는 시 | 16 | `#E8A87C` |
+| 5 | 인생 | 인생, 삶의 철학, 자아성찰 | 35 | `#4A90B8` |
+| 6 | 가족 | 부모, 형제, 가족애를 노래한 시 | 14 | `#8FC49A` |
+| 7 | 자연 | 자연, 바다, 계절 풍경 | 13 | `#5ABAC4` |
+| 8 | 세상 | 사회, 세태, 풍자, 비판 | 21 | `#A0889C` |
+| 9 | 의지 | 희망, 의지, 도전, 극복 | 15 | `#D4A85A` |
+
+### 변경 내역
+
+#### 1. `src/data/poem-categories.ts` (신규 — ~200줄)
+
+- `CATEGORY_LIST`: 9개 카테고리 목록 배열 (name, slug, description, order)
+- `PoemClassification` 인터페이스: `{ category: string; tags: string[] }`
+- `POEM_CLASSIFICATIONS`: page 번호 → `{ category, tags }` Record
+  - 177편 전체를 page 번호 기반으로 매핑 (중복 제목 안전 — "풍경" 2편, "병마" 2편 존재)
+  - 각 시마다 카테고리 1개 + 태그 3~5개 할당
+  - 분류 기준: 시 본문 내용 + 제목 + 핵심 감정/주제
+
+#### 2. `src/lib/constants.ts` 업데이트
+
+```typescript
+// 기존 6개 → 9개 카테고리 색상
+export const CATEGORY_COLORS: Record<string, string> = {
+  사랑: '#D4847A', 그리움: '#7BAFD4', 작별: '#C88FA8',
+  추억: '#E8A87C', 인생: '#4A90B8', 가족: '#8FC49A',
+  자연: '#5ABAC4', 세상: '#A0889C', 의지: '#D4A85A',
+};
+export const CATEGORY_NAMES = Object.keys(CATEGORY_COLORS);
+```
+
+#### 3. `src/pages/AdminPage.tsx` — Admin 관리 대폭 강화
+
+**PoemsAdmin (시 관리 탭)**:
+- 카테고리 `<input>` → `<select>` 드롭다운 변경 (오타 방지)
+- 기본 카테고리: '기타' → '사랑' 변경
+- **카테고리별 통계 바 추가**: 각 카테고리별 시 수를 색상 배지로 표시, 클릭 시 필터
+- **카테고리 필터**: 드롭다운으로 카테고리 선택 시 해당 카테고리 시만 표시
+- **제목/태그 검색**: 텍스트 입력으로 제목 또는 태그 검색
+- **태그 컬럼 추가**: 시 목록 테이블에 `#태그1 #태그2` 형태로 표시
+- **카테고리 색상 배지**: 카테고리명 옆에 해당 색상 배경의 pill 배지 표시
+- 필터 초기화 버튼 + 필터링된 시 수 표시
+
+**DbInitAdmin (DB 초기화 탭)**:
+- `handleSeedPoems` 수정: `POEM_CLASSIFICATIONS`에서 카테고리/태그 조회하여 등록
+  - 기존: `category: '시'`, `tags: []`
+  - 변경: `category: cls?.category ?? '인생'`, `tags: cls?.tags ?? []`
+- 카테고리 등록: 기존 단일 카테고리 → `CATEGORY_LIST` 9개 일괄 등록
+- **카테고리/태그 일괄 업데이트** 버튼 추가:
+  1. 기존 카테고리 전체 삭제 → 9개 새 카테고리 등록
+  2. 모든 시 조회 → display_order(=page)로 분류 데이터 매칭 → category/tags UPDATE
+  3. 카테고리별 분류 결과 로그 표시
+- **카테고리 현황 보기** 버튼 추가:
+  - 카테고리별 시 수 + ASCII 막대 그래프
+  - 태그 없는 시 수 표시
+  - 인기 태그 TOP 20 표시
+
+#### 4. 프론트엔드 카테고리 색상 적용
+
+**`CategoryFilter.tsx` + `.module.css`**:
+- 각 카테고리 pill 앞에 `CATEGORY_COLORS`에서 해당 색상 dot (8px 원형) 표시
+- 활성(선택된) 카테고리는 해당 색상을 배경으로 사용
+- `.dot` CSS 클래스 추가
+
+**`PoemCard.tsx`**:
+- 카테고리 텍스트 색상에 `CATEGORY_COLORS[poem.category]` 적용
+- 기존 CSS 변수 `var(--text-secondary)` → 동적 카테고리 색상
+
+**`PoemDetailPage.tsx`**:
+- 카테고리 텍스트 색상에 `CATEGORY_COLORS[poem.category]` 적용
+- 기존 CSS 변수 `var(--accent-gold)` → 동적 카테고리 색상
+
+### 파일 변경 요약
+```
+ src/data/poem-categories.ts             | 200+ (신규 — 177편 분류 매핑)
+ src/lib/constants.ts                    |  15  (9개 카테고리 색상)
+ src/pages/AdminPage.tsx                 | 120+ (필터, 통계, 일괄 업데이트)
+ src/components/ui/CategoryFilter.tsx    |  18  (색상 dot + 활성 배경)
+ src/components/ui/CategoryFilter.module.css | 8 (dot 스타일)
+ src/components/ui/PoemCard.tsx          |   4  (카테고리 색상)
+ src/pages/PoemDetailPage.tsx            |   4  (카테고리 색상)
+ 7 files changed, ~370 insertions(+), ~30 deletions(-)
+```
+
+### 사용 방법
+1. `/admin` → **DB 초기화** 탭
+2. (신규 등록 시) **시 177편 일괄 등록**: 자동으로 9개 카테고리 + 태그 포함 등록
+3. (기존 데이터 업데이트 시) **카테고리/태그 일괄 업데이트**: 기존 시의 분류만 변경
+4. **카테고리 현황 보기**: 분류 결과 통계 확인
+5. **시 관리** 탭에서 카테고리 필터/검색으로 확인

@@ -10,15 +10,21 @@ export const CARD_GRADIENTS = [
   'linear-gradient(135deg, #90C0D0, #5A98B8)', // 파도 거품
 ] as const;
 
-/** 카테고리별 기본 포인트 색상 */
+/** 카테고리별 기본 포인트 색상 (9개) */
 export const CATEGORY_COLORS: Record<string, string> = {
   사랑: '#D4847A',
-  자연: '#5ABAC4',
-  계절: '#E8A87C',
-  인생: '#4A90B8',
   그리움: '#7BAFD4',
-  기타: '#7FA3B8',
+  작별: '#C88FA8',
+  추억: '#E8A87C',
+  인생: '#4A90B8',
+  가족: '#8FC49A',
+  자연: '#5ABAC4',
+  세상: '#A0889C',
+  의지: '#D4A85A',
 };
+
+/** 카테고리 목록 (순서 보장용) */
+export const CATEGORY_NAMES = Object.keys(CATEGORY_COLORS);
 
 /** 사이트 기본 정보 */
 export const SITE = {

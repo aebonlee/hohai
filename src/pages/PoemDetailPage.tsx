@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/layout/PageTransition';
 import { usePoemDetail } from '../hooks/usePoems';
+import { CATEGORY_COLORS } from '../lib/constants';
 import styles from './PoemDetailPage.module.css';
 
 export default function PoemDetailPage() {
@@ -40,7 +41,7 @@ export default function PoemDetailPage() {
             ← 시 목록으로
           </Link>
 
-          <div className={styles.category}>{poem.category}</div>
+          <div className={styles.category} style={{ color: CATEGORY_COLORS[poem.category] }}>{poem.category}</div>
           <h1 className={styles.title}>{poem.title}</h1>
           {poem.written_date && (
             <p className={styles.meta}>{poem.written_date}</p>

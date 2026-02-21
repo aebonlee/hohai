@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { Poem } from '../../types/poem';
-import { CARD_GRADIENTS } from '../../lib/constants';
+import { CARD_GRADIENTS, CATEGORY_COLORS } from '../../lib/constants';
 import styles from './PoemCard.module.css';
 
 interface Props {
@@ -25,7 +25,7 @@ export default function PoemCard({ poem, index = 0 }: Props) {
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <span className={styles.category}>{poem.category}</span>
+      <span className={styles.category} style={{ color: CATEGORY_COLORS[poem.category] }}>{poem.category}</span>
       <h3 className={styles.title}>{poem.title}</h3>
       <p className={styles.excerpt}>{excerpt}</p>
       {poem.written_date && (

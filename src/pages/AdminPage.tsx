@@ -7,6 +7,8 @@ import { useAllSongs } from '../hooks/useSongs';
 import { useAllSeries } from '../hooks/useSeries';
 import { useAllCategories, type CategoryInsert } from '../hooks/useCategories';
 import { supabase } from '../lib/supabase';
+import { CATEGORY_NAMES, CATEGORY_COLORS } from '../lib/constants';
+import { POEM_CLASSIFICATIONS, CATEGORY_LIST } from '../data/poem-categories';
 import type { PoemInsert } from '../types/poem';
 import type { SongInsert } from '../types/song';
 import type { SeriesInsert } from '../types/series';
@@ -96,11 +98,13 @@ function PoemsAdmin() {
   const poemSeries = series.filter(s => s.type === 'poem');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [filterCategory, setFilterCategory] = useState<string>('');
+  const [searchText, setSearchText] = useState('');
   const [form, setForm] = useState<PoemInsert>({
     title: '',
     content: '',
     excerpt: '',
-    category: '기타',
+    category: '사랑',
     series_id: null,
     tags: [],
     bg_theme: 0,
@@ -112,7 +116,7 @@ function PoemsAdmin() {
 
   const resetForm = () => {
     setForm({
-      title: '', content: '', excerpt: '', category: '기타',
+      title: '', content: '', excerpt: '', category: '사랑',
       series_id: null, tags: [], bg_theme: 0, display_order: 0,
       is_featured: false, is_published: true, written_date: null,
     });
@@ -161,11 +165,81 @@ function PoemsAdmin() {
     }
   };
 
+  // 카테고리별 통계
+  const catStats: Record<string, number> = {};
+  for (const p of poems) {
+    catStats[p.category] = (catStats[p.category] || 0) + 1;
+  }
+
+  // 필터링
+  const filteredPoems = poems.filter(p => {
+    if (filterCategory && p.category !== filterCategory) return false;
+    if (searchText && !p.title.includes(searchText) && !(p.tags || []).some(t => t.includes(searchText))) return false;
+    return true;
+  });
+
   return (
     <>
       <div className={styles.header}>
         <h2>시 목록 ({poems.length}편)</h2>
         <button className={styles.addBtn} onClick={openCreate}>+ 새 시 작성</button>
+      </div>
+
+      {/* 카테고리별 통계 바 */}
+      {!loading && poems.length > 0 && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+          {Object.entries(catStats).sort((a, b) => b[1] - a[1]).map(([cat, count]) => (
+            <span
+              key={cat}
+              style={{
+                fontSize: '0.78rem',
+                padding: '3px 10px',
+                borderRadius: 999,
+                background: CATEGORY_COLORS[cat] ? `${CATEGORY_COLORS[cat]}22` : 'var(--bg-secondary)',
+                color: CATEGORY_COLORS[cat] || 'var(--text-muted)',
+                border: `1px solid ${CATEGORY_COLORS[cat] || 'transparent'}44`,
+                cursor: 'pointer',
+              }}
+              onClick={() => setFilterCategory(filterCategory === cat ? '' : cat)}
+            >
+              {cat} {count}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* 필터 컨트롤 */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
+        <select
+          className={styles.formInput}
+          value={filterCategory}
+          onChange={e => setFilterCategory(e.target.value)}
+          style={{ width: 'auto', minWidth: 100 }}
+        >
+          <option value="">전체 카테고리</option>
+          {CATEGORY_NAMES.map(name => (
+            <option key={name} value={name}>{name} ({catStats[name] || 0})</option>
+          ))}
+        </select>
+        <input
+          className={styles.formInput}
+          placeholder="제목 또는 태그 검색..."
+          value={searchText}
+          onChange={e => setSearchText(e.target.value)}
+          style={{ width: 'auto', minWidth: 180 }}
+        />
+        {(filterCategory || searchText) && (
+          <button
+            className={styles.cancelBtn}
+            onClick={() => { setFilterCategory(''); setSearchText(''); }}
+            style={{ padding: '6px 14px' }}
+          >
+            초기화
+          </button>
+        )}
+        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+          {filteredPoems.length}편 표시
+        </span>
       </div>
 
       {loading ? (
@@ -177,17 +251,33 @@ function PoemsAdmin() {
               <th>제목</th>
               <th>시집</th>
               <th>카테고리</th>
+              <th>태그</th>
               <th>상태</th>
               <th>순서</th>
               <th>작업</th>
             </tr>
           </thead>
           <tbody>
-            {poems.map((poem) => (
+            {filteredPoems.map((poem) => (
               <tr key={poem.id}>
                 <td className={styles.titleCell}>{poem.title}</td>
                 <td>{poemSeries.find(s => s.id === poem.series_id)?.name || '-'}</td>
-                <td>{poem.category}</td>
+                <td>
+                  <span style={{
+                    fontSize: '0.78rem',
+                    padding: '2px 8px',
+                    borderRadius: 999,
+                    background: CATEGORY_COLORS[poem.category] ? `${CATEGORY_COLORS[poem.category]}22` : 'var(--bg-secondary)',
+                    color: CATEGORY_COLORS[poem.category] || 'var(--text-muted)',
+                  }}>
+                    {poem.category}
+                  </span>
+                </td>
+                <td style={{ fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: 180 }}>
+                  {(poem.tags || []).length > 0
+                    ? poem.tags.map(t => `#${t}`).join(' ')
+                    : '-'}
+                </td>
                 <td>
                   <span className={`${styles.statusBadge} ${poem.is_published ? styles.published : styles.draft}`}>
                     {poem.is_published ? '공개' : '비공개'}
@@ -254,11 +344,15 @@ function PoemsAdmin() {
                 </div>
                 <div className={styles.formGroup}>
                   <label className={styles.formLabel}>카테고리</label>
-                  <input
+                  <select
                     className={styles.formInput}
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  />
+                  >
+                    {CATEGORY_NAMES.map(name => (
+                      <option key={name} value={name}>{name}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div className={styles.formRow}>
@@ -933,13 +1027,13 @@ function DbInitAdmin() {
     setLog([]);
     addLog('시 일괄 등록 시작...');
 
-    // 1. 카테고리 등록
-    addLog('카테고리 등록 중...');
-    const { error: catErr } = await supabase.from('hohai_categories').upsert(
-      [{ name: '시', slug: '시', description: '好海 이성헌의 시', display_order: 1 }],
-      { onConflict: 'slug' }
-    );
-    addLog(catErr ? `카테고리 등록 실패: ${catErr.message}` : '카테고리 등록 완료');
+    // 1. 카테고리 등록 (9개)
+    addLog('카테고리 9개 등록 중...');
+    const catRows = CATEGORY_LIST.map(c => ({
+      name: c.name, slug: c.slug, description: c.description, display_order: c.order,
+    }));
+    const { error: catErr } = await supabase.from('hohai_categories').upsert(catRows, { onConflict: 'slug' });
+    addLog(catErr ? `카테고리 등록 실패: ${catErr.message}` : `카테고리 ${catRows.length}개 등록 완료`);
 
     // 2. 시집(시리즈) 등록
     addLog('시집 등록 중...');
@@ -968,19 +1062,22 @@ function DbInitAdmin() {
     let errorCount = 0;
 
     for (let i = 0; i < POEM_DATA.length; i += BATCH_SIZE) {
-      const batch = POEM_DATA.slice(i, i + BATCH_SIZE).map((p, idx) => ({
-        title: p.title,
-        content: p.content,
-        excerpt: p.content.split('\n').slice(0, 4).join('\n'),
-        category: '시',
-        series_id: seriesId,
-        tags: [] as string[],
-        bg_theme: (i + idx) % 8,
-        display_order: p.page,
-        is_featured: false,
-        is_published: true,
-        written_date: '2008-08-15',
-      }));
+      const batch = POEM_DATA.slice(i, i + BATCH_SIZE).map((p, idx) => {
+        const cls = POEM_CLASSIFICATIONS[p.page];
+        return {
+          title: p.title,
+          content: p.content,
+          excerpt: p.content.split('\n').slice(0, 4).join('\n'),
+          category: cls?.category ?? '인생',
+          series_id: seriesId,
+          tags: cls?.tags ?? [],
+          bg_theme: (i + idx) % 8,
+          display_order: p.page,
+          is_featured: false,
+          is_published: true,
+          written_date: '2008-08-15',
+        };
+      });
 
       const { error: batchErr } = await supabase.from('hohai_poems').insert(batch);
       if (batchErr) {
@@ -996,13 +1093,125 @@ function DbInitAdmin() {
     setRunning(false);
   };
 
+  const handleUpdateCategories = async () => {
+    if (!window.confirm('기존 시 177편의 카테고리/태그를 일괄 업데이트하시겠습니까?\n(기존 카테고리 삭제 후 9개 새 카테고리 등록 + 시 분류 업데이트)')) return;
+    setRunning(true);
+    setLog([]);
+    addLog('카테고리/태그 일괄 업데이트 시작...');
+
+    // 1. 기존 카테고리 삭제 → 9개 새 카테고리 등록
+    addLog('기존 카테고리 삭제 중...');
+    const { error: delErr } = await supabase.from('hohai_categories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    addLog(delErr ? `카테고리 삭제 실패: ${delErr.message}` : '기존 카테고리 삭제 완료');
+
+    addLog('새 카테고리 9개 등록 중...');
+    const catRows = CATEGORY_LIST.map(c => ({
+      name: c.name, slug: c.slug, description: c.description, display_order: c.order,
+    }));
+    const { error: catErr } = await supabase.from('hohai_categories').insert(catRows);
+    addLog(catErr ? `카테고리 등록 실패: ${catErr.message}` : '카테고리 9개 등록 완료');
+
+    // 2. 모든 시 조회
+    addLog('시 목록 조회 중...');
+    const { data: poems, error: fetchErr } = await supabase
+      .from('hohai_poems')
+      .select('id, title, display_order')
+      .order('display_order');
+    if (fetchErr || !poems) {
+      addLog(`시 조회 실패: ${fetchErr?.message}`);
+      setRunning(false);
+      return;
+    }
+    addLog(`시 ${poems.length}편 조회 완료`);
+
+    // 3. 제목 기반 매칭 → category/tags UPDATE
+    let updated = 0;
+    let skipped = 0;
+    const stats: Record<string, number> = {};
+
+    for (const poem of poems) {
+      const cls = POEM_CLASSIFICATIONS[poem.display_order];
+      if (!cls) {
+        skipped++;
+        continue;
+      }
+
+      stats[cls.category] = (stats[cls.category] || 0) + 1;
+
+      const { error: upErr } = await supabase
+        .from('hohai_poems')
+        .update({ category: cls.category, tags: cls.tags })
+        .eq('id', poem.id);
+
+      if (upErr) {
+        addLog(`"${poem.title}" 업데이트 실패: ${upErr.message}`);
+      } else {
+        updated++;
+      }
+
+      if (updated % 20 === 0) {
+        addLog(`진행: ${updated} / ${poems.length}`);
+      }
+    }
+
+    addLog('--- 카테고리별 분류 결과 ---');
+    for (const [cat, count] of Object.entries(stats).sort((a, b) => b[1] - a[1])) {
+      addLog(`  ${cat}: ${count}편`);
+    }
+    addLog(`업데이트 완료! 성공: ${updated}편, 스킵: ${skipped}편`);
+    setRunning(false);
+  };
+
+  const handleShowStats = async () => {
+    setLog([]);
+    addLog('카테고리별 현황 조회 중...');
+
+    const { data: poems, error } = await supabase
+      .from('hohai_poems')
+      .select('category, tags');
+
+    if (error || !poems) {
+      addLog(`조회 실패: ${error?.message}`);
+      return;
+    }
+
+    const catStats: Record<string, number> = {};
+    const tagStats: Record<string, number> = {};
+    let noTag = 0;
+
+    for (const p of poems) {
+      catStats[p.category] = (catStats[p.category] || 0) + 1;
+      if (!p.tags || p.tags.length === 0) {
+        noTag++;
+      } else {
+        for (const t of p.tags) {
+          tagStats[t] = (tagStats[t] || 0) + 1;
+        }
+      }
+    }
+
+    addLog(`\n총 시: ${poems.length}편`);
+    addLog('--- 카테고리별 현황 ---');
+    for (const [cat, count] of Object.entries(catStats).sort((a, b) => b[1] - a[1])) {
+      const bar = '█'.repeat(Math.round(count / 2));
+      addLog(`  ${cat.padEnd(4)} ${String(count).padStart(3)}편 ${bar}`);
+    }
+
+    addLog(`\n태그 없는 시: ${noTag}편`);
+    addLog('--- 인기 태그 TOP 20 ---');
+    const topTags = Object.entries(tagStats).sort((a, b) => b[1] - a[1]).slice(0, 20);
+    for (const [tag, count] of topTags) {
+      addLog(`  #${tag} (${count})`);
+    }
+  };
+
   return (
     <>
       <div className={styles.header}>
-        <h2>DB 초기화 & 일괄 등록</h2>
+        <h2>DB 초기화 & 일괄 관리</h2>
       </div>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
         <button
           className={styles.deleteBtn}
           onClick={handleClearAll}
@@ -1021,6 +1230,25 @@ function DbInitAdmin() {
         </button>
       </div>
 
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+        <button
+          className={styles.saveBtn}
+          onClick={handleUpdateCategories}
+          disabled={running}
+          style={{ padding: '10px 20px', fontSize: '0.95rem' }}
+        >
+          카테고리/태그 일괄 업데이트
+        </button>
+        <button
+          className={styles.editBtn}
+          onClick={handleShowStats}
+          disabled={running}
+          style={{ padding: '10px 20px', fontSize: '0.95rem' }}
+        >
+          카테고리 현황 보기
+        </button>
+      </div>
+
       <div style={{
         background: 'var(--bg-secondary)',
         borderRadius: 8,
@@ -1030,6 +1258,7 @@ function DbInitAdmin() {
         maxHeight: 400,
         overflowY: 'auto',
         lineHeight: 1.6,
+        whiteSpace: 'pre-wrap',
       }}>
         {log.length === 0 ? (
           <p style={{ color: 'var(--text-muted)' }}>
@@ -1037,7 +1266,11 @@ function DbInitAdmin() {
             <br /><br />
             <strong>전체 데이터 삭제</strong>: 시, 노래, 시리즈, 카테고리 전부 삭제
             <br />
-            <strong>시 177편 일괄 등록</strong>: 카테고리 + 시집 + 177편 시 자동 등록
+            <strong>시 177편 일괄 등록</strong>: 카테고리 9개 + 시집 + 177편 시 (분류 포함) 자동 등록
+            <br />
+            <strong>카테고리/태그 일괄 업데이트</strong>: 기존 등록된 시의 카테고리/태그만 일괄 변경
+            <br />
+            <strong>카테고리 현황 보기</strong>: 카테고리별 시 수 + 인기 태그 통계
           </p>
         ) : (
           log.map((line, i) => <div key={i}>{line}</div>)
