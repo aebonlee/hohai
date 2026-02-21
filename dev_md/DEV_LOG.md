@@ -1363,3 +1363,22 @@ ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS suno_url TEXT;
 - "일괄 등록" 탭: 시/노래 일괄 등록 + 카테고리 업데이트 + 통계 보기
 - "데이터 관리" 탭: 전체 삭제 버튼 + 빨간 경고 표시
 - 모바일 뷰: 사이드바 → 드롭다운 전환, 메뉴 선택 시 닫힘
+
+---
+
+## 2026-02-21 (9차) — 관리자 페이지 와이드 레이아웃 (1400px)
+
+### 배경
+- 관리자 페이지는 PC에서만 사용하므로 기존 `--max-width: 1100px` 제한이 불필요
+- 넓은 화면에서 테이블과 콘텐츠 영역을 더 넓게 활용하도록 요청
+
+### 변경 내역
+
+**`src/pages/AdminPage.module.css`**:
+- `.content`: `max-width: var(--max-width)` + `margin: 0 auto` 제거 → 사이드바+메인이 전체 너비 사용
+- `.main`: padding `32px` → `40px`, `max-width: 1400px` 추가 (콘텐츠 영역 최대 폭 제한)
+- `.titleCell`: `max-width` 250px → 400px (넓은 화면에서 제목이 잘리지 않도록)
+
+### 빌드 결과
+- `npx tsc --noEmit` 통과
+- `npx vite build` 성공 (8.75s)
