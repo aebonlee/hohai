@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { SAMPLE_SONGS } from '../lib/sampleData';
 import type { Song, SongInsert, SongUpdate } from '../types/song';
 
 export function useSongs(seriesId?: string) {
@@ -22,15 +21,7 @@ export function useSongs(seriesId?: string) {
     }
 
     const { data } = await query;
-
-    if (data && data.length > 0) {
-      setSongs(data as Song[]);
-    } else {
-      const filtered = seriesId
-        ? SAMPLE_SONGS.filter(s => s.series_id === seriesId)
-        : SAMPLE_SONGS;
-      setSongs(filtered);
-    }
+    setSongs((data as Song[]) || []);
     setLoading(false);
   }, [seriesId]);
 
@@ -55,12 +46,7 @@ export function useFeaturedSong() {
         .limit(1)
         .single();
 
-      if (data) {
-        setSong(data as Song);
-      } else {
-        const featured = SAMPLE_SONGS.find((s) => s.is_featured) || SAMPLE_SONGS[0];
-        setSong(featured);
-      }
+      setSong((data as Song) || null);
       setLoading(false);
     };
     fetch();
@@ -82,11 +68,7 @@ export function useAllSongs() {
       .order('display_order', { ascending: true })
       .order('created_at', { ascending: false });
 
-    if (data && data.length > 0) {
-      setSongs(data as Song[]);
-    } else {
-      setSongs(SAMPLE_SONGS);
-    }
+    setSongs((data as Song[]) || []);
     setLoading(false);
   }, []);
 

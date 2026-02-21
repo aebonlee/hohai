@@ -1,5 +1,20 @@
 # 개발 변경 이력 (CHANGELOG)
 
+## 2026-02-21 — 샘플 데이터 제거 + 실제 데이터 전용 전환
+
+### 제거
+- `src/lib/sampleData.ts` 삭제 (하드코딩 샘플 시 10편, 노래 20곡, 시리즈 10개, 카테고리 6개, 리뷰 5개)
+- 모든 Hooks (usePoems, useSongs, useSeries, useReviews, useCategories)에서 샘플 데이터 fallback 로직 제거
+
+### 추가
+- `useAllCategories()` Admin hook — 카테고리 CRUD (생성/수정/삭제)
+- AdminPage 카테고리 관리 탭 — 5번째 탭으로 카테고리 등록/수정/삭제 UI
+
+### 변경
+- Supabase 데이터가 없을 때 빈 목록을 표시하도록 변경 (기존: 샘플 데이터 표시)
+
+---
+
 ## 2026-02-20 — 프로젝트 초기화 (Phase 1)
 
 ### 추가

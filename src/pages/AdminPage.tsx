@@ -5,12 +5,13 @@ import { useAuth } from '../hooks/useAuth';
 import { useAllPoems } from '../hooks/usePoems';
 import { useAllSongs } from '../hooks/useSongs';
 import { useAllSeries } from '../hooks/useSeries';
+import { useAllCategories, type CategoryInsert } from '../hooks/useCategories';
 import type { PoemInsert } from '../types/poem';
 import type { SongInsert } from '../types/song';
 import type { SeriesInsert } from '../types/series';
 import styles from './AdminPage.module.css';
 
-type Tab = 'poems' | 'poem-boards' | 'songs' | 'song-boards';
+type Tab = 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'categories';
 
 export default function AdminPage() {
   const { signOut } = useAuth();
@@ -58,12 +59,19 @@ export default function AdminPage() {
             >
               앨범 관리
             </button>
+            <button
+              className={`${styles.tab} ${activeTab === 'categories' ? styles.active : ''}`}
+              onClick={() => setActiveTab('categories')}
+            >
+              카테고리 관리
+            </button>
           </div>
 
           {activeTab === 'poems' && <PoemsAdmin />}
           {activeTab === 'poem-boards' && <BoardSeriesAdmin seriesType="poem" typeLabel="시집" itemLabel="시" />}
           {activeTab === 'songs' && <SongsAdmin />}
           {activeTab === 'song-boards' && <BoardSeriesAdmin seriesType="song" typeLabel="앨범" itemLabel="노래" />}
+          {activeTab === 'categories' && <CategoriesAdmin />}
         </div>
       </div>
     </>
@@ -717,6 +725,155 @@ function BoardSeriesAdmin({ seriesType, typeLabel, itemLabel }: {
                     공개
                   </label>
                 </div>
+              </div>
+              <div className={styles.modalActions}>
+                <button type="button" className={styles.cancelBtn} onClick={() => setShowModal(false)}>취소</button>
+                <button type="submit" className={styles.saveBtn}>{editingId ? '수정' : '저장'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ========================================
+   카테고리 관리 컴포넌트
+   ======================================== */
+function CategoriesAdmin() {
+  const { categories, loading, createCategory, updateCategory, deleteCategory } = useAllCategories();
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<CategoryInsert>({
+    name: '',
+    slug: '',
+    description: '',
+    display_order: 0,
+  });
+
+  const resetForm = () => {
+    setForm({ name: '', slug: '', description: '', display_order: 0 });
+    setEditingId(null);
+  };
+
+  const openCreate = () => {
+    resetForm();
+    setShowModal(true);
+  };
+
+  const openEdit = (id: string) => {
+    const cat = categories.find((c) => c.id === id);
+    if (!cat) return;
+    setForm({
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description || '',
+      display_order: cat.display_order,
+    });
+    setEditingId(id);
+    setShowModal(true);
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (editingId) {
+      await updateCategory(editingId, form);
+    } else {
+      await createCategory(form);
+    }
+    setShowModal(false);
+    resetForm();
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('정말 삭제하시겠습니까?')) {
+      await deleteCategory(id);
+    }
+  };
+
+  return (
+    <>
+      <div className={styles.header}>
+        <h2>카테고리 목록 ({categories.length}개)</h2>
+        <button className={styles.addBtn} onClick={openCreate}>+ 새 카테고리 추가</button>
+      </div>
+
+      {loading ? (
+        <p style={{ color: 'var(--text-muted)' }}>불러오는 중...</p>
+      ) : (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>이름</th>
+              <th>슬러그</th>
+              <th>설명</th>
+              <th>순서</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.map((cat) => (
+              <tr key={cat.id}>
+                <td className={styles.titleCell}>{cat.name}</td>
+                <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{cat.slug}</td>
+                <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                  {cat.description || '-'}
+                </td>
+                <td>{cat.display_order}</td>
+                <td className={styles.actions}>
+                  <button className={styles.editBtn} onClick={() => openEdit(cat.id)}>수정</button>
+                  <button className={styles.deleteBtn} onClick={() => handleDelete(cat.id)}>삭제</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {showModal && (
+        <div className={styles.overlay} onClick={() => setShowModal(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>{editingId ? '카테고리 수정' : '새 카테고리 추가'}</h3>
+            <form onSubmit={handleSubmit}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>카테고리 이름 *</label>
+                <input
+                  className={styles.formInput}
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  required
+                  placeholder="예: 사랑, 자연, 계절"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>슬러그 *</label>
+                <input
+                  className={styles.formInput}
+                  value={form.slug}
+                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                  required
+                  placeholder="예: 사랑 (카테고리 필터용)"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>설명</label>
+                <textarea
+                  className={styles.formInput}
+                  style={{ minHeight: 60 }}
+                  value={form.description || ''}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  placeholder="카테고리 설명 (선택)"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>표시 순서</label>
+                <input
+                  type="number"
+                  className={styles.formInput}
+                  value={form.display_order}
+                  onChange={(e) => setForm({ ...form, display_order: Number(e.target.value) })}
+                />
               </div>
               <div className={styles.modalActions}>
                 <button type="button" className={styles.cancelBtn} onClick={() => setShowModal(false)}>취소</button>

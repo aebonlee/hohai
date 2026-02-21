@@ -774,3 +774,72 @@ z-index 5: heroContent (텍스트), scrollHint, 최전면 파도
 - TypeScript 타입체크 통과
 - Vite 빌드 성공
 - CSS: 63.17 kB (gzip 12.75 kB), JS: 616.09 kB (gzip 183.14 kB)
+
+---
+
+## 2026-02-21 — 샘플 데이터 제거 + 실제 데이터 전용 전환 + 카테고리 Admin CRUD
+
+### 배경
+- Supabase DB 셋업이 완료되어, 더 이상 프론트엔드 내장 샘플 데이터가 필요 없음
+- 관리자 페이지(/admin)에서 실제 데이터를 직접 등록·관리할 수 있도록 전환
+- 기존에 카테고리 관리 CRUD가 없어서 Admin에 추가 필요
+
+### 변경 내역
+
+#### 1. `src/lib/sampleData.ts` 삭제
+- 10편의 샘플 시, 20곡의 샘플 노래, 시리즈 10개, 카테고리 6개, 리뷰 5개 등 모든 하드코딩 데이터 파일 완전 삭제
+- **144줄 제거**
+
+#### 2. 모든 Hooks에서 샘플 데이터 fallback 제거
+
+| Hook 파일 | 변경 내용 |
+|-----------|----------|
+| `usePoems.ts` | `SAMPLE_POEMS` import 제거, `usePoems`/`usePoemDetail`/`useFeaturedPoems`/`useAllPoems` 4개 함수에서 fallback 로직 제거. 에러 시 빈 배열 반환 |
+| `useSongs.ts` | `SAMPLE_SONGS` import 제거, `useSongs`/`useFeaturedSong`/`useAllSongs` 3개 함수에서 fallback 제거 |
+| `useSeries.ts` | `SAMPLE_POEM_SERIES`/`SAMPLE_SONG_SERIES` import 제거, `usePoemSeries`/`useSongSeries`/`useSeriesDetail`/`useAllSeries` 4개 함수에서 fallback 제거 |
+| `useReviews.ts` | `SAMPLE_REVIEWS` import 및 fallback 제거 |
+| `useCategories.ts` | `SAMPLE_CATEGORIES` import 및 fallback 제거 + **`useAllCategories` Admin hook 신규 추가** |
+
+**변경 전 동작**: Supabase 응답이 비어있으면 → 샘플 데이터를 화면에 표시
+**변경 후 동작**: Supabase 응답이 비어있으면 → 빈 목록 표시 (관리자가 직접 등록 필요)
+
+#### 3. `useCategories.ts` — Admin CRUD 추가
+
+```typescript
+// 기존: useCategories() — 읽기 전용
+// 추가: useAllCategories() — Admin용 전체 CRUD
+export function useAllCategories() {
+  // fetchAll, createCategory, updateCategory, deleteCategory
+}
+export interface CategoryInsert { name, slug, description?, display_order }
+export type CategoryUpdate = Partial<CategoryInsert>
+```
+
+#### 4. `AdminPage.tsx` — 카테고리 관리 탭 추가
+
+- 기존 4탭(시 관리, 시집 관리, 노래 관리, 앨범 관리) → **5탭** (+카테고리 관리)
+- `CategoriesAdmin` 컴포넌트 신규 추가 (약 120줄)
+  - 카테고리 목록 테이블 (이름, 슬러그, 설명, 순서)
+  - 모달 폼으로 생성/수정
+  - 삭제 (확인 다이얼로그)
+- **159줄 추가**
+
+### 파일 변경 요약
+```
+ src/hooks/useCategories.ts |  59 +++++++++++++-   (CRUD 추가)
+ src/hooks/usePoems.ts      |  45 ++---------   (fallback 제거)
+ src/hooks/useReviews.ts    |   7 +-          (fallback 제거)
+ src/hooks/useSeries.ts     |  26 ++------   (fallback 제거)
+ src/hooks/useSongs.ts      |  24 +------    (fallback 제거)
+ src/lib/sampleData.ts      | 144 ----------  (파일 삭제)
+ src/pages/AdminPage.tsx    | 159 ++++++++++  (카테고리 관리 탭)
+ 7 files changed, 223 insertions(+), 241 deletions(-)
+```
+
+### 운영 가이드
+1. `/admin` 페이지 접속 (관리자 계정 필요)
+2. **카테고리 관리** 탭에서 카테고리 먼저 등록 (사랑, 자연, 계절, 인생, 그리움, 기타 등)
+3. **시집 관리** 탭에서 시집(시리즈) 등록
+4. **시 관리** 탭에서 시 등록 (시집 선택, 카테고리 지정)
+5. **앨범 관리** 탭에서 앨범(시리즈) 등록
+6. **노래 관리** 탭에서 노래 등록 (YouTube ID 또는 Suno URL, 앨범 선택)

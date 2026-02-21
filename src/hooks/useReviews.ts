@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { SAMPLE_REVIEWS } from '../lib/sampleData';
 import type { Review, ReviewInsert } from '../types/review';
 
 export function useReviews() {
@@ -16,11 +15,7 @@ export function useReviews() {
       .eq('is_published', true)
       .order('created_at', { ascending: false });
 
-    if (data && data.length > 0) {
-      setReviews(data as Review[]);
-    } else {
-      setReviews(SAMPLE_REVIEWS);
-    }
+    setReviews((data as Review[]) || []);
     setLoading(false);
   }, []);
 

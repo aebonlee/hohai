@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { SAMPLE_POEMS } from '../lib/sampleData';
 import type { Poem, PoemInsert, PoemUpdate } from '../types/poem';
 
 export function usePoems(categorySlug?: string, seriesId?: string) {
@@ -28,16 +27,9 @@ export function usePoems(categorySlug?: string, seriesId?: string) {
 
     const { data, error: err } = await query;
 
-    if (err || !data || data.length === 0) {
-      let filtered = SAMPLE_POEMS as Poem[];
-      if (categorySlug) {
-        filtered = filtered.filter((p) => p.category === categorySlug);
-      }
-      if (seriesId) {
-        filtered = filtered.filter((p) => p.series_id === seriesId);
-      }
-      setPoems(filtered);
-      setError(null);
+    if (err) {
+      setError(err.message);
+      setPoems([]);
     } else {
       setPoems((data as Poem[]) || []);
     }
@@ -93,28 +85,9 @@ export function usePoemDetail(id: string | undefined) {
             prev: idx > 0 ? { id: allPoems[idx - 1].id, title: allPoems[idx - 1].title } : null,
             next: idx < allPoems.length - 1 ? { id: allPoems[idx + 1].id, title: allPoems[idx + 1].title } : null,
           });
-        } else {
-          setSampleAdjacent(id, seriesId);
-        }
-      } else {
-        const samplePoem = SAMPLE_POEMS.find((p) => p.id === id);
-        if (samplePoem) {
-          setPoem(samplePoem);
-          setSampleAdjacent(id, samplePoem.series_id);
         }
       }
       setLoading(false);
-    };
-
-    const setSampleAdjacent = (poemId: string, seriesId: string | null) => {
-      const filtered = seriesId
-        ? SAMPLE_POEMS.filter(p => p.series_id === seriesId)
-        : SAMPLE_POEMS;
-      const idx = filtered.findIndex((p) => p.id === poemId);
-      setAdjacentPoems({
-        prev: idx > 0 ? { id: filtered[idx - 1].id, title: filtered[idx - 1].title } : null,
-        next: idx < filtered.length - 1 ? { id: filtered[idx + 1].id, title: filtered[idx + 1].title } : null,
-      });
     };
 
     fetchPoem();
@@ -136,11 +109,7 @@ export function useFeaturedPoems() {
         .order('created_at', { ascending: false })
         .limit(3);
 
-      if (data && data.length > 0) {
-        setPoems(data as Poem[]);
-      } else {
-        setPoems(SAMPLE_POEMS.filter((p) => p.is_featured).slice(0, 3));
-      }
+      setPoems((data as Poem[]) || []);
       setLoading(false);
     };
     fetch();
@@ -162,11 +131,7 @@ export function useAllPoems() {
       .order('display_order', { ascending: true })
       .order('created_at', { ascending: false });
 
-    if (data && data.length > 0) {
-      setPoems(data as Poem[]);
-    } else {
-      setPoems(SAMPLE_POEMS);
-    }
+    setPoems((data as Poem[]) || []);
     setLoading(false);
   }, []);
 

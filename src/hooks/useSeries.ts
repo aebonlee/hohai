@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { SAMPLE_POEM_SERIES, SAMPLE_SONG_SERIES } from '../lib/sampleData';
 import type { Series, SeriesInsert, SeriesUpdate } from '../types/series';
 
 export function usePoemSeries() {
@@ -16,11 +15,7 @@ export function usePoemSeries() {
         .eq('is_published', true)
         .order('display_order', { ascending: true });
 
-      if (data && data.length > 0) {
-        setSeries(data as Series[]);
-      } else {
-        setSeries(SAMPLE_POEM_SERIES);
-      }
+      setSeries((data as Series[]) || []);
       setLoading(false);
     };
     fetch();
@@ -42,11 +37,7 @@ export function useSongSeries() {
         .eq('is_published', true)
         .order('display_order', { ascending: true });
 
-      if (data && data.length > 0) {
-        setSeries(data as Series[]);
-      } else {
-        setSeries(SAMPLE_SONG_SERIES);
-      }
+      setSeries((data as Series[]) || []);
       setLoading(false);
     };
     fetch();
@@ -70,12 +61,7 @@ export function useSeriesDetail(slug: string | undefined) {
         .eq('slug', slug)
         .single();
 
-      if (data) {
-        setSeries(data as Series);
-      } else {
-        const sample = [...SAMPLE_POEM_SERIES, ...SAMPLE_SONG_SERIES].find(s => s.slug === slug);
-        setSeries(sample || null);
-      }
+      setSeries((data as Series) || null);
       setLoading(false);
     };
     fetch();
@@ -97,11 +83,7 @@ export function useAllSeries() {
       .order('type', { ascending: true })
       .order('display_order', { ascending: true });
 
-    if (data && data.length > 0) {
-      setSeries(data as Series[]);
-    } else {
-      setSeries([...SAMPLE_POEM_SERIES, ...SAMPLE_SONG_SERIES]);
-    }
+    setSeries((data as Series[]) || []);
     setLoading(false);
   }, []);
 
