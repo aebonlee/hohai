@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import PageTransition from '../components/layout/PageTransition';
@@ -7,30 +8,45 @@ import { useAuth } from '../hooks/useAuth';
 import styles from './ReviewsPage.module.css';
 
 export default function ReviewsPage() {
-  const { reviews, loading, createReview } = useReviews();
+  const { reviews, loading, createReview, deleteReview } = useReviews();
   const { isLoggedIn, profile, user } = useAuth();
   const [showForm, setShowForm] = useState(false);
-  const [authorName, setAuthorName] = useState('');
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!content.trim()) return;
+    if (!content.trim() || !isLoggedIn) return;
     setSubmitting(true);
+    setFeedback(null);
 
-    await createReview({
-      author_name: isLoggedIn
-        ? (profile?.display_name || user?.email || '익명')
-        : (authorName.trim() || '익명'),
+    const { error } = await createReview({
+      author_name: profile?.display_name || user?.email || '익명',
       content: content.trim(),
       user_id: user?.id || null,
     });
 
-    setContent('');
-    setAuthorName('');
-    setShowForm(false);
+    if (error) {
+      setFeedback({ type: 'error', message: '등록에 실패했습니다. 다시 시도해주세요.' });
+    } else {
+      setFeedback({ type: 'success', message: '감상 후기가 등록되었습니다.' });
+      setContent('');
+      setShowForm(false);
+    }
     setSubmitting(false);
+    setTimeout(() => setFeedback(null), 3000);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('정말 삭제하시겠습니까?')) return;
+    const { error } = await deleteReview(id);
+    if (error) {
+      setFeedback({ type: 'error', message: '삭제에 실패했습니다.' });
+    } else {
+      setFeedback({ type: 'success', message: '후기가 삭제되었습니다.' });
+    }
+    setTimeout(() => setFeedback(null), 3000);
   };
 
   const formatDate = (dateStr: string) => {
@@ -52,22 +68,24 @@ export default function ReviewsPage() {
             <p className={styles.subtitle}>시와 노래를 감상하신 소감을 나눠주세요</p>
           </div>
 
+          {feedback && (
+            <div className={`${styles.feedback} ${styles[feedback.type]}`}>
+              {feedback.message}
+            </div>
+          )}
+
           <div className={styles.writeArea}>
-            {!showForm ? (
+            {!isLoggedIn ? (
+              <div className={styles.loginPrompt}>
+                <p>로그인 후 감상 후기를 남겨주세요</p>
+                <Link to="/login" className={styles.loginLink}>로그인하기</Link>
+              </div>
+            ) : !showForm ? (
               <button className={styles.writeBtn} onClick={() => setShowForm(true)}>
                 후기 작성하기
               </button>
             ) : (
               <form className={styles.form} onSubmit={handleSubmit}>
-                {!isLoggedIn && (
-                  <input
-                    className={styles.formInput}
-                    placeholder="닉네임 (선택)"
-                    value={authorName}
-                    onChange={(e) => setAuthorName(e.target.value)}
-                    maxLength={30}
-                  />
-                )}
                 <textarea
                   className={styles.formTextarea}
                   placeholder="감상 후기를 작성해주세요..."
@@ -80,7 +98,7 @@ export default function ReviewsPage() {
                   <button
                     type="button"
                     className={styles.cancelBtn}
-                    onClick={() => { setShowForm(false); setContent(''); setAuthorName(''); }}
+                    onClick={() => { setShowForm(false); setContent(''); }}
                   >
                     취소
                   </button>
@@ -107,7 +125,17 @@ export default function ReviewsPage() {
                 >
                   <div className={styles.reviewHeader}>
                     <span className={styles.reviewAuthor}>{review.author_name}</span>
-                    <span className={styles.reviewDate}>{formatDate(review.created_at)}</span>
+                    <div className={styles.reviewHeaderRight}>
+                      <span className={styles.reviewDate}>{formatDate(review.created_at)}</span>
+                      {isLoggedIn && user?.id === review.user_id && (
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={() => handleDelete(review.id)}
+                        >
+                          삭제
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <p className={styles.reviewContent}>{review.content}</p>
                 </motion.article>

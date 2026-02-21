@@ -169,6 +169,79 @@
   white-space: pre-wrap;
 }
 
+.loginPrompt {
+  text-align: center;
+  padding: 24px;
+  background: var(--bg-secondary);
+  border: 2px dashed rgba(10, 25, 41, 0.15);
+  border-radius: var(--radius-lg);
+}
+
+.loginPrompt p {
+  font-family: var(--font-serif);
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.loginLink {
+  display: inline-block;
+  padding: 8px 24px;
+  background: var(--accent-gold);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity var(--transition);
+}
+
+.loginLink:hover {
+  opacity: 0.9;
+}
+
+.feedback {
+  max-width: 640px;
+  margin: 0 auto 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.feedback.success {
+  background: rgba(34, 139, 34, 0.08);
+  color: #228b22;
+  border: 1px solid rgba(34, 139, 34, 0.2);
+}
+
+.feedback.error {
+  background: rgba(192, 69, 58, 0.08);
+  color: #c0453a;
+  border: 1px solid rgba(192, 69, 58, 0.2);
+}
+
+.reviewHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.deleteBtn {
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  background: none;
+  border: 1px solid rgba(192, 69, 58, 0.3);
+  border-radius: var(--radius-md);
+  color: #c0453a;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.deleteBtn:hover {
+  background: rgba(192, 69, 58, 0.08);
+}
+
 .empty {
   text-align: center;
   padding: 80px 0;

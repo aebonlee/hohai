@@ -185,3 +185,32 @@ ON CONFLICT (slug) DO NOTHING;
 -- ============================================================
 -- ALTER TABLE hohai_poems ADD COLUMN IF NOT EXISTS series_id UUID REFERENCES hohai_series(id) ON DELETE SET NULL;
 -- ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS series_id UUID REFERENCES hohai_series(id) ON DELETE SET NULL;
+
+-- ============================================================
+-- 6. hohai_reviews 테이블 (감상 후기 게시판)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS hohai_reviews (
+  id            UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  author_name   TEXT NOT NULL,
+  content       TEXT NOT NULL,
+  user_id       UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  is_published  BOOLEAN DEFAULT TRUE,
+  created_at    TIMESTAMPTZ DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TRIGGER hohai_reviews_updated_at
+  BEFORE UPDATE ON hohai_reviews
+  FOR EACH ROW EXECUTE FUNCTION hohai_update_updated_at();
+
+-- RLS
+ALTER TABLE hohai_reviews ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "hohai_reviews_public_read" ON hohai_reviews
+  FOR SELECT USING (is_published = TRUE);
+
+CREATE POLICY "hohai_reviews_auth_insert" ON hohai_reviews
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "hohai_reviews_auth_manage" ON hohai_reviews
+  FOR ALL USING (auth.role() = 'authenticated');

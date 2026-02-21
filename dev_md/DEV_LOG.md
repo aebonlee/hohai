@@ -1003,3 +1003,98 @@ export const CATEGORY_NAMES = Object.keys(CATEGORY_COLORS);
 3. (기존 데이터 업데이트 시) **카테고리/태그 일괄 업데이트**: 기존 시의 분류만 변경
 4. **카테고리 현황 보기**: 분류 결과 통계 확인
 5. **시 관리** 탭에서 카테고리 필터/검색으로 확인
+
+---
+
+## 2026-02-21 (5차) — 감상 후기 게시판 시스템 구현
+
+### 배경
+- 감상 후기(ReviewsPage) UI는 존재했으나 실제 동작하지 않음
+  - `hohai_reviews` 테이블이 DB에 없음 (migration.sql에 미정의)
+  - 후기 작성 시 `is_published` 미설정 → 등록해도 목록에 미노출
+  - 관리자 Admin 페이지에 후기 관리 탭 없음
+  - 비로그인 사용자도 후기 작성 가능 (요구사항: 로그인 필수)
+
+### 변경 내역
+
+#### 1. `dev_md/migration.sql` — hohai_reviews 테이블 추가
+
+```sql
+CREATE TABLE hohai_reviews (
+  id, author_name, content, user_id, is_published, created_at, updated_at
+);
+```
+
+- `user_id` → `auth.users(id)` FK (ON DELETE SET NULL)
+- `is_published` 기본값 TRUE
+- `updated_at` 자동 갱신 트리거
+- RLS 정책 3개:
+  - `hohai_reviews_public_read`: 공개된 후기만 읽기 가능
+  - `hohai_reviews_auth_insert`: 인증된 사용자만 등록 가능
+  - `hohai_reviews_auth_manage`: 인증된 사용자 전체 관리
+
+#### 2. `src/hooks/useReviews.ts` — Hook 강화
+
+**기존 `useReviews()`**:
+- `createReview`에 `is_published: true` 기본값 추가
+- `deleteReview(id)` 함수 추가 (본인 후기 삭제용)
+
+**신규 `useAllReviews()` Admin 훅**:
+- `fetchAll()` — 모든 리뷰 조회 (is_published 관계없이)
+- `updateReview(id, updates)` — 공개/비공개 토글 등
+- `deleteReview(id)` — 삭제
+
+#### 3. `src/pages/ReviewsPage.tsx` — 로그인 필수 게시판
+
+**비로그인 시**:
+- 후기 작성 버튼 대신 "로그인 후 감상 후기를 남겨주세요" + 로그인 링크 표시
+
+**로그인 시**:
+- 후기 작성 폼 표시 (닉네임 입력 필드 제거 — 프로필 이름 자동 사용)
+- `createReview` 호출 시 `is_published: true` 자동 설정
+
+**피드백 메시지**:
+- 등록 성공: "감상 후기가 등록되었습니다." (초록)
+- 등록 실패: "등록에 실패했습니다. 다시 시도해주세요." (빨강)
+- 3초 후 자동 소멸
+
+**본인 삭제**:
+- `user_id` 비교로 본인 작성 후기에만 삭제 버튼 표시
+- 삭제 확인 다이얼로그
+
+#### 4. `src/pages/ReviewsPage.module.css` — 신규 스타일
+
+- `.loginPrompt` — 로그인 유도 박스 (dashed border, 중앙 정렬)
+- `.loginLink` — 로그인 버튼 (accent-gold 배경)
+- `.feedback` / `.success` / `.error` — 피드백 메시지 (녹/적 배경)
+- `.reviewHeaderRight` — 날짜 + 삭제 버튼 그룹
+- `.deleteBtn` — 삭제 버튼 (산호색 테두리)
+
+#### 5. `src/pages/AdminPage.tsx` — 후기 관리 탭 추가
+
+- Tab에 `'reviews'` 추가 (카테고리 관리와 DB 초기화 사이)
+- **ReviewsAdmin 컴포넌트** (~70줄):
+  - 전체 후기 테이블 (작성자, 내용 미리보기(60자), 날짜, 공개 상태)
+  - 공개/비공개 토글 버튼
+  - 삭제 버튼 (확인 다이얼로그)
+  - 전체 후기 수 통계 표시
+
+### 파일 변경 요약
+```
+ dev_md/migration.sql                    | 28+ (hohai_reviews 테이블 + RLS)
+ src/hooks/useReviews.ts                 | 49+ (is_published 설정 + useAllReviews)
+ src/pages/ReviewsPage.tsx               | 전면 수정 (로그인 필수 + 피드백 + 삭제)
+ src/pages/ReviewsPage.module.css        | 62+ (로그인 프롬프트 + 피드백 + 삭제)
+ src/pages/AdminPage.tsx                 | 78+ (후기 관리 탭 + ReviewsAdmin)
+ 5 files changed
+```
+
+### 관리자 수동 작업 (1건)
+- Supabase SQL Editor에서 `hohai_reviews` 테이블 생성 SQL 실행 필요
+- `dev_md/migration.sql` 하단의 hohai_reviews 관련 SQL 복사-실행
+
+### 검증 시나리오
+- 비로그인: 후기 목록만 보이고, 작성 불가 (로그인 유도 표시)
+- 로그인: 후기 작성 → 목록에 즉시 표시
+- 본인 삭제: 자기가 쓴 후기만 삭제 버튼 표시
+- Admin: 후기 관리 탭에서 모든 후기 조회 + 공개/비공개 토글 + 삭제

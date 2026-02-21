@@ -6,6 +6,7 @@ import { useAllPoems } from '../hooks/usePoems';
 import { useAllSongs } from '../hooks/useSongs';
 import { useAllSeries } from '../hooks/useSeries';
 import { useAllCategories, type CategoryInsert } from '../hooks/useCategories';
+import { useAllReviews } from '../hooks/useReviews';
 import { supabase } from '../lib/supabase';
 import { CATEGORY_NAMES, CATEGORY_COLORS } from '../lib/constants';
 import { POEM_CLASSIFICATIONS, CATEGORY_LIST } from '../data/poem-categories';
@@ -14,7 +15,7 @@ import type { SongInsert } from '../types/song';
 import type { SeriesInsert } from '../types/series';
 import styles from './AdminPage.module.css';
 
-type Tab = 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'categories' | 'db-init';
+type Tab = 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'categories' | 'reviews' | 'db-init';
 
 export default function AdminPage() {
   const { signOut } = useAuth();
@@ -69,6 +70,12 @@ export default function AdminPage() {
               카테고리 관리
             </button>
             <button
+              className={`${styles.tab} ${activeTab === 'reviews' ? styles.active : ''}`}
+              onClick={() => setActiveTab('reviews')}
+            >
+              후기 관리
+            </button>
+            <button
               className={`${styles.tab} ${activeTab === 'db-init' ? styles.active : ''}`}
               onClick={() => setActiveTab('db-init')}
               style={{ color: activeTab === 'db-init' ? '#c0453a' : undefined }}
@@ -82,6 +89,7 @@ export default function AdminPage() {
           {activeTab === 'songs' && <SongsAdmin />}
           {activeTab === 'song-boards' && <BoardSeriesAdmin seriesType="song" typeLabel="앨범" itemLabel="노래" />}
           {activeTab === 'categories' && <CategoriesAdmin />}
+          {activeTab === 'reviews' && <ReviewsAdmin />}
           {activeTab === 'db-init' && <DbInitAdmin />}
         </div>
       </div>
@@ -985,6 +993,81 @@ function CategoriesAdmin() {
             </form>
           </div>
         </div>
+      )}
+    </>
+  );
+}
+
+/* ========================================
+   후기 관리 컴포넌트
+   ======================================== */
+function ReviewsAdmin() {
+  const { reviews, loading, updateReview, deleteReview } = useAllReviews();
+
+  const handleTogglePublish = async (id: string, current: boolean) => {
+    await updateReview(id, { is_published: !current });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('정말 삭제하시겠습니까?')) {
+      await deleteReview(id);
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  return (
+    <>
+      <div className={styles.header}>
+        <h2>감상 후기 ({reviews.length}건)</h2>
+      </div>
+
+      {loading ? (
+        <p style={{ color: 'var(--text-muted)' }}>불러오는 중...</p>
+      ) : reviews.length === 0 ? (
+        <p style={{ color: 'var(--text-muted)' }}>등록된 후기가 없습니다.</p>
+      ) : (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>작성자</th>
+              <th>내용</th>
+              <th>날짜</th>
+              <th>상태</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reviews.map((review) => (
+              <tr key={review.id}>
+                <td className={styles.titleCell}>{review.author_name}</td>
+                <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: 300 }}>
+                  {review.content.length > 60 ? review.content.slice(0, 60) + '...' : review.content}
+                </td>
+                <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                  {formatDate(review.created_at)}
+                </td>
+                <td>
+                  <span className={`${styles.statusBadge} ${review.is_published ? styles.published : styles.draft}`}>
+                    {review.is_published ? '공개' : '비공개'}
+                  </span>
+                </td>
+                <td className={styles.actions}>
+                  <button
+                    className={styles.editBtn}
+                    onClick={() => handleTogglePublish(review.id, review.is_published)}
+                  >
+                    {review.is_published ? '비공개' : '공개'}
+                  </button>
+                  <button className={styles.deleteBtn} onClick={() => handleDelete(review.id)}>삭제</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </>
   );
