@@ -14,10 +14,95 @@
   margin-top: 8px;
 }
 
+/* 카테고리 통계 바 */
+.statBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+  align-items: center;
+}
+
+.statChip {
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-weight: 500;
+}
+
+.statChip:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
+.totalCount {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+/* 그리드 */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
+}
+
+/* 카테고리 섹션 */
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.categorySection {
+  /* 섹션 단위 */
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(10, 25, 41, 0.08);
+}
+
+.sectionDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sectionTitle {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sectionCount {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.sectionMore {
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition);
+  border: none;
+  background: none;
+  padding: 4px 8px;
+}
+
+.sectionMore:hover {
+  color: var(--text-primary);
 }
 
 .empty {
@@ -42,5 +127,22 @@
   .grid {
     grid-template-columns: 1fr;
     gap: 16px;
+  }
+
+  .sections {
+    gap: 36px;
+  }
+
+  .sectionHeader {
+    flex-wrap: wrap;
+  }
+
+  .statBar {
+    gap: 6px;
+  }
+
+  .statChip {
+    font-size: 0.75rem;
+    padding: 3px 10px;
   }
 }

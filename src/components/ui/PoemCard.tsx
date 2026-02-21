@@ -28,9 +28,16 @@ export default function PoemCard({ poem, index = 0 }: Props) {
       <span className={styles.category} style={{ color: CATEGORY_COLORS[poem.category] }}>{poem.category}</span>
       <h3 className={styles.title}>{poem.title}</h3>
       <p className={styles.excerpt}>{excerpt}</p>
-      {poem.written_date && (
-        <span className={styles.date}>{poem.written_date}</span>
-      )}
+      <div className={styles.footer}>
+        {poem.tags && poem.tags.length > 0 && (
+          <span className={styles.tags}>
+            {poem.tags.slice(0, 3).map(t => `#${t}`).join(' ')}
+          </span>
+        )}
+        {poem.written_date && (
+          <span className={styles.date}>{poem.written_date}</span>
+        )}
+      </div>
     </motion.article>
   );
 }

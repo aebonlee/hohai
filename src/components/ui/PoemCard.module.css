@@ -57,8 +57,25 @@
   white-space: pre-line;
 }
 
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  gap: 8px;
+}
+
+.tags {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .date {
   font-size: 0.78rem;
   color: var(--text-muted);
-  margin-top: 16px;
+  white-space: nowrap;
 }
