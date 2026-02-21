@@ -1,6 +1,15 @@
 .page {
   padding: 48px 0 80px;
   min-height: 60vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    var(--poem-bg1, #F3F7FD),
+    var(--poem-bg2, #ECF1F8),
+    var(--poem-bg3, #E5EDF8),
+    var(--poem-bg4, #EEF3FA)
+  );
 }
 
 .inner {
@@ -8,6 +17,7 @@
   margin: 0 auto;
   padding: 0 24px;
   position: relative;
+  z-index: 2;
 }
 
 /* 좌측 세로 장식선 */
@@ -21,7 +31,7 @@
   background: linear-gradient(
     to bottom,
     transparent,
-    var(--accent-gold),
+    var(--mood-accent, var(--accent-gold)),
     transparent
   );
   opacity: 0.3;
@@ -94,7 +104,7 @@
 .tag {
   font-size: 0.8rem;
   color: var(--text-muted);
-  background: var(--bg-secondary);
+  background: color-mix(in srgb, var(--mood-accent, var(--bg-secondary)) 10%, white 90%);
   padding: 4px 12px;
   border-radius: 999px;
 }

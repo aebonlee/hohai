@@ -1,5 +1,20 @@
 # 개발 변경 이력 (CHANGELOG)
 
+## 2026-02-22 — 시(Poem) 무드 기반 배경 디자인
+
+### 추가
+- `MOOD_LIGHT_GRADIENTS` — 무드별 밝은 4색 그라디언트 (시 상세 페이지 배경용)
+- `MOOD_CARD_GRADIENTS` — 무드별 2색 그라디언트 (시 카드 배경용)
+- `MOOD_ACCENT_COLORS` — 무드별 장식 색상 (장식선, 태그 배경 등)
+- PoemEffects 컴포넌트 — 시 상세 페이지 Canvas 배경 효과 (LyricsEffects 재활용, opacity 0.3)
+
+### 변경
+- PoemDetailPage: 카테고리 기반 무드 그라디언트 배경 + 무드별 장식선/태그 색상
+- PoemCard: `CARD_GRADIENTS[bg_theme]` → `MOOD_CARD_GRADIENTS[category]` (카테고리별 고유 색상)
+- LyricsEffects: draw 함수·헬퍼 export (PoemEffects 재활용)
+
+---
+
 ## 2026-02-21 (9차) — 관리자 페이지 와이드 레이아웃 (1400px)
 
 ### 변경

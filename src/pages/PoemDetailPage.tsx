@@ -1,8 +1,11 @@
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/layout/PageTransition';
+import PoemEffects from '../components/ui/PoemEffects';
 import { usePoemDetail } from '../hooks/usePoems';
 import { CATEGORY_COLORS } from '../lib/constants';
+import type { MoodKey } from '../lib/mood';
+import { MOOD_LIGHT_GRADIENTS, MOOD_ACCENT_COLORS } from '../lib/mood';
 import styles from './PoemDetailPage.module.css';
 
 export default function PoemDetailPage() {
@@ -28,6 +31,13 @@ export default function PoemDetailPage() {
   // 연(stanza) 단위로 분리
   const stanzas = poem.content.split(/\n\s*\n/).filter(Boolean);
 
+  // 카테고리 → MoodKey
+  const mood: MoodKey = (MOOD_LIGHT_GRADIENTS[poem.category as MoodKey])
+    ? poem.category as MoodKey
+    : 'default';
+  const bg = MOOD_LIGHT_GRADIENTS[mood];
+  const accent = MOOD_ACCENT_COLORS[mood];
+
   return (
     <PageTransition>
       <Helmet>
@@ -35,7 +45,17 @@ export default function PoemDetailPage() {
         <meta name="description" content={poem.excerpt || poem.content.slice(0, 120)} />
       </Helmet>
 
-      <div className={styles.page}>
+      <div
+        className={styles.page}
+        style={{
+          '--poem-bg1': bg.c1,
+          '--poem-bg2': bg.c2,
+          '--poem-bg3': bg.c3,
+          '--poem-bg4': bg.c4,
+          '--mood-accent': accent,
+        } as React.CSSProperties}
+      >
+        <PoemEffects mood={mood} />
         <div className={styles.inner}>
           <Link to="/poems" className={styles.backLink}>
             ← 시 목록으로

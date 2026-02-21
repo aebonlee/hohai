@@ -12,11 +12,11 @@ interface Props {
   isActive: boolean;
 }
 
-const rand = (a: number, b: number) => Math.random() * (b - a) + a;
-const PARTICLE_COUNT = 40;
+export const rand = (a: number, b: number) => Math.random() * (b - a) + a;
+export const PARTICLE_COUNT = 40;
 
 // ---- Particle initializers ----
-function initParticles(w: number, h: number): Float64Array {
+export function initParticles(w: number, h: number): Float64Array {
   const p = new Float64Array(PARTICLE_COUNT * 4);
   for (let i = 0; i < PARTICLE_COUNT; i++) {
     p[i * 4] = rand(0, w);
@@ -489,7 +489,12 @@ function drawDefault(
 }
 
 // ==== Draw dispatcher ====
-const DRAW_FNS: Record<MoodKey, (
+export type DrawFn = (
+  ctx: CanvasRenderingContext2D, w: number, h: number, t: number,
+  p: Float64Array, c: { primary: [number, number, number]; secondary: [number, number, number] },
+) => void;
+
+export const DRAW_FNS: Record<MoodKey, (
   ctx: CanvasRenderingContext2D, w: number, h: number, t: number,
   p: Float64Array, c: { primary: [number, number, number]; secondary: [number, number, number] },
 ) => void> = {

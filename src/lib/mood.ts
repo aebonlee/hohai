@@ -28,6 +28,48 @@ export const MOOD_GRADIENTS: Record<MoodKey, { c1: string; c2: string; c3: strin
   default: { c1: '#071A33', c2: '#0A3D7A', c3: '#1466A8', c4: '#0D5699' },
 };
 
+/** 무드별 밝은 톤 4색 그라디언트 (시 상세 페이지 배경용) */
+export const MOOD_LIGHT_GRADIENTS: Record<MoodKey, { c1: string; c2: string; c3: string; c4: string }> = {
+  사랑:    { c1: '#FFF0ED', c2: '#FCDDD7', c3: '#F8D5CF', c4: '#FDE6E1' },
+  그리움:  { c1: '#EEF4FC', c2: '#DFE9F6', c3: '#D4E4F4', c4: '#E5EEF8' },
+  작별:    { c1: '#F6EEF4', c2: '#EDE0E9', c3: '#E6D2E2', c4: '#EFE4EC' },
+  추억:    { c1: '#FFF6EE', c2: '#FAE8D9', c3: '#F4DECA', c4: '#FCEEE0' },
+  인생:    { c1: '#ECF1FA', c2: '#DDE6F4', c3: '#D0DCF0', c4: '#E2EAF6' },
+  가족:    { c1: '#EDF8F0', c2: '#DDF0E3', c3: '#D0ECD8', c4: '#E3F2E8' },
+  자연:    { c1: '#EEF8F7', c2: '#DDF0ED', c3: '#D0ECE8', c4: '#E2F2EF' },
+  세상:    { c1: '#F2EEF6', c2: '#E8E0EE', c3: '#DED4E8', c4: '#EBE4F0' },
+  의지:    { c1: '#FBF6EC', c2: '#F5EBD5', c3: '#F0E0C0', c4: '#F7EDD8' },
+  default: { c1: '#F3F7FD', c2: '#ECF1F8', c3: '#E5EDF8', c4: '#EEF3FA' },
+};
+
+/** 무드별 카드 그라디언트 (시 카드 배경용) */
+export const MOOD_CARD_GRADIENTS: Record<MoodKey, { gradient: string }> = {
+  사랑:    { gradient: 'linear-gradient(135deg, #F0C8C0, #D4847A)' },
+  그리움:  { gradient: 'linear-gradient(135deg, #B8D4F0, #7BAFD4)' },
+  작별:    { gradient: 'linear-gradient(135deg, #E0C4D8, #C88FA8)' },
+  추억:    { gradient: 'linear-gradient(135deg, #F0D4B8, #E8A87C)' },
+  인생:    { gradient: 'linear-gradient(135deg, #A8C8E8, #4A90B8)' },
+  가족:    { gradient: 'linear-gradient(135deg, #B8E0C4, #8FC49A)' },
+  자연:    { gradient: 'linear-gradient(135deg, #A8DCD4, #5ABAC4)' },
+  세상:    { gradient: 'linear-gradient(135deg, #CCC0D8, #A0889C)' },
+  의지:    { gradient: 'linear-gradient(135deg, #E8D4A0, #D4A85A)' },
+  default: { gradient: 'linear-gradient(135deg, #B8D4F0, #6A9ED4)' },
+};
+
+/** 무드별 장식 색상 (장식선, 태그 배경 등) */
+export const MOOD_ACCENT_COLORS: Record<MoodKey, string> = {
+  사랑:    '#D4847A',
+  그리움:  '#7BAFD4',
+  작별:    '#C88FA8',
+  추억:    '#E8A87C',
+  인생:    '#4A90B8',
+  가족:    '#8FC49A',
+  자연:    '#5ABAC4',
+  세상:    '#A0889C',
+  의지:    '#D4A85A',
+  default: '#0A3D7A',
+};
+
 /** 무드별 파티클 RGB 색상 (primary + secondary) */
 export const MOOD_PARTICLE_COLORS: Record<MoodKey, { primary: [number, number, number]; secondary: [number, number, number] }> = {
   사랑:    { primary: [255, 160, 140], secondary: [255, 200, 200] },

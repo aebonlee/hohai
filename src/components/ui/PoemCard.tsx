@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { Poem } from '../../types/poem';
 import { CARD_GRADIENTS, CATEGORY_COLORS } from '../../lib/constants';
+import type { MoodKey } from '../../lib/mood';
+import { MOOD_CARD_GRADIENTS } from '../../lib/mood';
 import styles from './PoemCard.module.css';
 
 interface Props {
@@ -11,7 +13,8 @@ interface Props {
 
 export default function PoemCard({ poem, index = 0 }: Props) {
   const navigate = useNavigate();
-  const gradient = CARD_GRADIENTS[poem.bg_theme % CARD_GRADIENTS.length];
+  const gradient = MOOD_CARD_GRADIENTS[poem.category as MoodKey]?.gradient
+    ?? CARD_GRADIENTS[poem.bg_theme % CARD_GRADIENTS.length];
 
   const excerpt = poem.excerpt || poem.content.split('\n').slice(0, 4).join('\n');
 
