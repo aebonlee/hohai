@@ -108,6 +108,7 @@ function PoemsAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('');
   const [searchText, setSearchText] = useState('');
+  const todayStr = new Date().toISOString().split('T')[0];
   const [form, setForm] = useState<PoemInsert>({
     title: '',
     content: '',
@@ -119,14 +120,14 @@ function PoemsAdmin() {
     display_order: 0,
     is_featured: false,
     is_published: true,
-    written_date: null,
+    written_date: todayStr,
   });
 
   const resetForm = () => {
     setForm({
       title: '', content: '', excerpt: '', category: '사랑',
       series_id: null, tags: [], bg_theme: 0, display_order: 0,
-      is_featured: false, is_published: true, written_date: null,
+      is_featured: false, is_published: true, written_date: todayStr,
     });
     setEditingId(null);
   };
@@ -1162,7 +1163,7 @@ function DbInitAdmin() {
           display_order: p.page,
           is_featured: false,
           is_published: true,
-          written_date: '2008-08-15',
+          written_date: new Date().toISOString().split('T')[0],
         };
       });
 
@@ -1177,6 +1178,27 @@ function DbInitAdmin() {
     }
 
     addLog(`시 등록 완료! 성공: ${successCount}편, 실패: ${errorCount}편`);
+    setRunning(false);
+  };
+
+  const handleUpdateWrittenDates = async () => {
+    const today = new Date().toISOString().split('T')[0];
+    if (!window.confirm(`모든 시의 작성일을 ${today}(오늘)로 변경하시겠습니까?`)) return;
+    setRunning(true);
+    setLog([]);
+    addLog(`작성일 일괄 변경 시작 → ${today}`);
+
+    const { data, error: countErr } = await supabase
+      .from('hohai_poems')
+      .update({ written_date: today })
+      .neq('id', '00000000-0000-0000-0000-000000000000')
+      .select('id');
+
+    if (countErr) {
+      addLog(`업데이트 실패: ${countErr.message}`);
+    } else {
+      addLog(`${data?.length ?? 0}편의 작성일을 ${today}로 변경 완료!`);
+    }
     setRunning(false);
   };
 
@@ -1325,6 +1347,14 @@ function DbInitAdmin() {
           style={{ padding: '10px 20px', fontSize: '0.95rem' }}
         >
           카테고리/태그 일괄 업데이트
+        </button>
+        <button
+          className={styles.saveBtn}
+          onClick={handleUpdateWrittenDates}
+          disabled={running}
+          style={{ padding: '10px 20px', fontSize: '0.95rem' }}
+        >
+          작성일 → 오늘 날짜로 일괄 변경
         </button>
         <button
           className={styles.editBtn}
