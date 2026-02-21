@@ -1,5 +1,35 @@
 # 개발 변경 이력 (CHANGELOG)
 
+## 2026-02-21 (6차) — 추천 시 페이지 is_featured 기반 필터링
+
+### 변경
+- `usePoems` 훅에 `featuredOnly` 파라미터 추가 — `is_featured = true` 필터 지원
+- FeaturedPoemsPage에서 `featuredOnly=true` 전달하여 추천 시만 표시
+- 빈 상태 메시지: "아직 추천 시가 없습니다" / "이 카테고리에 추천 시가 없습니다"
+- AdminPage 시 편집 폼 체크박스 라벨: "대표 시" → "추천"
+- AdminPage 시 목록 테이블에 "추천" 컬럼 추가 (⭐ 표시)
+
+---
+
+## 2026-02-21 (5차) — 감상 후기 게시판 시스템 구현
+
+### 추가
+- `hohai_reviews` 테이블 마이그레이션 SQL (user_id FK, RLS 정책 3개)
+- `useAllReviews()` Admin 훅 — 전체 후기 조회/수정/삭제
+- ReviewsPage 로그인 필수 작성, 피드백 메시지, 본인 삭제 기능
+- AdminPage 후기 관리 탭 — 공개/비공개 토글 + 삭제
+
+---
+
+## 2026-02-21 (4차) — 추천 시 페이지 카테고리별 그룹 표시 + PoemCard 태그 표시
+
+### 추가
+- FeaturedPoemsPage 카테고리별 그룹 섹션 표시 (전체 보기 시)
+- FeaturedPoemsPage 카테고리 통계 바 (카테고리별 시 수 칩)
+- PoemCard 태그 표시 (해시태그 목록)
+
+---
+
 ## 2026-02-21 (3차) — 시 177편 카테고리 분류 + 해시태그 등록 + Admin 관리 강화
 
 ### 추가

@@ -12,7 +12,7 @@ import styles from './FeaturedPoemsPage.module.css';
 export default function FeaturedPoemsPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const { categories } = useCategories();
-  const { poems, loading } = usePoems(selectedCategory || undefined);
+  const { poems, loading } = usePoems(selectedCategory || undefined, undefined, true);
 
   // 카테고리별 그룹핑 (전체 보기일 때만)
   const groupedByCategory: { name: string; poems: Poem[] }[] = [];
@@ -129,8 +129,8 @@ export default function FeaturedPoemsPage() {
           ) : (
             <p className={styles.empty}>
               {selectedCategory
-                ? '이 카테고리에 등록된 시가 없습니다.'
-                : '아직 등록된 시가 없습니다.'}
+                ? '이 카테고리에 추천 시가 없습니다.'
+                : '아직 추천 시가 없습니다.'}
             </p>
           )}
         </div>

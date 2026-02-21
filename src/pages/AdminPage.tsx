@@ -260,6 +260,7 @@ function PoemsAdmin() {
               <th>시집</th>
               <th>카테고리</th>
               <th>태그</th>
+              <th>추천</th>
               <th>상태</th>
               <th>순서</th>
               <th>작업</th>
@@ -285,6 +286,9 @@ function PoemsAdmin() {
                   {(poem.tags || []).length > 0
                     ? poem.tags.map(t => `#${t}`).join(' ')
                     : '-'}
+                </td>
+                <td style={{ textAlign: 'center', fontSize: '1.1rem' }}>
+                  {poem.is_featured ? '⭐' : ''}
                 </td>
                 <td>
                   <span className={`${styles.statusBadge} ${poem.is_published ? styles.published : styles.draft}`}>
@@ -423,7 +427,7 @@ function PoemsAdmin() {
                     checked={form.is_featured}
                     onChange={(e) => setForm({ ...form, is_featured: e.target.checked })}
                   />
-                  대표 시
+                  추천
                 </label>
               </div>
               <div className={styles.modalActions}>

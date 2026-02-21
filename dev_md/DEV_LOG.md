@@ -1098,3 +1098,46 @@ CREATE TABLE hohai_reviews (
 - 로그인: 후기 작성 → 목록에 즉시 표시
 - 본인 삭제: 자기가 쓴 후기만 삭제 버튼 표시
 - Admin: 후기 관리 탭에서 모든 후기 조회 + 공개/비공개 토글 + 삭제
+
+---
+
+## 2026-02-21 (6차) — 추천 시 페이지 is_featured 기반 필터링 구현
+
+### 배경
+- "추천 시(詩)" 페이지(`/poems`, `FeaturedPoemsPage`)가 **모든 공개 시(177편)**를 표시하고 있었음
+- `is_featured` 필드가 DB 스키마와 Admin 폼(체크박스)에 존재했지만, 공개 페이지에서 필터로 사용하지 않음
+- 시집 소개(`/poem-series`)에서는 시집별 전체 시가 이미 표시되므로, 추천 시 페이지는 관리자가 선별한 시만 노출해야 함
+
+### 변경 내역
+
+#### 1. `src/hooks/usePoems.ts` — `featuredOnly` 파라미터 추가
+
+- `usePoems(categorySlug?, seriesId?, featuredOnly?)` 세 번째 인자 추가
+- `featuredOnly === true`이면 Supabase 쿼리에 `.eq('is_featured', true)` 필터 추가
+- `useCallback` 의존성 배열에 `featuredOnly` 추가
+
+#### 2. `src/pages/FeaturedPoemsPage.tsx` — 추천 시만 조회
+
+- `usePoems(selectedCategory || undefined, undefined, true)` — `featuredOnly=true` 전달
+- 빈 상태 메시지 변경:
+  - 카테고리 선택 시: "이 카테고리에 추천 시가 없습니다."
+  - 전체 보기: "아직 추천 시가 없습니다."
+
+#### 3. `src/pages/AdminPage.tsx` — Admin UI 개선
+
+- PoemsAdmin 체크박스 라벨: "대표 시" → "추천"
+- 시 목록 테이블에 "추천" 컬럼 추가 (추천 시는 ⭐ 표시)
+
+### 파일 변경 요약
+```
+ src/hooks/usePoems.ts          | 6+ (featuredOnly 파라미터 + 필터 + 의존성)
+ src/pages/FeaturedPoemsPage.tsx | 4~ (featuredOnly=true 전달 + 빈 상태 메시지)
+ src/pages/AdminPage.tsx         | 6~ (라벨 변경 + 추천 컬럼 추가)
+ 3 files changed
+```
+
+### 검증 시나리오
+- Admin에서 시 편집 → "추천" 체크 → 저장
+- `/poems` 페이지: 추천 체크된 시만 표시
+- `/poem-series/:slug` 페이지: 기존처럼 시집 내 모든 시 표시 (영향 없음)
+- 추천 시가 0편일 때 "아직 추천 시가 없습니다" 빈 상태 메시지 확인

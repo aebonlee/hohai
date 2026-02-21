@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Poem, PoemInsert, PoemUpdate } from '../types/poem';
 
-export function usePoems(categorySlug?: string, seriesId?: string) {
+export function usePoems(categorySlug?: string, seriesId?: string, featuredOnly?: boolean) {
   const [poems, setPoems] = useState<Poem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +24,9 @@ export function usePoems(categorySlug?: string, seriesId?: string) {
     if (seriesId) {
       query = query.eq('series_id', seriesId);
     }
+    if (featuredOnly) {
+      query = query.eq('is_featured', true);
+    }
 
     const { data, error: err } = await query;
 
@@ -34,7 +37,7 @@ export function usePoems(categorySlug?: string, seriesId?: string) {
       setPoems((data as Poem[]) || []);
     }
     setLoading(false);
-  }, [categorySlug, seriesId]);
+  }, [categorySlug, seriesId, featuredOnly]);
 
   useEffect(() => {
     fetchPoems();
