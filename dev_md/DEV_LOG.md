@@ -843,3 +843,56 @@ export type CategoryUpdate = Partial<CategoryInsert>
 4. **시 관리** 탭에서 시 등록 (시집 선택, 카테고리 지정)
 5. **앨범 관리** 탭에서 앨범(시리즈) 등록
 6. **노래 관리** 탭에서 노래 등록 (YouTube ID 또는 Suno URL, 앨범 선택)
+
+---
+
+## 2026-02-21 (2차) — DB 초기화 탭 + 시 177편 일괄 등록 기능
+
+### 배경
+- Supabase DB에 migration.sql로 삽입된 샘플 시리즈 10개 + 카테고리 6개가 남아있음
+- RLS 정책으로 anon key로는 삭제 불가 → Admin 페이지에 초기화 기능 추가 필요
+- 사용자가 poem.pdf (178페이지, 好海 이성헌 '3차 퇴고 완성작') 제공 → 실제 시 데이터 등록 요청
+
+### 변경 내역
+
+#### 1. poem.pdf 파싱 (Node.js pdf-parse)
+- 178페이지 PDF에서 텍스트 추출
+- `- N -` 페이지 번호 패턴으로 각 시의 경계를 파싱
+- **177편의 시** 추출 (page 2~178, 가나다순 정렬)
+- 5개의 페이지 경계 걸침 시 올바르게 병합 처리
+- 결과: `poems_parsed.json` (122KB)
+
+#### 2. `src/data/poems.ts` 생성
+- 파싱된 177편의 시를 TypeScript 데이터 파일로 변환
+- `POEM_DATA` 배열 export: `{ page, title, content }[]`
+
+#### 3. AdminPage 'DB 초기화' 탭 추가
+
+**DbInitAdmin 컴포넌트** — 2개 기능 버튼 + 실시간 로그:
+
+1. **전체 데이터 삭제** 버튼:
+   - `hohai_poems` → `hohai_songs` → `hohai_series` → `hohai_categories` 순서로 삭제
+   - FK 참조 순서 고려 (시/노래 먼저 → 시리즈 → 카테고리)
+   - 인증된 사용자(admin)만 삭제 가능 (RLS 정책)
+
+2. **시 177편 일괄 등록** 버튼:
+   - Step 1: 카테고리 '시' 등록 (upsert)
+   - Step 2: 시집 '3차 퇴고 완성작' 시리즈 생성
+   - Step 3: 177편의 시를 20편씩 배치 등록 (9 배치)
+   - 각 시: title, content, excerpt(첫 4행), category='시', series_id, bg_theme(0-7 순환), display_order=page번호, written_date='2008-08-15'
+
+3. **실시간 로그 패널**: 작업 진행 상황을 시간+메시지로 표시
+
+### 파일 변경 요약
+```
+ src/data/poems.ts       | 895+ (신규 — 177편 시 데이터)
+ src/pages/AdminPage.tsx | 153+ (DB 초기화 탭 + DbInitAdmin 컴포넌트)
+ 2 files changed, 1048 insertions(+), 1 deletion(-)
+```
+
+### 사용 방법
+1. `/admin` → 관리자 로그인
+2. **DB 초기화** 탭 클릭
+3. **전체 데이터 삭제** → 기존 샘플 데이터 제거
+4. **시 177편 일괄 등록** → 카테고리 + 시집 + 177편 자동 등록
+5. **시 관리** 탭에서 등록된 시 확인 가능
