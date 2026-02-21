@@ -16,11 +16,62 @@ import type { SeriesInsert } from '../types/series';
 import { SUNO_ALBUM_DEFS, SUNO_SONGS } from '../data/suno-songs';
 import styles from './AdminPage.module.css';
 
-type Tab = 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'categories' | 'reviews' | 'db-init';
+type Tab = 'dashboard' | 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'poem-categories' | 'reviews' | 'batch-seed' | 'data-manage';
+
+const MENU_ITEMS: { group: string; items: { tab: Tab; label: string; icon: string }[] }[] = [
+  {
+    group: '',
+    items: [{ tab: 'dashboard', label: '대시보드', icon: '{}' }],
+  },
+  {
+    group: '시',
+    items: [
+      { tab: 'poems', label: '시 관리', icon: '{}' },
+      { tab: 'poem-boards', label: '시집 관리', icon: '{}' },
+      { tab: 'poem-categories', label: '시 카테고리', icon: '{}' },
+    ],
+  },
+  {
+    group: '노래',
+    items: [
+      { tab: 'songs', label: '노래 관리', icon: '{}' },
+      { tab: 'song-boards', label: '앨범 관리', icon: '{}' },
+    ],
+  },
+  {
+    group: '커뮤니티',
+    items: [{ tab: 'reviews', label: '후기 관리', icon: '{}' }],
+  },
+  {
+    group: '도구',
+    items: [
+      { tab: 'batch-seed', label: '일괄 등록', icon: '{}' },
+      { tab: 'data-manage', label: '데이터 관리', icon: '{}' },
+    ],
+  },
+];
+
+const TAB_LABELS: Record<Tab, string> = {
+  dashboard: '대시보드',
+  poems: '시 관리',
+  'poem-boards': '시집 관리',
+  'poem-categories': '시 카테고리',
+  songs: '노래 관리',
+  'song-boards': '앨범 관리',
+  reviews: '후기 관리',
+  'batch-seed': '일괄 등록',
+  'data-manage': '데이터 관리',
+};
 
 export default function AdminPage() {
   const { signOut } = useAuth();
-  const [activeTab, setActiveTab] = useState<Tab>('poems');
+  const [activeTab, setActiveTab] = useState<Tab>('dashboard');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    setMobileMenuOpen(false);
+  };
 
   return (
     <>
@@ -39,59 +90,114 @@ export default function AdminPage() {
         </div>
 
         <div className={styles.content}>
-          <div className={styles.tabs}>
+          {/* 모바일 메뉴 */}
+          <div className={styles.mobileMenuBar}>
             <button
-              className={`${styles.tab} ${activeTab === 'poems' ? styles.active : ''}`}
-              onClick={() => setActiveTab('poems')}
+              className={`${styles.mobileMenuToggle} ${mobileMenuOpen ? styles.open : ''}`}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              시 관리
+              <span>{TAB_LABELS[activeTab]}</span>
+              <span>&#9662;</span>
             </button>
-            <button
-              className={`${styles.tab} ${activeTab === 'poem-boards' ? styles.active : ''}`}
-              onClick={() => setActiveTab('poem-boards')}
-            >
-              시집 관리
-            </button>
-            <button
-              className={`${styles.tab} ${activeTab === 'songs' ? styles.active : ''}`}
-              onClick={() => setActiveTab('songs')}
-            >
-              노래 관리
-            </button>
-            <button
-              className={`${styles.tab} ${activeTab === 'song-boards' ? styles.active : ''}`}
-              onClick={() => setActiveTab('song-boards')}
-            >
-              앨범 관리
-            </button>
-            <button
-              className={`${styles.tab} ${activeTab === 'categories' ? styles.active : ''}`}
-              onClick={() => setActiveTab('categories')}
-            >
-              카테고리 관리
-            </button>
-            <button
-              className={`${styles.tab} ${activeTab === 'reviews' ? styles.active : ''}`}
-              onClick={() => setActiveTab('reviews')}
-            >
-              후기 관리
-            </button>
-            <button
-              className={`${styles.tab} ${activeTab === 'db-init' ? styles.active : ''}`}
-              onClick={() => setActiveTab('db-init')}
-              style={{ color: activeTab === 'db-init' ? '#c0453a' : undefined }}
-            >
-              DB 초기화
-            </button>
+            {mobileMenuOpen && (
+              <div className={styles.mobileDropdown}>
+                {MENU_ITEMS.map((group) => (
+                  <div key={group.group || '_dashboard'}>
+                    {group.group && (
+                      <div className={styles.mobileGroupLabel}>{group.group}</div>
+                    )}
+                    {group.items.map((item) => (
+                      <button
+                        key={item.tab}
+                        className={`${styles.mobileMenuItem} ${activeTab === item.tab ? styles.active : ''}`}
+                        onClick={() => handleTabChange(item.tab)}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {activeTab === 'poems' && <PoemsAdmin />}
-          {activeTab === 'poem-boards' && <BoardSeriesAdmin seriesType="poem" typeLabel="시집" itemLabel="시" />}
-          {activeTab === 'songs' && <SongsAdmin />}
-          {activeTab === 'song-boards' && <BoardSeriesAdmin seriesType="song" typeLabel="앨범" itemLabel="노래" />}
-          {activeTab === 'categories' && <CategoriesAdmin />}
-          {activeTab === 'reviews' && <ReviewsAdmin />}
-          {activeTab === 'db-init' && <DbInitAdmin />}
+          {/* 사이드바 */}
+          <nav className={styles.sidebar}>
+            {MENU_ITEMS.map((group) => (
+              <div key={group.group || '_dashboard'}>
+                {group.group && (
+                  <div className={styles.sidebarGroup}>{group.group}</div>
+                )}
+                {group.items.map((item) => (
+                  <button
+                    key={item.tab}
+                    className={`${styles.sidebarItem} ${activeTab === item.tab ? styles.active : ''}`}
+                    onClick={() => setActiveTab(item.tab)}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </nav>
+
+          {/* 메인 컨텐츠 */}
+          <div className={styles.main}>
+            {activeTab === 'dashboard' && <DashboardAdmin onNavigate={setActiveTab} />}
+            {activeTab === 'poems' && <PoemsAdmin />}
+            {activeTab === 'poem-boards' && <BoardSeriesAdmin seriesType="poem" typeLabel="시집" itemLabel="시" />}
+            {activeTab === 'songs' && <SongsAdmin />}
+            {activeTab === 'song-boards' && <BoardSeriesAdmin seriesType="song" typeLabel="앨범" itemLabel="노래" />}
+            {activeTab === 'poem-categories' && <CategoriesAdmin />}
+            {activeTab === 'reviews' && <ReviewsAdmin />}
+            {activeTab === 'batch-seed' && <BatchSeedAdmin />}
+            {activeTab === 'data-manage' && <DataManageAdmin />}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ========================================
+   대시보드 컴포넌트
+   ======================================== */
+function DashboardAdmin({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
+  const { poems, loading: poemsLoading } = useAllPoems();
+  const { songs, loading: songsLoading } = useAllSongs();
+  const { series, loading: seriesLoading } = useAllSeries();
+  const { reviews, loading: reviewsLoading } = useAllReviews();
+
+  const loading = poemsLoading || songsLoading || seriesLoading || reviewsLoading;
+  const poemSeriesCount = series.filter(s => s.type === 'poem').length;
+  const songSeriesCount = series.filter(s => s.type === 'song').length;
+
+  return (
+    <>
+      <div className={styles.header}>
+        <h2>대시보드</h2>
+      </div>
+
+      <div className={styles.dashboardGrid}>
+        <div className={styles.statCard} onClick={() => onNavigate('poems')}>
+          <div className={styles.statLabel}>시</div>
+          <div className={styles.statValue}>{loading ? '...' : poems.length}</div>
+          <div className={styles.statHint}>시집 {poemSeriesCount}개 &rarr;</div>
+        </div>
+        <div className={styles.statCard} onClick={() => onNavigate('songs')}>
+          <div className={styles.statLabel}>노래</div>
+          <div className={styles.statValue}>{loading ? '...' : songs.length}</div>
+          <div className={styles.statHint}>앨범 {songSeriesCount}개 &rarr;</div>
+        </div>
+        <div className={styles.statCard} onClick={() => onNavigate('poem-boards')}>
+          <div className={styles.statLabel}>시리즈</div>
+          <div className={styles.statValue}>{loading ? '...' : series.length}</div>
+          <div className={styles.statHint}>시집 + 앨범 &rarr;</div>
+        </div>
+        <div className={styles.statCard} onClick={() => onNavigate('reviews')}>
+          <div className={styles.statLabel}>후기</div>
+          <div className={styles.statValue}>{loading ? '...' : reviews.length}</div>
+          <div className={styles.statHint}>감상 후기 &rarr;</div>
         </div>
       </div>
     </>
@@ -1084,35 +1190,13 @@ function ReviewsAdmin() {
 }
 
 /* ========================================
-   DB 초기화 & 시 일괄 등록 컴포넌트
+   일괄 등록 컴포넌트
    ======================================== */
-function DbInitAdmin() {
+function BatchSeedAdmin() {
   const [log, setLog] = useState<string[]>([]);
   const [running, setRunning] = useState(false);
 
   const addLog = (msg: string) => setLog(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
-
-  const handleClearAll = async () => {
-    if (!window.confirm('정말 모든 데이터를 삭제하시겠습니까?\n(시, 노래, 시리즈, 카테고리 전부 삭제됩니다)')) return;
-    setRunning(true);
-    setLog([]);
-    addLog('데이터 삭제 시작...');
-
-    const { error: e1 } = await supabase.from('hohai_poems').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    addLog(e1 ? `시 삭제 실패: ${e1.message}` : '시 삭제 완료');
-
-    const { error: e2 } = await supabase.from('hohai_songs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    addLog(e2 ? `노래 삭제 실패: ${e2.message}` : '노래 삭제 완료');
-
-    const { error: e3 } = await supabase.from('hohai_series').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    addLog(e3 ? `시리즈 삭제 실패: ${e3.message}` : '시리즈 삭제 완료');
-
-    const { error: e4 } = await supabase.from('hohai_categories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    addLog(e4 ? `카테고리 삭제 실패: ${e4.message}` : '카테고리 삭제 완료');
-
-    addLog('전체 삭제 완료!');
-    setRunning(false);
-  };
 
   const handleSeedPoems = async () => {
     if (!window.confirm('177편의 시를 일괄 등록하시겠습니까?\n(시집 "3차 퇴고 완성작" 생성 후 시 등록)')) return;
@@ -1307,7 +1391,7 @@ function DbInitAdmin() {
     addLog(`\n총 시: ${poems.length}편`);
     addLog('--- 카테고리별 현황 ---');
     for (const [cat, count] of Object.entries(catStats).sort((a, b) => b[1] - a[1])) {
-      const bar = '█'.repeat(Math.round(count / 2));
+      const bar = '\u2588'.repeat(Math.round(count / 2));
       addLog(`  ${cat.padEnd(4)} ${String(count).padStart(3)}편 ${bar}`);
     }
 
@@ -1342,7 +1426,7 @@ function DbInitAdmin() {
         addLog(`앨범 "${album.name}" 생성 실패: ${error.message}`);
       } else if (data) {
         albumIdMap[album.slug] = data.id;
-        addLog(`  ✓ ${album.name} (${album.slug})`);
+        addLog(`  \u2713 ${album.name} (${album.slug})`);
       }
     }
     addLog(`앨범 ${Object.keys(albumIdMap).length}개 등록 완료`);
@@ -1399,18 +1483,10 @@ function DbInitAdmin() {
   return (
     <>
       <div className={styles.header}>
-        <h2>DB 초기화 & 일괄 관리</h2>
+        <h2>일괄 등록</h2>
       </div>
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
-        <button
-          className={styles.deleteBtn}
-          onClick={handleClearAll}
-          disabled={running}
-          style={{ padding: '10px 20px', fontSize: '0.95rem' }}
-        >
-          전체 데이터 삭제
-        </button>
         <button
           className={styles.addBtn}
           onClick={handleSeedPoems}
@@ -1471,8 +1547,6 @@ function DbInitAdmin() {
           <p style={{ color: 'var(--text-muted)' }}>
             버튼을 클릭하면 로그가 표시됩니다.
             <br /><br />
-            <strong>전체 데이터 삭제</strong>: 시, 노래, 시리즈, 카테고리 전부 삭제
-            <br />
             <strong>시 177편 일괄 등록</strong>: 카테고리 9개 + 시집 + 177편 시 (분류 포함) 자동 등록
             <br />
             <strong>노래 일괄 등록</strong>: Suno AI 곡 7개 앨범으로 분류 + 중복 제거 후 일괄 등록
@@ -1485,6 +1559,78 @@ function DbInitAdmin() {
           log.map((line, i) => <div key={i}>{line}</div>)
         )}
       </div>
+    </>
+  );
+}
+
+/* ========================================
+   데이터 관리 컴포넌트
+   ======================================== */
+function DataManageAdmin() {
+  const [log, setLog] = useState<string[]>([]);
+  const [running, setRunning] = useState(false);
+
+  const addLog = (msg: string) => setLog(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
+
+  const handleClearAll = async () => {
+    if (!window.confirm('정말 모든 데이터를 삭제하시겠습니까?\n(시, 노래, 시리즈, 카테고리 전부 삭제됩니다)')) return;
+    setRunning(true);
+    setLog([]);
+    addLog('데이터 삭제 시작...');
+
+    const { error: e1 } = await supabase.from('hohai_poems').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    addLog(e1 ? `시 삭제 실패: ${e1.message}` : '시 삭제 완료');
+
+    const { error: e2 } = await supabase.from('hohai_songs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    addLog(e2 ? `노래 삭제 실패: ${e2.message}` : '노래 삭제 완료');
+
+    const { error: e3 } = await supabase.from('hohai_series').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    addLog(e3 ? `시리즈 삭제 실패: ${e3.message}` : '시리즈 삭제 완료');
+
+    const { error: e4 } = await supabase.from('hohai_categories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    addLog(e4 ? `카테고리 삭제 실패: ${e4.message}` : '카테고리 삭제 완료');
+
+    addLog('전체 삭제 완료!');
+    setRunning(false);
+  };
+
+  return (
+    <>
+      <div className={styles.header}>
+        <h2>데이터 관리</h2>
+      </div>
+
+      <div className={styles.dangerZone}>
+        <div className={styles.dangerTitle}>위험 영역</div>
+        <div className={styles.dangerDesc}>
+          아래 작업은 되돌릴 수 없습니다. 실행 전 반드시 확인하세요.
+        </div>
+        <button
+          className={styles.deleteBtn}
+          onClick={handleClearAll}
+          disabled={running}
+          style={{ padding: '10px 20px', fontSize: '0.95rem' }}
+        >
+          전체 데이터 삭제
+        </button>
+      </div>
+
+      {log.length > 0 && (
+        <div style={{
+          background: 'var(--bg-secondary)',
+          borderRadius: 8,
+          padding: 16,
+          fontFamily: 'monospace',
+          fontSize: '0.85rem',
+          maxHeight: 300,
+          overflowY: 'auto',
+          lineHeight: 1.6,
+          whiteSpace: 'pre-wrap',
+          marginTop: 20,
+        }}>
+          {log.map((line, i) => <div key={i}>{line}</div>)}
+        </div>
+      )}
     </>
   );
 }

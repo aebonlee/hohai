@@ -1256,3 +1256,110 @@ ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS suno_url TEXT;
 - `/songs` 페이지(추천 노래): 추천 체크된 곡만 표시
 - `/songs/series/:slug` (앨범 상세): 앨범별 곡 정상 표시
 - SongCard에서 Suno embed 재생 확인
+
+---
+
+## 2026-02-21 (8차) — 관리자 페이지 리디자인: 대시보드 + 사이드바 메뉴
+
+### 배경
+- 기존 AdminPage는 수평 탭 7개로 구성 — 메뉴가 길고 역할 불명확
+- "카테고리 관리"가 시 카테고리인지 노래 카테고리인지 구분 불가
+- "DB 초기화" 탭에 일괄 등록/삭제/통계 등 성격이 다른 작업 혼재
+- 대시보드(통계 요약)가 없어 관리 현황 파악 어려움
+
+### 변경 내역
+
+#### 1. Tab 타입 변경 + 대시보드 추가
+
+**Tab 타입**:
+- 기존: `'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'categories' | 'reviews' | 'db-init'`
+- 변경: `'dashboard' | 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'poem-categories' | 'reviews' | 'batch-seed' | 'data-manage'`
+
+**변경 포인트**:
+- `'categories'` → `'poem-categories'` (시 카테고리 명확화)
+- `'db-init'` → `'batch-seed'` + `'data-manage'` (기능별 분리)
+- `'dashboard'` 추가 (기본 탭)
+
+**DashboardAdmin 컴포넌트** (신규):
+- 4개 통계 카드: 시 총 수, 노래 총 수, 시리즈 수, 후기 수
+- 각 카드 클릭 시 해당 관리 탭으로 이동 (`onNavigate` 콜백)
+- 기존 hooks (`useAllPoems`, `useAllSongs`, `useAllSeries`, `useAllReviews`)의 count 활용
+- 카드 hover 효과: 그림자 + 약간의 translateY
+
+#### 2. 사이드바 레이아웃 변경
+
+**기존**: 수평 `.tabs` → 7개 탭 버튼 나열
+**변경**: 좌측 사이드바 240px 고정 + 우측 `.main` 영역
+
+**사이드바 메뉴 그룹 구조** (`MENU_ITEMS` 배열):
+```
+[대시보드]
+
+시 ───────────
+  시 관리
+  시집 관리
+  시 카테고리
+
+노래 ──────────
+  노래 관리
+  앨범 관리
+
+커뮤니티 ──────
+  후기 관리
+
+도구 ──────────
+  일괄 등록
+  데이터 관리
+```
+
+**CSS 변경**:
+- `.tabs` / `.tab` → `.sidebar` / `.sidebarItem` / `.sidebarGroup`
+- `.content`: `padding` 기반 → `display: flex` (사이드바 + 메인)
+- `.sidebarItem.active`: 좌측 3px 골드 border + 배경 하이라이트
+- `.sidebar`: `position: sticky`, `top: 60px`, `height: calc(100vh - 60px)`
+
+#### 3. DbInitAdmin 분리
+
+**BatchSeedAdmin** (일괄 등록):
+- 시 177편 일괄 등록
+- 노래 N곡 일괄 등록
+- 카테고리/태그 일괄 업데이트
+- 작성일 일괄 변경
+- 카테고리 현황 보기
+
+**DataManageAdmin** (데이터 관리):
+- 전체 데이터 삭제 — `.dangerZone` 빨간 경고 영역으로 감싸기
+- `border: 2px solid rgba(229, 115, 115, 0.4)` + 빨간 배경
+- "위험 영역" 제목 + 경고 메시지 표시
+- 로그는 실행 후에만 표시
+
+#### 4. 모바일 반응형 처리
+
+- 768px 이하: `.sidebar` 숨김 → `.mobileMenuBar` 표시
+- `.mobileMenuToggle`: 현재 선택된 메뉴명 + ▾ 토글 버튼
+- `.mobileDropdown`: 전체 메뉴 드롭다운 (그룹별 구분)
+- `.mobileMenuItem.active`: 활성 메뉴 하이라이트
+- 대시보드 그리드: 4열 → 2열
+
+### 파일 변경 요약
+```
+ src/pages/AdminPage.tsx        | Tab 타입 변경, DashboardAdmin 추가, 사이드바 메뉴 구조, DbInitAdmin 분리
+ src/pages/AdminPage.module.css | 사이드바 레이아웃, 대시보드 카드, 위험 영역, 모바일 드롭다운
+ dev_md/CHANGELOG.md            | 8차 변경 이력 추가
+ dev_md/DEV_LOG.md              | 8차 개발일지 추가
+ 4 files changed
+```
+
+### 빌드 결과
+- `npx tsc --noEmit` 통과
+- `npx vite build` 성공
+  - `dist/assets/index-*.css`: 67.79 kB (gzip 12.68 kB)
+  - `dist/assets/index-*.js`: 700.95 kB (gzip 208.76 kB)
+
+### 검증 시나리오
+- 대시보드: 시/노래/시리즈/후기 숫자 표시, 카드 클릭 시 탭 전환
+- 사이드바: 그룹별 메뉴 표시, 클릭 시 탭 전환, active 표시
+- "시 카테고리" 탭: 기존 CategoriesAdmin 동작 확인
+- "일괄 등록" 탭: 시/노래 일괄 등록 + 카테고리 업데이트 + 통계 보기
+- "데이터 관리" 탭: 전체 삭제 버튼 + 빨간 경고 표시
+- 모바일 뷰: 사이드바 → 드롭다운 전환, 메뉴 선택 시 닫힘

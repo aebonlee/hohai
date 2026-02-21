@@ -1,5 +1,25 @@
 # 개발 변경 이력 (CHANGELOG)
 
+## 2026-02-21 (8차) — 관리자 페이지 리디자인: 대시보드 + 사이드바 메뉴
+
+### 추가
+- DashboardAdmin 컴포넌트 — 시/노래/시리즈/후기 4개 통계 카드, 클릭 시 해당 탭 이동
+- 좌측 사이드바 메뉴 — 5개 그룹(대시보드, 시, 노래, 커뮤니티, 도구)으로 메뉴 정리
+- DataManageAdmin 컴포넌트 — 위험 영역(빨간 경고) 데이터 삭제 전용
+- 모바일 반응형 — 768px 이하에서 사이드바 → 드롭다운 메뉴 전환
+
+### 변경
+- Tab 타입: `'categories'` → `'poem-categories'`, `'db-init'` → `'batch-seed'` + `'data-manage'`
+- 기본 탭: `'poems'` → `'dashboard'`
+- 수평 탭 7개 → 사이드바 그룹 메뉴 9개로 재구성
+- DbInitAdmin → BatchSeedAdmin (일괄 등록) + DataManageAdmin (데이터 관리) 분리
+- `.content` 레이아웃: 단일 컬럼 → `flex` (사이드바 240px + 메인)
+
+### 제거
+- `.tabs` / `.tab` CSS 클래스 (수평 탭 스타일 제거)
+
+---
+
 ## 2026-02-21 (6차) — 추천 시 페이지 is_featured 기반 필터링
 
 ### 변경
