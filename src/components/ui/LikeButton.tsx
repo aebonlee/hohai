@@ -29,7 +29,7 @@ export default function LikeButton({ targetType, targetId }: Props) {
       title={liked ? '좋아요 취소' : '좋아요'}
     >
       <span className={styles.heart}>{liked ? '♥' : '♡'}</span>
-      {count > 0 && <span className={styles.count}>{count}</span>}
+      좋아요{count > 0 && <span className={styles.count}>{count}</span>}
     </button>
   );
 }
