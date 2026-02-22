@@ -9,7 +9,7 @@ export default function Footer() {
           <div className={styles.brand}>好海</div>
           <p className={styles.desc}>
             시와 노래로 전하는 마음.<br />
-            호해 이성헌 시인의 작품 세계를 만나보세요.
+            好海 이성헌 시인의 작품 세계를 만나보세요.
           </p>
         </div>
         <div className={styles.linkGroups}>
