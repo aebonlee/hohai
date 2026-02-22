@@ -224,6 +224,13 @@
   padding: 20px;
 }
 
+.infoHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .title {
   font-family: var(--font-serif);
   font-size: 1.1rem;

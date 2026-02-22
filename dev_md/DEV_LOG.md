@@ -1,5 +1,34 @@
 # 개발일지
 
+## 2026-02-22 — 개인 재생목록(Playlist) 기능 구현
+
+### 작업 내용
+
+사용자가 음악을 재생목록으로 만들어 이어듣기/반복/셔플 재생할 수 있는 기능 전체 구현.
+
+#### DB
+- `hohai_playlists` 테이블 생성 (song_ids TEXT[] 배열, RLS 4정책, updated_at 트리거, user_id 인덱스)
+
+#### 신규 파일 (7개)
+- `src/types/playlist.ts` — Playlist, PlaylistInsert, PlaylistUpdate 타입
+- `src/hooks/usePlaylist.ts` — Supabase CRUD 훅 (기존 useSongs/useReviews 패턴 동일)
+- `src/contexts/PlaylistContext.tsx` — PlaylistProvider (1회 fetch, Context 공유, 비로그인 빈 값)
+- `src/components/ui/AddToPlaylist.tsx` + `.module.css` — SongCard "+" 드롭다운
+- `src/pages/PlaylistPage.tsx` + `.module.css` — 사이드바+곡그리드, 전체재생/셔플/반복
+
+#### 수정 파일 (6개)
+- `PlaybackContext.tsx` — repeatMode, playShuffled, 순환 next/prev, onSongEnd 반복 로직
+- `SongCard.tsx/.css` — AddToPlaylist 통합, .infoHeader flex
+- `Header.tsx` — NAV_ITEMS에 "재생목록" 추가
+- `App.tsx` — /playlist 라우트 (AuthGuard)
+- `main.tsx` — PlaylistProvider 래핑
+
+### 검증
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과 (8.22s)
+
+---
+
 ## 2026-02-20 (Day 1) — 프로젝트 전체 구현
 
 ### 작업 내용

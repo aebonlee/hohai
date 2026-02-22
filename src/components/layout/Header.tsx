@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: '/poem-series', label: '시집 소개' },
   { to: '/songs', label: '추천 노래' },
   { to: '/albums', label: '앨범별 소개' },
+  { to: '/playlist', label: '재생목록' },
   { to: '/reviews', label: '감상 후기' },
   { to: '/about', label: '시인 소개' },
 ];

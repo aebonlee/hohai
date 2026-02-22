@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { Song } from '../types/song';
 
+export type RepeatMode = 'none' | 'all' | 'one';
+
 interface PlaybackContextValue {
   /** 현재 재생 중인 song ID (null이면 아무것도 재생 안 함) */
   currentId: string | null;
@@ -19,6 +21,13 @@ interface PlaybackContextValue {
   next: () => void;
   prev: () => void;
   onSongEnd: () => void;
+
+  /** 반복 모드 */
+  repeatMode: RepeatMode;
+  setRepeatMode: (mode: RepeatMode) => void;
+
+  /** 셔플 재생: 곡 배열을 랜덤 순서로 섞어서 재생 */
+  playShuffled: (songs: Song[]) => void;
 
   /** auto-play 시그널 (next/prev에 의한 자동 전환) */
   autoPlayIntent: boolean;
@@ -42,25 +51,42 @@ const PlaybackContext = createContext<PlaybackContextValue>({
   next: () => {},
   prev: () => {},
   onSongEnd: () => {},
+  repeatMode: 'none',
+  setRepeatMode: () => {},
+  playShuffled: () => {},
   autoPlayIntent: false,
   lyricsPlayerOpen: false,
   openLyricsPlayer: () => {},
   closeLyricsPlayer: () => {},
 });
 
+function shuffleArray<T>(arr: T[]): T[] {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export function PlaybackProvider({ children }: { children: React.ReactNode }) {
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [playlist, setPlaylistState] = useState<Song[] | null>(null);
   const [autoPlayIntent, setAutoPlayIntent] = useState(false);
   const [lyricsPlayerOpen, setLyricsPlayerOpen] = useState(false);
+  const [repeatMode, setRepeatMode] = useState<RepeatMode>('none');
 
   const currentIndex = useMemo(() => {
     if (!playlist || !currentId) return -1;
     return playlist.findIndex((s) => s.id === currentId);
   }, [playlist, currentId]);
 
-  const hasNext = playlist !== null && currentIndex >= 0 && currentIndex < playlist.length - 1;
-  const hasPrev = playlist !== null && currentIndex > 0;
+  const hasNext = playlist !== null && currentIndex >= 0 && (
+    currentIndex < playlist.length - 1 || repeatMode === 'all'
+  );
+  const hasPrev = playlist !== null && currentIndex >= 0 && (
+    currentIndex > 0 || repeatMode === 'all'
+  );
 
   const play = useCallback((songId: string) => {
     setAutoPlayIntent(false);
@@ -82,30 +108,72 @@ export function PlaybackProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const next = useCallback(() => {
-    if (!playlist || currentIndex < 0 || currentIndex >= playlist.length - 1) return;
-    const nextSong = playlist[currentIndex + 1];
+    if (!playlist || currentIndex < 0) return;
+    let nextIdx = currentIndex + 1;
+    if (nextIdx >= playlist.length) {
+      if (repeatMode === 'all') {
+        nextIdx = 0;
+      } else {
+        return;
+      }
+    }
     setAutoPlayIntent(true);
-    setCurrentId(nextSong.id);
-  }, [playlist, currentIndex]);
+    setCurrentId(playlist[nextIdx].id);
+  }, [playlist, currentIndex, repeatMode]);
 
   const prev = useCallback(() => {
-    if (!playlist || currentIndex <= 0) return;
-    const prevSong = playlist[currentIndex - 1];
+    if (!playlist || currentIndex < 0) return;
+    let prevIdx = currentIndex - 1;
+    if (prevIdx < 0) {
+      if (repeatMode === 'all') {
+        prevIdx = playlist.length - 1;
+      } else {
+        return;
+      }
+    }
     setAutoPlayIntent(true);
-    setCurrentId(prevSong.id);
-  }, [playlist, currentIndex]);
+    setCurrentId(playlist[prevIdx].id);
+  }, [playlist, currentIndex, repeatMode]);
 
   const onSongEnd = useCallback(() => {
-    // YouTube 곡 끝나면 자동 다음 곡
-    if (playlist && currentIndex >= 0 && currentIndex < playlist.length - 1) {
-      const nextSong = playlist[currentIndex + 1];
+    if (!playlist || currentIndex < 0) {
+      setAutoPlayIntent(false);
+      return;
+    }
+
+    if (repeatMode === 'one') {
+      // 같은 곡 재시작 — ID를 잠시 null로 돌렸다 복원하면 effect가 재트리거
+      const id = currentId;
+      setCurrentId(null);
+      requestAnimationFrame(() => {
+        setAutoPlayIntent(true);
+        setCurrentId(id);
+      });
+      return;
+    }
+
+    if (currentIndex < playlist.length - 1) {
+      // 다음 곡
       setAutoPlayIntent(true);
-      setCurrentId(nextSong.id);
+      setCurrentId(playlist[currentIndex + 1].id);
+    } else if (repeatMode === 'all') {
+      // 마지막 곡 → 처음으로
+      setAutoPlayIntent(true);
+      setCurrentId(playlist[0].id);
     } else {
-      // 마지막 곡이면 정지
+      // 정지
       setAutoPlayIntent(false);
     }
-  }, [playlist, currentIndex]);
+  }, [playlist, currentIndex, currentId, repeatMode]);
+
+  const playShuffled = useCallback((songs: Song[]) => {
+    const shuffled = shuffleArray(songs);
+    setPlaylistState(shuffled);
+    if (shuffled.length > 0) {
+      setAutoPlayIntent(true);
+      setCurrentId(shuffled[0].id);
+    }
+  }, []);
 
   const openLyricsPlayer = useCallback(() => {
     setLyricsPlayerOpen(true);
@@ -128,6 +196,9 @@ export function PlaybackProvider({ children }: { children: React.ReactNode }) {
     next,
     prev,
     onSongEnd,
+    repeatMode,
+    setRepeatMode,
+    playShuffled,
     autoPlayIntent,
     lyricsPlayerOpen,
     openLyricsPlayer,
@@ -136,6 +207,7 @@ export function PlaybackProvider({ children }: { children: React.ReactNode }) {
     currentId, play, stop,
     playlist, currentIndex, hasNext, hasPrev,
     setPlaylist, clearPlaylist, next, prev, onSongEnd,
+    repeatMode, playShuffled,
     autoPlayIntent, lyricsPlayerOpen, openLyricsPlayer, closeLyricsPlayer,
   ]);
 

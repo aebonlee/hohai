@@ -18,6 +18,7 @@ import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import MyPagePage from './pages/MyPagePage';
 import AdminPage from './pages/AdminPage';
+import PlaylistPage from './pages/PlaylistPage';
 
 export default function App() {
   return (
@@ -34,6 +35,9 @@ export default function App() {
           <Route path="albums/:slug" element={<SongSeriesPage />} />
           <Route path="reviews" element={<ReviewsPage />} />
           <Route path="about" element={<AboutPage />} />
+          <Route path="playlist" element={
+            <AuthGuard><PlaylistPage /></AuthGuard>
+          } />
           <Route path="mypage" element={
             <AuthGuard><MyPagePage /></AuthGuard>
           } />

@@ -1,5 +1,24 @@
 # 개발 변경 이력 (CHANGELOG)
 
+## 2026-02-22 — 개인 재생목록(Playlist) 기능
+
+### 추가
+- `hohai_playlists` Supabase 테이블 — `song_ids TEXT[]` 배열, RLS 4정책, user_id 인덱스
+- `Playlist` / `PlaylistInsert` / `PlaylistUpdate` 타입 (`src/types/playlist.ts`)
+- `usePlaylists()` 훅 — fetch/create/update/delete/addSong/removeSong/reorder (`src/hooks/usePlaylist.ts`)
+- `PlaylistContext` / `PlaylistProvider` — 전역 재생목록 상태 공유, 비로그인 시 빈 값 (`src/contexts/PlaylistContext.tsx`)
+- `AddToPlaylist` 컴포넌트 — SongCard "+" 드롭다운, 재생목록 선택/생성 (`src/components/ui/AddToPlaylist.tsx`)
+- `PlaylistPage` — 사이드바 + 곡 그리드, 전체재생/셔플/반복/이름변경/삭제 (`src/pages/PlaylistPage.tsx`)
+- PlaybackContext에 `repeatMode` ('none'|'all'|'one'), `playShuffled()`, 순환 next/prev 추가
+
+### 변경
+- SongCard: `.infoHeader` flex 레이아웃 + AddToPlaylist "+" 버튼 삽입
+- Header NAV_ITEMS: "재생목록" 항목 추가 (앨범별 소개와 감상 후기 사이)
+- App.tsx: `/playlist` 라우트 (AuthGuard)
+- main.tsx: PlaylistProvider 래핑 (AuthProvider > PlaylistProvider > PlaybackProvider)
+
+---
+
 ## 2026-02-22 — 해시태그 클릭 네비게이션 + 음악 동시재생 방지
 
 ### 추가

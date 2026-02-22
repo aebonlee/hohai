@@ -2,6 +2,96 @@
 
 ---
 
+## 2026-02-22 — 개인 재생목록(Playlist) 기능 구현
+
+### 배경
+
+사용자가 음악을 재생목록으로 만들어서 이어듣거나 반복해서 들을 수 있는 기능 요청.
+Supabase DB 저장 방식으로 로그인 필수, 기기 간 동기화를 지원하며,
+여러 개의 재생목록을 이름 지정하여 생성 가능하고, 반복/셔플 재생을 지원한다.
+
+### DB 설계
+
+- `hohai_playlists` 테이블 — `song_ids TEXT[]` 배열 방식 채택
+  - 곡 수가 적은 개인 사이트에 적합, 순서 보존, 단일 행 CRUD로 충분
+  - RLS 4개 정책 (SELECT/INSERT/UPDATE/DELETE — `auth.uid() = user_id`)
+  - `updated_at` 자동 갱신 트리거, `user_id` 인덱스
+
+### 신규 파일 (7개)
+
+| 파일 | 설명 |
+|------|------|
+| `src/types/playlist.ts` | `Playlist`, `PlaylistInsert`, `PlaylistUpdate` 타입 정의 |
+| `src/hooks/usePlaylist.ts` | Supabase CRUD 훅 — fetch/create/update/delete/addSong/removeSong/reorder |
+| `src/contexts/PlaylistContext.tsx` | PlaylistProvider — `usePlaylists()` 1회 호출 후 Context로 공유, 비로그인 시 빈 값 반환 |
+| `src/components/ui/AddToPlaylist.tsx` | SongCard 제목 옆 "+" 드롭다운 — 재생목록 선택, 이미 추가된 곡 ✓ 표시, 새 재생목록 인라인 생성 |
+| `src/components/ui/AddToPlaylist.module.css` | 드롭다운 스타일 — 바깥 클릭 닫기, 인라인 생성 폼 |
+| `src/pages/PlaylistPage.tsx` | 재생목록 관리 페이지 — 사이드바 + 곡 그리드, 전체재생/셔플/반복, 이름변경/삭제 |
+| `src/pages/PlaylistPage.module.css` | 반응형 레이아웃 — 모바일(768px 이하)에서 사이드바 상단 스택 |
+
+### 수정 파일 (6개)
+
+| 파일 | 변경 내용 |
+|------|----------|
+| `src/contexts/PlaybackContext.tsx` | `repeatMode` ('none'\|'all'\|'one'), `playShuffled()`, 순환 next/prev, onSongEnd 반복 로직 추가 |
+| `src/components/ui/SongCard.tsx` | AddToPlaylist import + `.infoHeader` flex 레이아웃으로 "+" 버튼 삽입 |
+| `src/components/ui/SongCard.module.css` | `.infoHeader` flex 스타일 추가 |
+| `src/components/layout/Header.tsx` | NAV_ITEMS에 `{ to: '/playlist', label: '재생목록' }` 추가 (앨범별 소개와 감상 후기 사이) |
+| `src/App.tsx` | `/playlist` 라우트 추가 (AuthGuard 적용) |
+| `src/main.tsx` | PlaylistProvider 래핑 (AuthProvider 안, PlaybackProvider 바깥) |
+
+### PlaybackContext 확장 상세
+
+```typescript
+// 신규 필드
+repeatMode: 'none' | 'all' | 'one';
+setRepeatMode: (mode) => void;
+playShuffled: (songs: Song[]) => void;
+
+// onSongEnd 수정 로직
+if (repeatMode === 'one') → 같은 곡 재시작 (id null → requestAnimationFrame → 복원)
+else if (hasNext) → 다음 곡
+else if (repeatMode === 'all') → 첫 곡으로 돌아감
+else → 정지
+
+// next/prev 래핑
+repeatMode === 'all' → 마지막↔첫곡 순환
+```
+
+### PlaylistPage 레이아웃
+
+```
+┌──────────────────────────────────────────────┐
+│  내 재생목록                                  │
+│  나만의 음악 재생목록을 만들어 보세요          │
+├────────────┬─────────────────────────────────┤
+│ 사이드바    │  선택된 재생목록                 │
+│            │  ▶전체재생 🔀셔플 🔁반복         │
+│ ♫ 드라이브 │  이름변경  삭제                  │
+│ ♫ 밤에듣기 │  ┌────────┐ ┌────────┐         │
+│            │  │SongCard│ │SongCard│  ...     │
+│ + 새 목록  │  │   ✕    │ │   ✕    │         │
+│            │  └────────┘ └────────┘         │
+└────────────┴─────────────────────────────────┘
+모바일(<768px): 사이드바가 위에 가로 pill 형태로 스택
+```
+
+### 주요 기술 결정
+
+1. **song_ids TEXT[] 배열** — 별도 조인 테이블 없이 단일 행으로 곡 순서 관리. 개인 사이트 규모에 최적
+2. **PlaylistContext 분리** — usePlaylist 훅을 1회만 호출하고 Context로 공유하여 N+1 쿼리 방지
+3. **Provider 순서** — AuthProvider > PlaylistProvider > PlaybackProvider (PlaylistContext가 Auth를 의존)
+4. **repeat 'one' 모드** — 같은 곡 ID를 null → requestAnimationFrame → 복원하여 useEffect 재트리거
+5. **Fisher-Yates 셔플** — playShuffled에서 배열 복사 후 셔플, 원본 불변
+6. **비로그인 처리** — AddToPlaylist "+" 클릭 시 `/login`으로 이동, `/playlist` 페이지는 AuthGuard로 보호
+
+### 검증 결과
+
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과 (8.22s)
+
+---
+
 ## 2026-02-22 — 해시태그 클릭 네비게이션 + 음악 동시재생 방지
 
 ### 배경

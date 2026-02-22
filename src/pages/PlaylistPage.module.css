@@ -1,0 +1,419 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.pageTitle {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.pageDesc {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 40vh;
+}
+
+/* 레이아웃 */
+.layout {
+  display: flex;
+  gap: 24px;
+  min-height: 50vh;
+}
+
+/* 사이드바 */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebarList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition);
+}
+
+.sidebarItem:hover {
+  background: rgba(10, 61, 122, 0.06);
+}
+
+.sidebarItem.active {
+  background: rgba(10, 61, 122, 0.1);
+  font-weight: 600;
+}
+
+.sidebarIcon {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+
+.sidebarName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebarCount {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: rgba(10, 25, 41, 0.06);
+  padding: 2px 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.newPlaylistBtn {
+  width: 100%;
+  padding: 10px 12px;
+  background: none;
+  border: 1.5px dashed rgba(10, 25, 41, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.newPlaylistBtn:hover {
+  border-color: var(--accent-gold);
+  background: rgba(196, 149, 106, 0.06);
+}
+
+.sidebarCreate {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebarInput {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(10, 25, 41, 0.15);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  outline: none;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary);
+}
+
+.sidebarInput:focus {
+  border-color: var(--accent-gold);
+}
+
+.sidebarCreateBtns {
+  display: flex;
+  gap: 6px;
+}
+
+/* 메인 영역 */
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.playlistHeader {
+  margin-bottom: 24px;
+}
+
+.playlistTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.playlistName {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.songCount {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: rgba(10, 25, 41, 0.06);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.renameForm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.renameInput {
+  padding: 6px 10px;
+  border: 1px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  outline: none;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary);
+}
+
+/* 액션 버튼 */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.actionBtn {
+  padding: 6px 14px;
+  border: 1px solid rgba(10, 25, 41, 0.12);
+  border-radius: 999px;
+  background: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.actionBtn:hover:not(:disabled) {
+  background: rgba(10, 61, 122, 0.06);
+}
+
+.actionBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.actionBtn.actionActive {
+  background: rgba(10, 61, 122, 0.1);
+  border-color: var(--accent-sage);
+  color: var(--accent-sage);
+}
+
+.actionsDivider {
+  width: 1px;
+  height: 20px;
+  background: rgba(10, 25, 41, 0.12);
+}
+
+.actionBtnMuted {
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.actionBtnMuted:hover {
+  color: var(--text-primary);
+}
+
+.actionBtnDanger {
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.actionBtnDanger:hover {
+  color: #c0392b;
+}
+
+/* 공통 버튼 */
+.confirmBtn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--accent-gold);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.confirmBtn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.confirmBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.cancelBtn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  background: rgba(10, 25, 41, 0.06);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.cancelBtn:hover {
+  background: rgba(10, 25, 41, 0.1);
+}
+
+/* 곡 그리드 */
+.songGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.songCardWrapper {
+  position: relative;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.songCardWrapper:hover .removeBtn {
+  opacity: 1;
+}
+
+.removeBtn:hover {
+  background: #c0392b;
+}
+
+/* 빈 상태 */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.emptyHint {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .page {
+    padding: 24px 16px 60px;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sidebarList {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .sidebarItem {
+    width: auto;
+    padding: 8px 12px;
+    background: rgba(10, 25, 41, 0.04);
+    border-radius: 999px;
+    font-size: 0.8rem;
+  }
+
+  .sidebarItem.active {
+    background: rgba(10, 61, 122, 0.12);
+  }
+
+  .newPlaylistBtn {
+    width: auto;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+  }
+
+  .sidebarCreate {
+    width: 100%;
+  }
+
+  .songGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    gap: 6px;
+  }
+
+  .actionBtn {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+}

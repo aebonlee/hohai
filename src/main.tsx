@@ -4,6 +4,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { PlaybackProvider } from './contexts/PlaybackContext';
+import { PlaylistProvider } from './contexts/PlaylistContext';
 import App from './App';
 import './styles/globals.css';
 
@@ -12,9 +13,11 @@ createRoot(document.getElementById('root')!).render(
     <HelmetProvider>
       <BrowserRouter>
         <AuthProvider>
-          <PlaybackProvider>
-            <App />
-          </PlaybackProvider>
+          <PlaylistProvider>
+            <PlaybackProvider>
+              <App />
+            </PlaybackProvider>
+          </PlaylistProvider>
         </AuthProvider>
       </BrowserRouter>
     </HelmetProvider>

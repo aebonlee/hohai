@@ -1,0 +1,162 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-gold);
+  background: none;
+  color: var(--accent-gold);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.addBtn:hover {
+  background: var(--accent-gold);
+  color: #fff;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 100;
+  min-width: 220px;
+  background: var(--bg-primary, #fff);
+  border: 1px solid rgba(10, 25, 41, 0.12);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.dropdownHeader {
+  padding: 10px 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(10, 25, 41, 0.08);
+}
+
+.empty {
+  padding: 12px 14px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition);
+}
+
+.dropdownItem:hover {
+  background: rgba(10, 61, 122, 0.06);
+}
+
+.dropdownItem.included {
+  color: var(--accent-sage);
+}
+
+.itemCheck {
+  width: 16px;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.itemName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemCount {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.createBtn {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(10, 25, 41, 0.08);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition);
+}
+
+.createBtn:hover {
+  background: rgba(196, 149, 106, 0.08);
+}
+
+.createForm {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid rgba(10, 25, 41, 0.08);
+}
+
+.createInput {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid rgba(10, 25, 41, 0.15);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  outline: none;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary);
+}
+
+.createInput:focus {
+  border-color: var(--accent-gold);
+}
+
+.createConfirm {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--accent-gold);
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity var(--transition);
+}
+
+.createConfirm:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.createConfirm:hover:not(:disabled) {
+  opacity: 0.85;
+}

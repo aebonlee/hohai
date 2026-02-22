@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import type { Song } from '../../types/song';
 import { usePlayback } from '../../contexts/PlaybackContext';
 import { useYouTubePlayer } from '../../hooks/useYouTubePlayer';
+import AddToPlaylist from './AddToPlaylist';
 import styles from './SongCard.module.css';
 
 /** suno_url에서 song ID를 추출하여 embed URL 반환 */
@@ -191,7 +192,10 @@ export default function SongCard({ song, index = 0 }: Props) {
       )}
 
       <div className={styles.info}>
-        <h3 className={styles.title}>{song.title}</h3>
+        <div className={styles.infoHeader}>
+          <h3 className={styles.title}>{song.title}</h3>
+          <AddToPlaylist songId={song.id} />
+        </div>
         {song.description && (
           <p className={styles.description}>{song.description}</p>
         )}
