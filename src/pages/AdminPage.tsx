@@ -1818,8 +1818,24 @@ function SunoImportAdmin() {
   const existingUrls = new Set(songs.filter(s => s.suno_url).map(s => s.suno_url!));
   const isAlreadyImported = (id: string, url: string) => existingUrls.has(url) || existingIds.has(id);
 
-  /** Suno 페이지 HTML을 CORS 프록시로 가져오기 */
-  const fetchSunoPage = async (pageUrl: string): Promise<string | null> => {
+  /** Supabase Edge Function으로 Suno 페이지 스크래핑 */
+  const fetchViaScraper = async (urls: string[]): Promise<Map<string, { title: string; lyrics: string; style: string }>> => {
+    const map = new Map<string, { title: string; lyrics: string; style: string }>();
+    try {
+      const { data, error } = await supabase.functions.invoke('suno-scrape', {
+        body: { urls },
+      });
+      if (!error && data?.results) {
+        for (const r of data.results) {
+          map.set(r.url, { title: r.title || '', lyrics: r.lyrics || '', style: r.style || '' });
+        }
+      }
+    } catch { /* Edge Function 미배포 시 무시 */ }
+    return map;
+  };
+
+  /** CORS 프록시로 Suno 페이지 HTML 가져오기 (폴백) */
+  const fetchViaProxy = async (pageUrl: string): Promise<{ title: string; lyrics: string; style: string } | null> => {
     const proxies = [
       (u: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
       (u: string) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
@@ -1829,14 +1845,14 @@ function SunoImportAdmin() {
         const res = await fetch(makeUrl(pageUrl));
         if (res.ok) {
           const text = await res.text();
-          if (text.length > 500) return text;
+          if (text.length > 500) return parseSunoPageSource(text);
         }
       } catch { /* 다음 프록시 시도 */ }
     }
     return null;
   };
 
-  /** 곡 정보 가져오기 (여러 URL/ID 지원) — 페이지 스크래핑 우선 */
+  /** 곡 정보 가져오기 — Edge Function 우선 → CORS 프록시 → Studio API */
   const handleFetch = async () => {
     const lines = sunoUrl.trim().split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
     if (lines.length === 0) return;
@@ -1848,62 +1864,82 @@ function SunoImportAdmin() {
     setLog([]);
     addLog(`${lines.length}개 항목 처리 중...`);
 
-    const results: SunoFetchedSong[] = [];
-    const newSelected = new Set<string>();
-
+    // URL/ID 파싱
+    const parsed: { id: string; url: string; already: boolean }[] = [];
     for (const line of lines) {
       const info = extractSunoInfo(line);
       if (!info) {
         addLog(`[무시] "${line}" — 유효한 Suno URL/ID가 아닙니다`);
         continue;
       }
-      const { id, url } = info;
-      const already = isAlreadyImported(id, url);
+      parsed.push({ ...info, already: isAlreadyImported(info.id, info.url) });
+    }
 
+    // 1차: Edge Function으로 일괄 스크래핑 시도
+    const allUrls = parsed.map(p => p.url);
+    addLog(`[서버 스크래핑] ${allUrls.length}곡 조회 중...`);
+    const scraped = await fetchViaScraper(allUrls);
+
+    if (scraped.size > 0) {
+      addLog(`[서버 스크래핑] ${scraped.size}곡 정보 수신 완료`);
+    } else {
+      addLog(`[서버 스크래핑] Edge Function 미배포 또는 실패 — 대체 방법 시도`);
+    }
+
+    const results: SunoFetchedSong[] = [];
+    const newSelected = new Set<string>();
+
+    for (const { id, url, already } of parsed) {
       let title = '';
       let lyrics = '';
       let style = '';
       let tags: string[] = [];
       let fetchFailed = false;
 
-      addLog(`[조회] ${id} ...`);
-
-      // 1차: 페이지 스크래핑 (CORS 프록시 경유)
-      const html = await fetchSunoPage(url);
-      if (html) {
-        const parsed = parseSunoPageSource(html);
-        title = parsed.title;
-        lyrics = parsed.lyrics;
-        style = parsed.style;
+      // Edge Function 결과 확인
+      const edgeResult = scraped.get(url);
+      if (edgeResult && edgeResult.title) {
+        title = edgeResult.title;
+        lyrics = edgeResult.lyrics;
+        style = edgeResult.style;
         if (style) tags = style.split(',').map((t: string) => t.trim()).filter(Boolean);
+        addLog(`[성공] "${title}" — 제목 ✓ 가사 ${lyrics ? '✓' : '✗'} 스타일 ${style ? '✓' : '✗'}`);
+      }
 
-        if (title && lyrics) {
-          addLog(`[성공] "${title}" — 제목 ✓ 가사 ✓ 스타일 ${style ? '✓' : '✗'}`);
-        } else if (title) {
-          addLog(`[부분] "${title}" — 제목 ✓ 가사 ✗ (편집에서 입력 필요)`);
-        } else {
-          addLog(`[스크래핑 실패] 페이지에서 정보를 추출하지 못했습니다`);
+      // 2차: CORS 프록시 시도
+      if (!title) {
+        addLog(`[프록시] ${id} 조회 중...`);
+        const proxyResult = await fetchViaProxy(url);
+        if (proxyResult && proxyResult.title) {
+          title = proxyResult.title;
+          lyrics = proxyResult.lyrics;
+          style = proxyResult.style;
+          if (style) tags = style.split(',').map((t: string) => t.trim()).filter(Boolean);
+          addLog(`[프록시] "${title}" — 제목 ✓ 가사 ${lyrics ? '✓' : '✗'}`);
         }
       }
 
-      // 2차: 스크래핑 실패 시 studio API 시도
+      // 3차: Studio API 시도
       if (!title) {
         try {
+          addLog(`[API] ${id} 조회 중...`);
           const res = await fetch(`https://studio-api.suno.ai/api/clip/${id}`);
           if (res.ok) {
             const data = await res.json();
-            title = data.title || title;
-            lyrics = lyrics || data.metadata?.prompt || '';
-            style = style || data.metadata?.tags || '';
+            title = data.title || '';
+            lyrics = data.metadata?.prompt || '';
+            style = data.metadata?.tags || '';
             if (style && tags.length === 0) tags = style.split(',').map((t: string) => t.trim()).filter(Boolean);
             addLog(`[API] "${title}" — 제목 ✓ 가사 ${lyrics ? '✓' : '✗'}`);
           }
-        } catch { /* API도 실패 */ }
+        } catch { /* API 실패 */ }
       }
 
       if (!title) {
         fetchFailed = true;
-        addLog(`[실패] ${id} — 편집 버튼으로 직접 입력하세요`);
+        addLog(`[실패] ${id} — 편집 버튼에서 직접 입력하세요`);
+      } else if (!lyrics) {
+        addLog(`[경고] "${title}" — 가사 없음! 편집에서 가사를 입력해 주세요`);
       }
 
       results.push({ id, title, suno_url: url, lyrics, style, tags, already, fetchFailed });
@@ -1915,7 +1951,8 @@ function SunoImportAdmin() {
     const newCount = results.filter(s => !s.already).length;
     const successCount = results.filter(s => !s.already && s.title && s.lyrics).length;
     const noLyricsCount = results.filter(s => !s.already && s.title && !s.lyrics).length;
-    addLog(`\n완료: 신규 ${newCount}곡 (완전 ${successCount}, 가사 미확보 ${noLyricsCount}, 중복 ${results.length - newCount})`);
+    const failedCount = results.filter(s => !s.already && !s.title).length;
+    addLog(`\n완료: 신규 ${newCount}곡 (완전 ${successCount}, 가사 미확보 ${noLyricsCount}, 실패 ${failedCount}, 중복 ${results.length - newCount})`);
     setFetching(false);
   };
 
