@@ -1722,17 +1722,53 @@ function extractSunoInfo(input: string): { id: string; url: string } | null {
   return null;
 }
 
-/** 페이지 소스 HTML에서 Suno 곡 정보(제목/가사/스타일) 추출 */
-function parseSunoPageSource(html: string): { title: string; lyrics: string; style: string } {
+/** 페이지 소스 HTML에서 Suno 곡 정보(제목/가사/스타일/URL) 추출 */
+function parseSunoPageSource(html: string): { title: string; lyrics: string; style: string; url: string } {
   let title = '';
   let lyrics = '';
   let style = '';
+  let url = '';
+
+  // __NEXT_DATA__ JSON 블록 파싱 시도 (가장 정확한 소스)
+  const nextDataMatch = html.match(/<script\s+id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i);
+  if (nextDataMatch) {
+    try {
+      const nd = JSON.parse(nextDataMatch[1]);
+      // Next.js pageProps에서 clip/song 데이터 탐색
+      const clip = nd?.props?.pageProps?.clip
+        || nd?.props?.pageProps?.song
+        || nd?.props?.pageProps?.data;
+      if (clip) {
+        title = clip.title || '';
+        lyrics = clip.metadata?.prompt || clip.prompt || clip.lyrics || '';
+        style = clip.metadata?.tags || clip.tags || clip.style || '';
+        if (clip.id) {
+          const isUuid = /^[a-f0-9]{8}-[a-f0-9]{4}-/.test(clip.id);
+          url = isUuid ? `https://suno.com/song/${clip.id}` : `https://suno.com/s/${clip.id}`;
+        }
+      }
+    } catch { /* JSON 파싱 실패 시 아래 regex로 대체 */ }
+  }
+
+  // URL: canonical 또는 og:url에서 추출
+  if (!url) {
+    const canonicalMatch = html.match(/<link\s[^>]*rel="canonical"\s[^>]*href="([^"]+)"/i)
+      || html.match(/<meta\s[^>]*property="og:url"\s[^>]*content="([^"]+)"/i)
+      || html.match(/<meta\s[^>]*content="([^"]+)"\s[^>]*property="og:url"/i);
+    if (canonicalMatch) url = canonicalMatch[1];
+  }
+  if (!url) {
+    const urlInJson = html.match(/"(?:clip_url|song_url|share_url)"\s*:\s*"(https?:\/\/suno\.com\/[^"]+)"/);
+    if (urlInJson) url = urlInJson[1];
+  }
 
   // 제목: og:title → <title> → JSON "title" 순으로 시도
-  const ogTitle = html.match(/<meta\s[^>]*property="og:title"\s[^>]*content="([^"]+)"/i)
-    || html.match(/<meta\s[^>]*content="([^"]+)"\s[^>]*property="og:title"/i);
-  if (ogTitle) {
-    title = ogTitle[1].replace(/\s*[\|–—]\s*Suno.*$/i, '').trim();
+  if (!title) {
+    const ogTitle = html.match(/<meta\s[^>]*property="og:title"\s[^>]*content="([^"]+)"/i)
+      || html.match(/<meta\s[^>]*content="([^"]+)"\s[^>]*property="og:title"/i);
+    if (ogTitle) {
+      title = ogTitle[1].replace(/\s*[\|–—]\s*Suno.*$/i, '').trim();
+    }
   }
   if (!title) {
     const titleTag = html.match(/<title[^>]*>([^<]+)<\/title>/i);
@@ -1747,34 +1783,39 @@ function parseSunoPageSource(html: string): { title: string; lyrics: string; sty
   }
 
   // 가사: "prompt" 필드 추출 (여러 패턴)
-  const promptPatterns = [
-    /"prompt"\s*:\s*"((?:[^"\\]|\\.)*)"/,
-    /"text"\s*:\s*"((?:[^"\\]|\\.)*(?:\\n)(?:[^"\\]|\\.)*)"/,
-  ];
-  for (const pattern of promptPatterns) {
-    if (lyrics) break;
-    const m = html.match(pattern);
-    if (m) {
-      try { lyrics = JSON.parse(`"${m[1]}"`); }
-      catch { lyrics = m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"'); }
+  if (!lyrics) {
+    const promptPatterns = [
+      /"prompt"\s*:\s*"((?:[^"\\]|\\.)*)"/,
+      /"lyrics"\s*:\s*"((?:[^"\\]|\\.)*)"/,
+      /"text"\s*:\s*"((?:[^"\\]|\\.)*(?:\\n)(?:[^"\\]|\\.)*)"/,
+    ];
+    for (const pattern of promptPatterns) {
+      if (lyrics) break;
+      const m = html.match(pattern);
+      if (m) {
+        try { lyrics = JSON.parse(`"${m[1]}"`); }
+        catch { lyrics = m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"'); }
+      }
     }
   }
 
   // 스타일: "tags" 필드 추출
-  const tagsPatterns = [
-    /"tags"\s*:\s*"((?:[^"\\]|\\.)*)"/,
-    /"style"\s*:\s*"((?:[^"\\]|\\.)*)"/,
-  ];
-  for (const pattern of tagsPatterns) {
-    if (style) break;
-    const m = html.match(pattern);
-    if (m) {
-      try { style = JSON.parse(`"${m[1]}"`); }
-      catch { style = m[1]; }
+  if (!style) {
+    const tagsPatterns = [
+      /"tags"\s*:\s*"((?:[^"\\]|\\.)*)"/,
+      /"style"\s*:\s*"((?:[^"\\]|\\.)*)"/,
+    ];
+    for (const pattern of tagsPatterns) {
+      if (style) break;
+      const m = html.match(pattern);
+      if (m) {
+        try { style = JSON.parse(`"${m[1]}"`); }
+        catch { style = m[1]; }
+      }
     }
   }
 
-  return { title, lyrics, style };
+  return { title, lyrics, style, url };
 }
 
 interface SunoFetchedSong {
@@ -1796,8 +1837,6 @@ function SunoImportAdmin() {
   const { series } = useAllSeries();
   const songSeries = series.filter(s => s.type === 'song');
 
-  const [sunoUrl, setSunoUrl] = useState('');
-  const [fetching, setFetching] = useState(false);
   const [fetchedSongs, setFetchedSongs] = useState<SunoFetchedSong[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [importing, setImporting] = useState(false);
@@ -1805,6 +1844,9 @@ function SunoImportAdmin() {
   const [log, setLog] = useState<string[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [pastedSource, setPastedSource] = useState('');
+  const [activeMethod, setActiveMethod] = useState<'paste' | 'url'>('paste');
+  const [sunoUrl, setSunoUrl] = useState('');
+  const [fetching, setFetching] = useState(false);
 
   const addLog = (msg: string) => setLog(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
 
@@ -1818,146 +1860,158 @@ function SunoImportAdmin() {
   const existingUrls = new Set(songs.filter(s => s.suno_url).map(s => s.suno_url!));
   const isAlreadyImported = (id: string, url: string) => existingUrls.has(url) || existingIds.has(id);
 
-  /** Supabase Edge Function으로 Suno 페이지 스크래핑 */
-  const fetchViaScraper = async (urls: string[]): Promise<Map<string, { title: string; lyrics: string; style: string }>> => {
-    const map = new Map<string, { title: string; lyrics: string; style: string }>();
-    try {
-      const { data, error } = await supabase.functions.invoke('suno-scrape', {
-        body: { urls },
-      });
-      if (!error && data?.results) {
-        for (const r of data.results) {
-          map.set(r.url, { title: r.title || '', lyrics: r.lyrics || '', style: r.style || '' });
-        }
-      }
-    } catch { /* Edge Function 미배포 시 무시 */ }
-    return map;
-  };
+  /** 페이지 소스 붙여넣기로 곡 추가 (핵심 방법) */
+  const handlePasteAdd = () => {
+    if (!pastedSource.trim()) return;
+    const parsed = parseSunoPageSource(pastedSource);
 
-  /** CORS 프록시로 Suno 페이지 HTML 가져오기 (폴백) */
-  const fetchViaProxy = async (pageUrl: string): Promise<{ title: string; lyrics: string; style: string } | null> => {
-    const proxies = [
-      (u: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-      (u: string) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
-    ];
-    for (const makeUrl of proxies) {
-      try {
-        const res = await fetch(makeUrl(pageUrl));
-        if (res.ok) {
-          const text = await res.text();
-          if (text.length > 500) return parseSunoPageSource(text);
-        }
-      } catch { /* 다음 프록시 시도 */ }
+    if (!parsed.title && !parsed.lyrics) {
+      addLog('[실패] 붙여넣은 내용에서 곡 정보를 찾을 수 없습니다');
+      return;
     }
-    return null;
+
+    // URL에서 ID 추출
+    let songId = '';
+    let songUrl = parsed.url || '';
+    if (songUrl) {
+      const info = extractSunoInfo(songUrl);
+      if (info) { songId = info.id; songUrl = info.url; }
+    }
+    // URL이 없으면 소스에서 직접 ID 추출 시도
+    if (!songId) {
+      const idMatch = pastedSource.match(/suno\.com\/(?:song|s)\/([a-zA-Z0-9_-]+)/);
+      if (idMatch) {
+        songId = idMatch[1];
+        const isUuid = /^[a-f0-9]{8}-[a-f0-9]{4}-/.test(songId);
+        songUrl = isUuid ? `https://suno.com/song/${songId}` : `https://suno.com/s/${songId}`;
+      }
+    }
+    if (!songId) {
+      // ID 없으면 임시 ID 생성
+      songId = `paste-${Date.now()}`;
+    }
+
+    const already = songUrl ? isAlreadyImported(songId, songUrl) : false;
+    const tags = parsed.style ? parsed.style.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+    // 이미 목록에 같은 ID가 있으면 업데이트
+    const existing = fetchedSongs.find(s => s.id === songId);
+    if (existing) {
+      setFetchedSongs(prev => prev.map(s => {
+        if (s.id !== songId) return s;
+        return {
+          ...s,
+          title: parsed.title || s.title,
+          lyrics: parsed.lyrics || s.lyrics,
+          style: parsed.style || s.style,
+          tags: tags.length > 0 ? tags : s.tags,
+          suno_url: songUrl || s.suno_url,
+          fetchFailed: false,
+        };
+      }));
+      addLog(`[업데이트] "${parsed.title || existing.title}" — 가사 ${parsed.lyrics ? '✓' : '✗'}, 스타일 ${parsed.style ? '✓' : '✗'}`);
+    } else {
+      const newSong: SunoFetchedSong = {
+        id: songId,
+        title: parsed.title,
+        suno_url: songUrl,
+        lyrics: parsed.lyrics,
+        style: parsed.style,
+        tags,
+        already,
+        fetchFailed: false,
+      };
+      setFetchedSongs(prev => [...prev, newSong]);
+      if (!already) setSelectedIds(prev => new Set([...prev, songId]));
+      addLog(`[추출 성공] "${parsed.title || '(제목 없음)'}" — 가사 ${parsed.lyrics ? '✓' : '✗'}, 스타일 ${parsed.style ? '✓' : '✗'}${already ? ' (이미 등록됨)' : ''}`);
+    }
+
+    setPastedSource('');
   };
 
-  /** 곡 정보 가져오기 — Edge Function 우선 → CORS 프록시 → Studio API */
+  /** URL 자동 조회 (보조 방법) */
   const handleFetch = async () => {
     const lines = sunoUrl.trim().split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
     if (lines.length === 0) return;
 
     setFetching(true);
-    setFetchedSongs([]);
-    setSelectedIds(new Set());
     setExpandedId(null);
-    setLog([]);
     addLog(`${lines.length}개 항목 처리 중...`);
 
-    // URL/ID 파싱
-    const parsed: { id: string; url: string; already: boolean }[] = [];
     for (const line of lines) {
       const info = extractSunoInfo(line);
       if (!info) {
         addLog(`[무시] "${line}" — 유효한 Suno URL/ID가 아닙니다`);
         continue;
       }
-      parsed.push({ ...info, already: isAlreadyImported(info.id, info.url) });
-    }
 
-    // 1차: Edge Function으로 일괄 스크래핑 시도
-    const allUrls = parsed.map(p => p.url);
-    addLog(`[서버 스크래핑] ${allUrls.length}곡 조회 중...`);
-    const scraped = await fetchViaScraper(allUrls);
-
-    if (scraped.size > 0) {
-      addLog(`[서버 스크래핑] ${scraped.size}곡 정보 수신 완료`);
-    } else {
-      addLog(`[서버 스크래핑] Edge Function 미배포 또는 실패 — 대체 방법 시도`);
-    }
-
-    const results: SunoFetchedSong[] = [];
-    const newSelected = new Set<string>();
-
-    for (const { id, url, already } of parsed) {
+      const { id, url } = info;
+      const already = isAlreadyImported(id, url);
       let title = '';
       let lyrics = '';
       let style = '';
-      let tags: string[] = [];
-      let fetchFailed = false;
 
-      // Edge Function 결과 확인
-      const edgeResult = scraped.get(url);
-      if (edgeResult && edgeResult.title) {
-        title = edgeResult.title;
-        lyrics = edgeResult.lyrics;
-        style = edgeResult.style;
-        if (style) tags = style.split(',').map((t: string) => t.trim()).filter(Boolean);
-        addLog(`[성공] "${title}" — 제목 ✓ 가사 ${lyrics ? '✓' : '✗'} 스타일 ${style ? '✓' : '✗'}`);
-      }
+      // Edge Function 시도
+      try {
+        const { data, error } = await supabase.functions.invoke('suno-scrape', {
+          body: { urls: [url] },
+        });
+        if (!error && data?.results?.[0]) {
+          const r = data.results[0];
+          title = r.title || '';
+          lyrics = r.lyrics || '';
+          style = r.style || '';
+        }
+      } catch { /* 무시 */ }
 
-      // 2차: CORS 프록시 시도
+      // CORS 프록시 시도
       if (!title) {
-        addLog(`[프록시] ${id} 조회 중...`);
-        const proxyResult = await fetchViaProxy(url);
-        if (proxyResult && proxyResult.title) {
-          title = proxyResult.title;
-          lyrics = proxyResult.lyrics;
-          style = proxyResult.style;
-          if (style) tags = style.split(',').map((t: string) => t.trim()).filter(Boolean);
-          addLog(`[프록시] "${title}" — 제목 ✓ 가사 ${lyrics ? '✓' : '✗'}`);
+        const proxies = [
+          (u: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+          (u: string) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+        ];
+        for (const makeUrl of proxies) {
+          if (title) break;
+          try {
+            const res = await fetch(makeUrl(url));
+            if (res.ok) {
+              const text = await res.text();
+              if (text.length > 500) {
+                const p = parseSunoPageSource(text);
+                if (p.title) { title = p.title; lyrics = p.lyrics; style = p.style; }
+              }
+            }
+          } catch { /* 다음 시도 */ }
         }
       }
 
-      // 3차: Studio API 시도
-      if (!title) {
-        try {
-          addLog(`[API] ${id} 조회 중...`);
-          const res = await fetch(`https://studio-api.suno.ai/api/clip/${id}`);
-          if (res.ok) {
-            const data = await res.json();
-            title = data.title || '';
-            lyrics = data.metadata?.prompt || '';
-            style = data.metadata?.tags || '';
-            if (style && tags.length === 0) tags = style.split(',').map((t: string) => t.trim()).filter(Boolean);
-            addLog(`[API] "${title}" — 제목 ✓ 가사 ${lyrics ? '✓' : '✗'}`);
-          }
-        } catch { /* API 실패 */ }
+      const tags = style ? style.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
+      const fetchFailed = !title;
+      const existingIdx = fetchedSongs.findIndex(s => s.id === id);
+
+      if (existingIdx >= 0) {
+        setFetchedSongs(prev => prev.map(s => {
+          if (s.id !== id) return s;
+          return { ...s, title: title || s.title, lyrics: lyrics || s.lyrics, style: style || s.style, tags: tags.length > 0 ? tags : s.tags, fetchFailed };
+        }));
+      } else {
+        setFetchedSongs(prev => [...prev, { id, title, suno_url: url, lyrics, style, tags, already, fetchFailed }]);
+        if (!already) setSelectedIds(prev => new Set([...prev, id]));
       }
 
-      if (!title) {
-        fetchFailed = true;
-        addLog(`[실패] ${id} — 편집 버튼에서 직접 입력하세요`);
-      } else if (!lyrics) {
-        addLog(`[경고] "${title}" — 가사 없음! 편집에서 가사를 입력해 주세요`);
+      if (fetchFailed) {
+        addLog(`[${id}] 자동 조회 실패 — "페이지 소스 붙여넣기"를 사용하세요`);
+      } else {
+        addLog(`[${id}] "${title}" — 가사 ${lyrics ? '✓' : '✗'}, 스타일 ${style ? '✓' : '✗'}`);
       }
-
-      results.push({ id, title, suno_url: url, lyrics, style, tags, already, fetchFailed });
-      if (!already) newSelected.add(id);
     }
 
-    setFetchedSongs(results);
-    setSelectedIds(newSelected);
-    const newCount = results.filter(s => !s.already).length;
-    const successCount = results.filter(s => !s.already && s.title && s.lyrics).length;
-    const noLyricsCount = results.filter(s => !s.already && s.title && !s.lyrics).length;
-    const failedCount = results.filter(s => !s.already && !s.title).length;
-    addLog(`\n완료: 신규 ${newCount}곡 (완전 ${successCount}, 가사 미확보 ${noLyricsCount}, 실패 ${failedCount}, 중복 ${results.length - newCount})`);
+    setSunoUrl('');
     setFetching(false);
   };
 
-  /** 페이지 소스에서 곡 정보 추출하여 반영 */
-  const handleParseSource = (songId: string) => {
+  /** 편집 패널에서 소스 추출 */
+  const handleParseSourceForSong = (songId: string) => {
     if (!pastedSource.trim()) return;
     const parsed = parseSunoPageSource(pastedSource);
     setFetchedSongs(prev => prev.map(s => {
@@ -1971,7 +2025,7 @@ function SunoImportAdmin() {
         fetchFailed: false,
       };
     }));
-    addLog(`[소스 추출] "${parsed.title || '(제목 없음)'}" — 가사 ${parsed.lyrics ? 'O' : 'X'}, 스타일 ${parsed.style ? 'O' : 'X'}`);
+    addLog(`[소스 추출] "${parsed.title || '(제목 없음)'}" — 가사 ${parsed.lyrics ? '✓' : '✗'}, 스타일 ${parsed.style ? '✓' : '✗'}`);
     setPastedSource('');
     setExpandedId(null);
   };
@@ -2044,67 +2098,158 @@ function SunoImportAdmin() {
     })));
   };
 
+  /** 목록에서 곡 제거 */
+  const removeSong = (id: string) => {
+    setFetchedSongs(prev => prev.filter(s => s.id !== id));
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  };
+
   return (
     <>
       <div className={styles.header}>
         <h2>Suno 노래 가져오기</h2>
       </div>
 
-      <div style={{ marginBottom: 24 }}>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.6 }}>
-          Suno AI에서 새로 만든 노래를 DB에 등록합니다.<br />
-          곡 URL을 입력하세요 (여러 곡은 줄바꿈으로 구분).<br />
-          <strong>지원 형식:</strong>{' '}
-          <code style={{ background: 'rgba(0,0,0,0.06)', padding: '2px 6px', borderRadius: 4, fontSize: '0.8rem' }}>
-            https://suno.com/s/단축ID
-          </code>{' '}또는{' '}
-          <code style={{ background: 'rgba(0,0,0,0.06)', padding: '2px 6px', borderRadius: 4, fontSize: '0.8rem' }}>
-            https://suno.com/song/UUID
-          </code>
-        </p>
+      {/* 방법 선택 탭 */}
+      <div style={{ display: 'flex', gap: 0, marginBottom: 20, borderBottom: '2px solid rgba(0,0,0,0.08)' }}>
+        <button
+          onClick={() => setActiveMethod('paste')}
+          style={{
+            padding: '10px 20px',
+            fontSize: '0.9rem',
+            fontWeight: activeMethod === 'paste' ? 700 : 500,
+            color: activeMethod === 'paste' ? 'var(--accent-gold)' : 'var(--text-muted)',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeMethod === 'paste' ? '2px solid var(--accent-gold)' : '2px solid transparent',
+            cursor: 'pointer',
+            marginBottom: -2,
+          }}
+        >
+          페이지 소스 붙여넣기 (권장)
+        </button>
+        <button
+          onClick={() => setActiveMethod('url')}
+          style={{
+            padding: '10px 20px',
+            fontSize: '0.9rem',
+            fontWeight: activeMethod === 'url' ? 700 : 500,
+            color: activeMethod === 'url' ? 'var(--accent-gold)' : 'var(--text-muted)',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeMethod === 'url' ? '2px solid var(--accent-gold)' : '2px solid transparent',
+            cursor: 'pointer',
+            marginBottom: -2,
+          }}
+        >
+          URL 자동 조회
+        </button>
+      </div>
 
-        <textarea
-          className={styles.formInput}
-          style={{ width: '100%', minHeight: 80, fontFamily: 'monospace', fontSize: '0.85rem', marginBottom: 12 }}
-          value={sunoUrl}
-          onChange={e => setSunoUrl(e.target.value)}
-          placeholder={`https://suno.com/s/0PUDECh8YKcNKS3X\nhttps://suno.com/s/abc123XYZ\n(한 줄에 하나씩 입력)`}
-        />
+      {/* 방법 1: 페이지 소스 붙여넣기 (권장) */}
+      {activeMethod === 'paste' && (
+        <div style={{
+          marginBottom: 24,
+          padding: 20,
+          background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+          borderRadius: 12,
+          border: '1px solid #fbbf24',
+        }}>
+          <div style={{ marginBottom: 16 }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#92400e', marginBottom: 12 }}>
+              Suno 페이지 소스로 곡 정보 가져오기
+            </h3>
+            <div style={{ fontSize: '0.85rem', color: '#78350f', lineHeight: 2 }}>
+              <div><strong style={{ display: 'inline-block', width: 28, height: 28, lineHeight: '28px', textAlign: 'center', background: '#f59e0b', color: '#fff', borderRadius: '50%', marginRight: 8, fontSize: '0.8rem' }}>1</strong> Suno 곡 페이지를 브라우저에서 엽니다</div>
+              <div><strong style={{ display: 'inline-block', width: 28, height: 28, lineHeight: '28px', textAlign: 'center', background: '#f59e0b', color: '#fff', borderRadius: '50%', marginRight: 8, fontSize: '0.8rem' }}>2</strong> 키보드에서 <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>Ctrl</kbd> + <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>U</kbd> 를 눌러 페이지 소스를 엽니다</div>
+              <div><strong style={{ display: 'inline-block', width: 28, height: 28, lineHeight: '28px', textAlign: 'center', background: '#f59e0b', color: '#fff', borderRadius: '50%', marginRight: 8, fontSize: '0.8rem' }}>3</strong> <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>Ctrl</kbd> + <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>A</kbd> (전체 선택) → <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>Ctrl</kbd> + <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>C</kbd> (복사)</div>
+              <div><strong style={{ display: 'inline-block', width: 28, height: 28, lineHeight: '28px', textAlign: 'center', background: '#f59e0b', color: '#fff', borderRadius: '50%', marginRight: 8, fontSize: '0.8rem' }}>4</strong> 아래 입력칸에 <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>Ctrl</kbd> + <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>V</kbd> (붙여넣기) → "<strong>곡 추가</strong>" 클릭</div>
+            </div>
+          </div>
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+          <textarea
+            className={styles.formTextarea}
+            style={{
+              width: '100%',
+              minHeight: 120,
+              fontFamily: 'monospace',
+              fontSize: '0.78rem',
+              background: '#fff',
+              border: '2px solid #f59e0b',
+              borderRadius: 8,
+              marginBottom: 12,
+            }}
+            value={pastedSource}
+            onChange={e => setPastedSource(e.target.value)}
+            placeholder="Suno 페이지 소스(Ctrl+U로 열리는 소스 코드)를 여기에 붙여넣으세요...&#10;&#10;제목, 가사, 스타일, URL이 자동으로 추출됩니다."
+          />
+          <button
+            className={styles.addBtn}
+            style={{ padding: '10px 24px', fontSize: '0.9rem', fontWeight: 700 }}
+            onClick={handlePasteAdd}
+            disabled={!pastedSource.trim()}
+          >
+            곡 추가
+          </button>
+          <span style={{ marginLeft: 12, fontSize: '0.8rem', color: '#92400e' }}>
+            여러 곡은 한 곡씩 붙여넣기 → 추가를 반복하세요
+          </span>
+        </div>
+      )}
+
+      {/* 방법 2: URL 자동 조회 (보조) */}
+      {activeMethod === 'url' && (
+        <div style={{ marginBottom: 24 }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.6 }}>
+            URL을 입력하면 자동으로 곡 정보를 가져옵니다.<br />
+            <span style={{ color: '#dc2626' }}>* 자동 조회가 실패할 수 있습니다 — 실패 시 "페이지 소스 붙여넣기" 방법을 사용하세요.</span>
+          </p>
+
+          <textarea
+            className={styles.formInput}
+            style={{ width: '100%', minHeight: 80, fontFamily: 'monospace', fontSize: '0.85rem', marginBottom: 12 }}
+            value={sunoUrl}
+            onChange={e => setSunoUrl(e.target.value)}
+            placeholder={`https://suno.com/s/0PUDECh8YKcNKS3X\nhttps://suno.com/s/abc123XYZ\n(한 줄에 하나씩 입력)`}
+          />
+
           <button className={styles.saveBtn} onClick={handleFetch} disabled={fetching || !sunoUrl.trim()}>
             {fetching ? '가져오는 중...' : '곡 정보 가져오기'}
           </button>
         </div>
+      )}
 
-        {/* 앨범 선택 + 등록 버튼 */}
-        {fetchedSongs.length > 0 && (
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
-            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-              등록할 앨범:
-            </label>
-            <select
-              className={styles.formInput}
-              style={{ width: 'auto', minWidth: 160 }}
-              value={targetSeriesId}
-              onChange={e => setTargetSeriesId(e.target.value)}
-            >
-              <option value="">미분류</option>
-              {songSeries.map(s => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-            <button
-              className={styles.addBtn}
-              onClick={handleImport}
-              disabled={importing || selectedIds.size === 0}
-              style={{ marginLeft: 'auto' }}
-            >
-              {importing ? '등록 중...' : `선택한 ${selectedIds.size}곡 등록`}
-            </button>
-          </div>
-        )}
-      </div>
+      {/* 앨범 선택 + 등록 버튼 */}
+      {fetchedSongs.length > 0 && (
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
+          <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+            등록할 앨범:
+          </label>
+          <select
+            className={styles.formInput}
+            style={{ width: 'auto', minWidth: 160 }}
+            value={targetSeriesId}
+            onChange={e => setTargetSeriesId(e.target.value)}
+          >
+            <option value="">미분류</option>
+            {songSeries.map(s => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+          <button
+            className={styles.addBtn}
+            onClick={handleImport}
+            disabled={importing || selectedIds.size === 0}
+            style={{ marginLeft: 'auto' }}
+          >
+            {importing ? '등록 중...' : `선택한 ${selectedIds.size}곡 등록`}
+          </button>
+        </div>
+      )}
 
       {/* 조회 결과 */}
       {fetchedSongs.length > 0 && (
@@ -2129,7 +2274,7 @@ function SunoImportAdmin() {
                 <th>가사</th>
                 <th>스타일</th>
                 <th>상태</th>
-                <th style={{ width: 60 }}></th>
+                <th style={{ width: 90 }}></th>
               </tr>
             </thead>
             <tbody>
@@ -2162,24 +2307,33 @@ function SunoImportAdmin() {
                     </td>
                     <td>
                       <span
-                        className={`${styles.statusBadge} ${song.already ? styles.draft : song.fetchFailed ? '' : styles.published}`}
-                        style={song.fetchFailed && !song.already ? { background: '#fef3c7', color: '#92400e' } : undefined}
+                        className={`${styles.statusBadge} ${song.already ? styles.draft : (song.title && song.lyrics) ? styles.published : ''}`}
+                        style={!song.already && (!song.title || !song.lyrics) ? { background: '#fef3c7', color: '#92400e' } : undefined}
                       >
-                        {song.already ? '이미 등록' : song.fetchFailed ? '수동 입력' : '준비'}
+                        {song.already ? '이미 등록' : (song.title && song.lyrics) ? '준비 완료' : '편집 필요'}
                       </span>
                     </td>
-                    <td>
+                    <td style={{ display: 'flex', gap: 4 }}>
                       {!song.already && (
-                        <button
-                          className={styles.editBtn}
-                          style={{ fontSize: '0.75rem', padding: '4px 8px' }}
-                          onClick={() => {
-                            setExpandedId(expandedId === song.id ? null : song.id);
-                            setPastedSource('');
-                          }}
-                        >
-                          {expandedId === song.id ? '접기' : '편집'}
-                        </button>
+                        <>
+                          <button
+                            className={styles.editBtn}
+                            style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+                            onClick={() => {
+                              setExpandedId(expandedId === song.id ? null : song.id);
+                              setPastedSource('');
+                            }}
+                          >
+                            {expandedId === song.id ? '접기' : '편집'}
+                          </button>
+                          <button
+                            className={styles.deleteBtn}
+                            style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+                            onClick={() => removeSong(song.id)}
+                          >
+                            삭제
+                          </button>
+                        </>
                       )}
                     </td>
                   </tr>
@@ -2200,6 +2354,18 @@ function SunoImportAdmin() {
                               />
                             </div>
                             <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Suno URL</label>
+                              <input
+                                className={styles.formInput}
+                                value={song.suno_url}
+                                onChange={e => updateField(song.id, 'suno_url', e.target.value)}
+                                placeholder="https://suno.com/s/..."
+                              />
+                            </div>
+                          </div>
+
+                          <div className={styles.formRow}>
+                            <div className={styles.formGroup}>
                               <label className={styles.formLabel}>스타일 (태그 참고용)</label>
                               <input
                                 className={styles.formInput}
@@ -2217,19 +2383,14 @@ function SunoImportAdmin() {
                               style={{ minHeight: 120 }}
                               value={song.lyrics}
                               onChange={e => updateField(song.id, 'lyrics', e.target.value)}
-                              placeholder="가사를 직접 입력하거나, 아래 소스 붙여넣기로 자동 추출하세요"
+                              placeholder="가사를 직접 입력하세요"
                             />
                           </div>
 
-                          {/* 페이지 소스 붙여넣기 영역 */}
+                          {/* 페이지 소스로 보충 */}
                           <div style={{ borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: 12 }}>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 8, lineHeight: 1.6 }}>
-                              <strong>페이지 소스에서 자동 추출</strong> —{' '}
-                              <a href={song.suno_url} target="_blank" rel="noopener noreferrer"
-                                style={{ color: 'var(--accent-gold)', textDecoration: 'underline' }}>
-                                Suno 페이지 열기
-                              </a>
-                              {' '}→ 우클릭 "페이지 소스 보기" → Ctrl+A 전체 선택 → 복사 → 아래 붙여넣기
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 8 }}>
+                              <strong>소스에서 자동 추출</strong> — 페이지 소스를 붙여넣으면 빈 항목을 자동으로 채웁니다
                             </p>
                             <textarea
                               className={styles.formInput}
@@ -2241,7 +2402,7 @@ function SunoImportAdmin() {
                             <button
                               className={styles.saveBtn}
                               style={{ marginTop: 8, padding: '6px 16px', fontSize: '0.8rem' }}
-                              onClick={() => handleParseSource(song.id)}
+                              onClick={() => handleParseSourceForSong(song.id)}
                               disabled={!pastedSource.trim()}
                             >
                               소스에서 추출
