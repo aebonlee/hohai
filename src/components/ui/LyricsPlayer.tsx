@@ -236,13 +236,8 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
                 <div className={styles.songActions}>
                   <LikeButton targetType="song" targetId={song.id} />
                   <AddToPlaylist songId={song.id} />
-                  <ShareButton title={song.title} text={song.description || song.title} />
+                  <ShareButton title={song.title} text={song.title} />
                 </div>
-
-                {/* 시인 소개글 */}
-                {song.description && (
-                  <p className={styles.songDescription}>{song.description}</p>
-                )}
 
                 {hasTags && (
                   <div className={styles.songTags}>
