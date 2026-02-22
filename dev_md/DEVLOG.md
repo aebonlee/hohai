@@ -2,6 +2,54 @@
 
 ---
 
+## 2026-02-22 — 사이트 점검 & 안정성 개선
+
+### 배경
+
+전체 사이트 점검 후 발견된 버그, 성능, 안정성 문제를 일괄 수정.
+
+### 버그 수정
+
+| 문제 | 수정 |
+|------|------|
+| Footer `/reviews` 깨진 링크 | `/community/reviews`로 수정, "앨범별 소개" → "노래모음집" 반영 |
+| PoemDetailPage 불필요한 전체 쿼리 | `usePoems`에 `enabled` 파라미터 추가, series_id 없는 시에서 전체 시 fetch 방지 |
+
+### 안정성 개선
+
+| 추가 | 설명 |
+|------|------|
+| ErrorBoundary 컴포넌트 | 렌더링 에러 시 백지 화면 대신 "문제가 발생했습니다" + 새로고침/홈 버튼 |
+| 404 NotFoundPage | 존재하지 않는 경로 접근 시 안내 페이지 (`*` catch-all 라우트) |
+
+### 성능 개선
+
+| 변경 | 효과 |
+|------|------|
+| React.lazy 라우트 분할 | 18개 페이지 lazy loading. index 번들 717KB → 587KB (−18%), AdminPage 53KB 별도 분리 |
+
+### 관리자 기능 확장
+
+| 추가 | 설명 |
+|------|------|
+| 갤러리 관리 탭 | 이미지 썸네일 + 공개/비공개 토글 + 삭제 (Storage 동시 삭제) |
+| 소식통 관리 탭 | 제목/내용 미리보기 + 공개/비공개 토글 + 삭제 |
+| useAllGallery / useAllNews 훅 | Admin용 전체 조회 + update + delete |
+
+### 코드 정리
+
+| 정리 | 설명 |
+|------|------|
+| ProtectedRoute.tsx 삭제 | AdminGuard로 대체된 미사용 컴포넌트 제거 |
+| getSunoEmbedUrl 유틸 추출 | SongCard, LyricsPlayer, SunoEmbed 3곳 중복 → `src/lib/suno.ts`로 통합 |
+
+### 검증 결과
+
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과 (8.84s), 페이지별 청크 분리 확인
+
+---
+
 ## 2026-02-22 — 커뮤니티 섹션 추가 + 메뉴 이름 변경
 
 ### 배경

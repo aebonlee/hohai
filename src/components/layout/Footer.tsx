@@ -16,8 +16,8 @@ export default function Footer() {
           <Link to="/poems" className={styles.link}>추천 시</Link>
           <Link to="/poem-series" className={styles.link}>시집 소개</Link>
           <Link to="/songs" className={styles.link}>추천 노래</Link>
-          <Link to="/albums" className={styles.link}>앨범별 소개</Link>
-          <Link to="/reviews" className={styles.link}>감상 후기</Link>
+          <Link to="/albums" className={styles.link}>노래모음집</Link>
+          <Link to="/community" className={styles.link}>커뮤니티</Link>
           <Link to="/about" className={styles.link}>시인 소개</Link>
         </div>
       </div>

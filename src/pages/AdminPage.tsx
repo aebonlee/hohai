@@ -7,6 +7,8 @@ import { useAllSongs } from '../hooks/useSongs';
 import { useAllSeries } from '../hooks/useSeries';
 import { useAllCategories, type CategoryInsert } from '../hooks/useCategories';
 import { useAllReviews } from '../hooks/useReviews';
+import { useAllGallery } from '../hooks/useGallery';
+import { useAllNews } from '../hooks/useNews';
 import { supabase } from '../lib/supabase';
 import { CATEGORY_NAMES, CATEGORY_COLORS } from '../lib/constants';
 import { POEM_CLASSIFICATIONS, CATEGORY_LIST } from '../data/poem-categories';
@@ -15,7 +17,7 @@ import type { SongInsert } from '../types/song';
 import type { SeriesInsert } from '../types/series';
 import styles from './AdminPage.module.css';
 
-type Tab = 'dashboard' | 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'poem-categories' | 'reviews' | 'batch-seed' | 'data-manage';
+type Tab = 'dashboard' | 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'poem-categories' | 'reviews' | 'gallery' | 'news' | 'batch-seed' | 'data-manage';
 
 const MENU_ITEMS: { group: string; items: { tab: Tab; label: string; icon: string }[] }[] = [
   {
@@ -39,7 +41,11 @@ const MENU_ITEMS: { group: string; items: { tab: Tab; label: string; icon: strin
   },
   {
     group: '커뮤니티',
-    items: [{ tab: 'reviews', label: '후기 관리', icon: '{}' }],
+    items: [
+      { tab: 'reviews', label: '후기 관리', icon: '{}' },
+      { tab: 'gallery', label: '갤러리 관리', icon: '{}' },
+      { tab: 'news', label: '소식통 관리', icon: '{}' },
+    ],
   },
   {
     group: '도구',
@@ -58,6 +64,8 @@ const TAB_LABELS: Record<Tab, string> = {
   songs: '노래 관리',
   'song-boards': '앨범 관리',
   reviews: '후기 관리',
+  gallery: '갤러리 관리',
+  news: '소식통 관리',
   'batch-seed': '총괄 관리',
   'data-manage': '데이터 관리',
 };
@@ -149,6 +157,8 @@ export default function AdminPage() {
             {activeTab === 'song-boards' && <BoardSeriesAdmin seriesType="song" typeLabel="앨범" itemLabel="노래" />}
             {activeTab === 'poem-categories' && <CategoriesAdmin />}
             {activeTab === 'reviews' && <ReviewsAdmin />}
+            {activeTab === 'gallery' && <GalleryAdmin />}
+            {activeTab === 'news' && <NewsAdmin />}
             {activeTab === 'batch-seed' && <BatchSeedAdmin />}
             {activeTab === 'data-manage' && <DataManageAdmin />}
           </div>
@@ -1178,6 +1188,164 @@ function ReviewsAdmin() {
                     {review.is_published ? '비공개' : '공개'}
                   </button>
                   <button className={styles.deleteBtn} onClick={() => handleDelete(review.id)}>삭제</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </>
+  );
+}
+
+/* ========================================
+   갤러리 관리 컴포넌트
+   ======================================== */
+function GalleryAdmin() {
+  const { items, loading, updateItem, deleteItem } = useAllGallery();
+
+  const handleTogglePublish = async (id: string, current: boolean) => {
+    await updateItem(id, { is_published: !current });
+  };
+
+  const handleDelete = async (id: string, imageUrl: string) => {
+    if (window.confirm('정말 삭제하시겠습니까? (이미지도 함께 삭제됩니다)')) {
+      await deleteItem(id, imageUrl);
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  return (
+    <>
+      <div className={styles.header}>
+        <h2>갤러리 ({items.length}건)</h2>
+      </div>
+
+      {loading ? (
+        <p style={{ color: 'var(--text-muted)' }}>불러오는 중...</p>
+      ) : items.length === 0 ? (
+        <p style={{ color: 'var(--text-muted)' }}>등록된 갤러리 항목이 없습니다.</p>
+      ) : (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>이미지</th>
+              <th>제목</th>
+              <th>작성자</th>
+              <th>날짜</th>
+              <th>상태</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.id}>
+                <td>
+                  <img
+                    src={item.image_url}
+                    alt={item.title}
+                    style={{ width: 60, height: 45, objectFit: 'cover', borderRadius: 4 }}
+                  />
+                </td>
+                <td className={styles.titleCell}>{item.title}</td>
+                <td style={{ fontSize: '0.85rem' }}>{item.author_name}</td>
+                <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                  {formatDate(item.created_at)}
+                </td>
+                <td>
+                  <span className={`${styles.statusBadge} ${item.is_published ? styles.published : styles.draft}`}>
+                    {item.is_published ? '공개' : '비공개'}
+                  </span>
+                </td>
+                <td className={styles.actions}>
+                  <button
+                    className={styles.editBtn}
+                    onClick={() => handleTogglePublish(item.id, item.is_published)}
+                  >
+                    {item.is_published ? '비공개' : '공개'}
+                  </button>
+                  <button className={styles.deleteBtn} onClick={() => handleDelete(item.id, item.image_url)}>삭제</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </>
+  );
+}
+
+/* ========================================
+   소식통 관리 컴포넌트
+   ======================================== */
+function NewsAdmin() {
+  const { items, loading, updateItem, deleteItem } = useAllNews();
+
+  const handleTogglePublish = async (id: string, current: boolean) => {
+    await updateItem(id, { is_published: !current });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('정말 삭제하시겠습니까?')) {
+      await deleteItem(id);
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  return (
+    <>
+      <div className={styles.header}>
+        <h2>소식통 ({items.length}건)</h2>
+      </div>
+
+      {loading ? (
+        <p style={{ color: 'var(--text-muted)' }}>불러오는 중...</p>
+      ) : items.length === 0 ? (
+        <p style={{ color: 'var(--text-muted)' }}>등록된 소식이 없습니다.</p>
+      ) : (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>제목</th>
+              <th>작성자</th>
+              <th>내용</th>
+              <th>날짜</th>
+              <th>상태</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.id}>
+                <td className={styles.titleCell}>{item.title}</td>
+                <td style={{ fontSize: '0.85rem' }}>{item.author_name}</td>
+                <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: 300 }}>
+                  {item.content.length > 60 ? item.content.slice(0, 60) + '...' : item.content}
+                </td>
+                <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                  {formatDate(item.created_at)}
+                </td>
+                <td>
+                  <span className={`${styles.statusBadge} ${item.is_published ? styles.published : styles.draft}`}>
+                    {item.is_published ? '공개' : '비공개'}
+                  </span>
+                </td>
+                <td className={styles.actions}>
+                  <button
+                    className={styles.editBtn}
+                    onClick={() => handleTogglePublish(item.id, item.is_published)}
+                  >
+                    {item.is_published ? '비공개' : '공개'}
+                  </button>
+                  <button className={styles.deleteBtn} onClick={() => handleDelete(item.id)}>삭제</button>
                 </td>
               </tr>
             ))}

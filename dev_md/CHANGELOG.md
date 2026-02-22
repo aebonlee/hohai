@@ -1,5 +1,24 @@
 # 개발 변경 이력 (CHANGELOG)
 
+## 2026-02-22 — 사이트 점검 & 안정성 개선
+
+### 수정
+- Footer: `/reviews` 깨진 링크 → `/community/reviews`, "앨범별 소개" → "노래모음집"
+- PoemDetailPage: series_id 없는 시에서 전체 시 목록 불필요 fetch 방지 (`usePoems` enabled 파라미터)
+
+### 추가
+- ErrorBoundary — 렌더링 에러 시 "문제가 발생했습니다" 안내 페이지
+- NotFoundPage (404) — 미존재 경로 catch-all 라우트
+- React.lazy 라우트 분할 — 18개 페이지 lazy loading (index 번들 −18%)
+- AdminPage: 갤러리 관리 탭 (썸네일 + 공개 토글 + 삭제), 소식통 관리 탭
+- useAllGallery / useAllNews Admin 훅
+
+### 제거
+- ProtectedRoute.tsx (미사용 컴포넌트)
+- getSunoEmbedUrl 3곳 중복 → `src/lib/suno.ts` 유틸로 통합
+
+---
+
 ## 2026-02-22 — 커뮤니티 섹션 추가 + 메뉴 이름 변경
 
 ### 추가

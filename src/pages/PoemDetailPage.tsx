@@ -15,8 +15,9 @@ export default function PoemDetailPage() {
   const { poem, loading, adjacentPoems } = usePoemDetail(id);
   const [readerOpen, setReaderOpen] = useState(false);
 
-  // 시집에 속한 시일 때 같은 시리즈의 시 목록 로드
-  const { poems: seriesPoems } = usePoems(undefined, poem?.series_id || undefined);
+  // 시집에 속한 시일 때만 같은 시리즈의 시 목록 로드
+  const hasSeriesId = !!poem?.series_id;
+  const { poems: seriesPoems } = usePoems(undefined, poem?.series_id || undefined, false, undefined, hasSeriesId);
   const readerIndex = seriesPoems.findIndex((p) => p.id === id);
 
   if (loading) {

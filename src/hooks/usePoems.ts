@@ -2,12 +2,18 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Poem, PoemInsert, PoemUpdate } from '../types/poem';
 
-export function usePoems(categorySlug?: string, seriesId?: string, featuredOnly?: boolean, tag?: string) {
+export function usePoems(categorySlug?: string, seriesId?: string, featuredOnly?: boolean, tag?: string, enabled = true) {
   const [poems, setPoems] = useState<Poem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPoems = useCallback(async () => {
+    if (!enabled) {
+      setPoems([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -39,7 +45,7 @@ export function usePoems(categorySlug?: string, seriesId?: string, featuredOnly?
       setPoems((data as Poem[]) || []);
     }
     setLoading(false);
-  }, [categorySlug, seriesId, featuredOnly, tag]);
+  }, [categorySlug, seriesId, featuredOnly, tag, enabled]);
 
   useEffect(() => {
     fetchPoems();
