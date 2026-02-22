@@ -118,6 +118,15 @@
   transform: translateY(-1px);
 }
 
+.tagPlain {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--mood-accent, var(--bg-secondary)) 10%, white 90%);
+  padding: 4px 12px;
+  border-radius: 999px;
+  opacity: 0.7;
+}
+
 .readerBtn {
   display: inline-flex;
   align-items: center;

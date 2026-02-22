@@ -5,7 +5,7 @@ import PageTransition from '../components/layout/PageTransition';
 import PoemEffects from '../components/ui/PoemEffects';
 import PoemReaderMode from '../components/ui/PoemReaderMode';
 import { usePoemDetail, usePoems } from '../hooks/usePoems';
-import { CATEGORY_COLORS } from '../lib/constants';
+import { CATEGORY_COLORS, CATEGORY_NAMES } from '../lib/constants';
 import type { MoodKey } from '../lib/mood';
 import { MOOD_LIGHT_GRADIENTS, MOOD_ACCENT_COLORS } from '../lib/mood';
 import styles from './PoemDetailPage.module.css';
@@ -84,9 +84,13 @@ export default function PoemDetailPage() {
 
           {poem.tags && poem.tags.length > 0 && (
             <div className={styles.tags}>
-              {poem.tags.map((tag) => (
-                <Link key={tag} to={`/poems?tag=${encodeURIComponent(tag)}`} className={styles.tag}>#{tag}</Link>
-              ))}
+              {poem.tags.map((tag) =>
+                CATEGORY_NAMES.includes(tag) ? (
+                  <Link key={tag} to={`/poems?tag=${encodeURIComponent(tag)}`} className={styles.tag}>#{tag}</Link>
+                ) : (
+                  <span key={tag} className={styles.tagPlain}>#{tag}</span>
+                )
+              )}
             </div>
           )}
 

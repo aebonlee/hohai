@@ -74,6 +74,10 @@
   overflow: hidden;
 }
 
+.tag {
+  white-space: nowrap;
+}
+
 .tagLink {
   cursor: pointer;
   transition: opacity var(--transition);

@@ -2,6 +2,29 @@
 
 ---
 
+## 2026-02-22 — 시 해시태그 카테고리 미연결 시 클릭 비활성화
+
+### 배경
+
+시의 해시태그 중 9개 카테고리(사랑, 그리움, 작별 등)에 해당하지 않는 태그를 클릭하면
+의미 없는 필터 결과 페이지로 이동하는 문제.
+
+### 변경 내용
+
+| 파일 | 변경 |
+|------|------|
+| `src/components/ui/PoemCard.tsx` | `CATEGORY_NAMES.includes(tag)` 체크 — 카테고리 태그만 `tagLink`(클릭 가능), 나머지 `tag`(일반 텍스트) |
+| `src/components/ui/PoemCard.module.css` | `.tag` 스타일 추가 (클릭 불가 일반 태그) |
+| `src/pages/PoemDetailPage.tsx` | 동일 로직 — 카테고리 태그만 `<Link>`, 나머지 `<span className={tagPlain}>` |
+| `src/pages/PoemDetailPage.module.css` | `.tagPlain` 스타일 추가 (opacity 0.7, cursor 기본) |
+
+### 검증 결과
+
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과 (10.25s)
+
+---
+
 ## 2026-02-22 — 재생목록 전체재생/셔플 시 반복 모드 자동 설정
 
 ### 배경

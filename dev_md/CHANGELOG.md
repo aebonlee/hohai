@@ -1,5 +1,14 @@
 # 개발 변경 이력 (CHANGELOG)
 
+## 2026-02-22 — 시 해시태그 카테고리 미연결 시 클릭 비활성화
+
+### 변경
+- PoemCard: 카테고리에 해당하는 태그만 클릭 가능 (tagLink), 나머지 일반 텍스트 (tag)
+- PoemDetailPage: 카테고리 태그만 `<Link>`, 나머지 `<span>` (tagPlain)
+- CSS: `.tag` (PoemCard), `.tagPlain` (PoemDetailPage) 비활성 스타일 추가
+
+---
+
 ## 2026-02-22 — 재생목록 전체재생/셔플 시 반복 모드 자동 설정
 
 ### 변경

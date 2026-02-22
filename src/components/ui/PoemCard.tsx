@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { Poem } from '../../types/poem';
-import { CARD_GRADIENTS, CATEGORY_COLORS } from '../../lib/constants';
+import { CARD_GRADIENTS, CATEGORY_COLORS, CATEGORY_NAMES } from '../../lib/constants';
 import type { MoodKey } from '../../lib/mood';
 import { MOOD_CARD_GRADIENTS } from '../../lib/mood';
 import styles from './PoemCard.module.css';
@@ -39,9 +39,13 @@ export default function PoemCard({ poem, index = 0 }: Props) {
       <div className={styles.footer}>
         {poem.tags && poem.tags.length > 0 && (
           <span className={styles.tags}>
-            {poem.tags.slice(0, 3).map(t => (
-              <span key={t} className={styles.tagLink} onClick={(e) => handleTagClick(e, t)}>#{t}</span>
-            ))}
+            {poem.tags.slice(0, 3).map(t =>
+              CATEGORY_NAMES.includes(t) ? (
+                <span key={t} className={styles.tagLink} onClick={(e) => handleTagClick(e, t)}>#{t}</span>
+              ) : (
+                <span key={t} className={styles.tag}>#{t}</span>
+              )
+            )}
           </span>
         )}
         {poem.written_date && (
