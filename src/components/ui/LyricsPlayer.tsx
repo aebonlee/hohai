@@ -166,18 +166,18 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
                 ) : hasSuno ? (
                   <iframe
                     src={getSunoEmbedUrl(song.suno_url!)}
-                    title={`${song.title} - Suno AI`}
+                    title={song.title}
                     allow="autoplay"
                   />
                 ) : null}
               </div>
 
-              {/* YouTube + Suno 둘 다 있을 때 Suno 미니 플레이어 */}
+              {/* YouTube + 음원 둘 다 있을 때 음원 미니 플레이어 */}
               {hasYoutube && hasSuno && (
                 <div className={styles.secondaryPlayer}>
                   <iframe
                     src={getSunoEmbedUrl(song.suno_url!)}
-                    title={`${song.title} - Suno AI`}
+                    title={song.title}
                     allow="autoplay"
                   />
                 </div>

@@ -26,7 +26,7 @@ export default function LatestSongsPage() {
     <PageTransition>
       <Helmet>
         <title>최신 노래 — 好海</title>
-        <meta name="description" content="好海 이성헌 시인의 최신 노래 — Suno AI로 시에 멜로디를 입히다" />
+        <meta name="description" content="好海 이성헌 시인의 최신 노래 — 시에 멜로디를 입힌 창작 음악" />
       </Helmet>
 
       <div className={styles.page}>

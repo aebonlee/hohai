@@ -86,7 +86,7 @@
   height: 100%;
 }
 
-/* Suno 플레이스홀더 (YouTube 없는 경우) */
+/* 음원 플레이스홀더 (YouTube 없는 경우) */
 .sunoPlaceholder {
   width: 100%;
   height: 100%;
@@ -150,7 +150,7 @@
   min-height: 160px;
 }
 
-/* YouTube + Suno 둘 다 있는 경우의 Suno 영역 */
+/* YouTube + 음원 둘 다 있는 경우의 음원 영역 */
 .sunoSection {
   border-top: 1px solid rgba(10, 25, 41, 0.08);
 }
@@ -224,11 +224,11 @@
   padding: 20px;
 }
 
-.infoHeader {
+.actions {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
 .title {

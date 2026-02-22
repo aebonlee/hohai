@@ -35,7 +35,7 @@ export default function SunoEmbed({ sunoUrl, title = '' }: Props) {
           <circle cx="18" cy="16" r="3" />
         </svg>
         <span style={{ fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.05em' }}>
-          Suno AI
+          음원 재생
         </span>
         <div
           style={{
@@ -72,7 +72,7 @@ export default function SunoEmbed({ sunoUrl, title = '' }: Props) {
     >
       <iframe
         src={getSunoEmbedUrl(sunoUrl)}
-        title={title ? `${title} - Suno AI` : 'Suno AI'}
+        title={title || '노래 재생'}
         style={{ width: '100%', height: '100%', border: 'none' }}
         allow="autoplay"
       />
