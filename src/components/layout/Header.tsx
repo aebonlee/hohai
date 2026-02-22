@@ -6,8 +6,9 @@ import styles from './Header.module.css';
 const NAV_ITEMS = [
   { to: '/', label: '홈' },
   { to: '/poems', label: '추천 시(詩)' },
-  { to: '/poem-series', label: '시집 소개' },
-  { to: '/songs', label: '추천 노래' },
+  { to: '/poem-series', label: '시(詩)모음집' },
+  { to: '/published-books', label: '출간시집' },
+  { to: '/latest-songs', label: '최신 노래' },
   { to: '/albums', label: '노래모음집' },
   { to: '/playlist', label: '재생목록', title: '내가 만든 재생목록을 관리합니다 (로그인 필요)' },
   { to: '/community', label: '커뮤니티' },

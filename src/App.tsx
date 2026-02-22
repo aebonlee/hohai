@@ -12,7 +12,9 @@ const PoemsPage = lazy(() => import('./pages/PoemsPage'));
 const PoemSeriesPage = lazy(() => import('./pages/PoemSeriesPage'));
 const PoemDetailPage = lazy(() => import('./pages/PoemDetailPage'));
 const FeaturedSongsPage = lazy(() => import('./pages/FeaturedSongsPage'));
+const LatestSongsPage = lazy(() => import('./pages/LatestSongsPage'));
 const SongsPage = lazy(() => import('./pages/SongsPage'));
+const PublishedBooksPage = lazy(() => import('./pages/PublishedBooksPage'));
 const SongSeriesPage = lazy(() => import('./pages/SongSeriesPage'));
 const CommunityPage = lazy(() => import('./pages/CommunityPage'));
 const ReviewsPage = lazy(() => import('./pages/ReviewsPage'));
@@ -57,6 +59,8 @@ export default function App() {
               <Route path="poem-series" element={<PoemsPage />} />
               <Route path="poem-series/:slug" element={<PoemSeriesPage />} />
               <Route path="songs" element={<FeaturedSongsPage />} />
+              <Route path="latest-songs" element={<LatestSongsPage />} />
+              <Route path="published-books" element={<PublishedBooksPage />} />
               <Route path="albums" element={<SongsPage />} />
               <Route path="albums/:slug" element={<SongSeriesPage />} />
               <Route path="community" element={<CommunityPage />} />

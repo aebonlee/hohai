@@ -59,6 +59,28 @@ export function useFeaturedSong() {
   return { song, loading };
 }
 
+/** 최신 노래: 모든 공개 노래를 최신순으로 */
+export function useLatestSongs() {
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase
+        .from('hohai_songs')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+
+      setSongs((data as Song[]) || []);
+      setLoading(false);
+    };
+    fetch();
+  }, []);
+
+  return { songs, loading };
+}
+
 // Admin hooks
 export function useAllSongs() {
   const [songs, setSongs] = useState<Song[]>([]);
