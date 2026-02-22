@@ -5,10 +5,10 @@ import PageTransition from '../components/layout/PageTransition';
 import styles from './AboutPage.module.css';
 
 const TIMELINE = [
-  { year: '2020', text: '시 창작 활동 시작' },
-  { year: '2022', text: '호해(好海) 필명으로 본격 활동' },
-  { year: '2023', text: 'Suno AI 활용 시 낭송 · 노래 제작 시작' },
-  { year: '2024', text: '好海 웹사이트 개설, 시집 및 노래모음집 연재' },
+  { year: '2005', text: '모던 포엠 신인문예 작품상 수상 (2005년 4월 25일)' },
+  { year: '2006', text: '호해(好海) 필명으로 본격 활동' },
+  { year: '2025', text: 'Suno AI 활용 시 낭송 · 노래 제작 시작' },
+  { year: '2026', text: '好海 웹사이트 개설, 시집 및 노래모음집 연재' },
 ];
 
 export default function AboutPage() {
