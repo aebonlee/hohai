@@ -2,6 +2,28 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import type { TargetType } from '../types/interaction';
 
+const FAVORITES_NAME = '즐겨찾기';
+
+/** 특정 곡의 전체 즐겨찾기 횟수 (모든 사용자) */
+export function useFavoritesCount(songId: string) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!songId) return;
+    const fetch = async () => {
+      const { data } = await supabase
+        .from('hohai_playlists')
+        .select('id')
+        .eq('name', FAVORITES_NAME)
+        .contains('song_ids', [songId]);
+      setCount(data?.length || 0);
+    };
+    fetch();
+  }, [songId]);
+
+  return count;
+}
+
 export function useLikes(targetType: TargetType, targetId: string, userId?: string) {
   const [count, setCount] = useState(0);
   const [liked, setLiked] = useState(false);

@@ -224,11 +224,39 @@
   padding: 20px;
 }
 
+.statsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.counts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.countItem {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.countItem:first-child {
+  color: #dc2626;
+}
+
+.countItem:nth-child(2) {
+  color: #c88a10;
+}
+
 .actions {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 10px;
 }
 
 .title {

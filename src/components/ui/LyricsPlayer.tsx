@@ -7,6 +7,7 @@ import { useYouTubePlayer } from '../../hooks/useYouTubePlayer';
 import { detectMood, MOOD_GRADIENTS } from '../../lib/mood';
 import LyricsEffects from './LyricsEffects';
 import { getSunoEmbedUrl } from '../../lib/suno';
+import { cleanLyrics } from '../../lib/cleanLyrics';
 import styles from './LyricsPlayer.module.css';
 
 interface Props {
@@ -238,7 +239,7 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
             >
               <div className={styles.lyricsHeader}>가사</div>
               {hasLyrics ? (
-                <div className={styles.lyricsBody}>{song.lyrics}</div>
+                <div className={styles.lyricsBody}>{cleanLyrics(song.lyrics!)}</div>
               ) : (
                 <div className={styles.noLyrics}>가사가 없습니다</div>
               )}

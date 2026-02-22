@@ -6,7 +6,10 @@ import { useYouTubePlayer } from '../../hooks/useYouTubePlayer';
 import AddToPlaylist from './AddToPlaylist';
 import ShareButton from './ShareButton';
 import LikeButton from './LikeButton';
+import { useLikes, useFavoritesCount } from '../../hooks/useLikes';
+import { useAuth } from '../../contexts/AuthContext';
 import { getSunoEmbedUrl } from '../../lib/suno';
+import { cleanLyrics } from '../../lib/cleanLyrics';
 import styles from './SongCard.module.css';
 
 interface Props {
@@ -29,6 +32,9 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
   const cardRef = useRef<HTMLElement>(null);
   const hasYoutube = !!song.youtube_id;
   const hasSuno = !!song.suno_url;
+  const { user } = useAuth();
+  const { count: likeCount } = useLikes('song', song.id, user?.id);
+  const favCount = useFavoritesCount(song.id);
   const hasLyrics = !!song.lyrics;
   const hasTags = song.tags && song.tags.length > 0;
   const isInPlaylist = playlist !== null;
@@ -202,14 +208,27 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
 
       <div className={styles.info}>
         <h3 className={styles.title}>{song.title}</h3>
-        <div className={styles.actions}>
-          <AddToPlaylist songId={song.id} />
-          <LikeButton targetType="song" targetId={song.id} />
-          <ShareButton title={song.title} text={song.description || song.title} />
+
+        {/* 좋아요·즐겨찾기 카운트 + 액션 버튼 */}
+        <div className={styles.statsRow}>
+          {(likeCount > 0 || favCount > 0) && (
+            <div className={styles.counts}>
+              {likeCount > 0 && <span className={styles.countItem}>♥ {likeCount}</span>}
+              {favCount > 0 && <span className={styles.countItem}>★ {favCount}</span>}
+            </div>
+          )}
+          <div className={styles.actions}>
+            <AddToPlaylist songId={song.id} />
+            <LikeButton targetType="song" targetId={song.id} />
+            <ShareButton title={song.title} text={song.description || song.title} />
+          </div>
         </div>
+
+        {/* 시인 소개글 */}
         {song.description && (
           <p className={styles.description}>{song.description}</p>
         )}
+
         {hasTags && (
           <div className={styles.tags}>
             {song.tags.map((tag) => (
@@ -217,6 +236,7 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
             ))}
           </div>
         )}
+
         {hasLyrics && (
           <>
             <div className={styles.lyricsActions}>
@@ -236,7 +256,7 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
               </button>
             </div>
             {lyricsOpen && (
-              <div className={styles.lyrics}>{song.lyrics}</div>
+              <div className={styles.lyrics}>{cleanLyrics(song.lyrics!)}</div>
             )}
           </>
         )}
