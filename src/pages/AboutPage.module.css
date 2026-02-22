@@ -57,6 +57,31 @@
   color: var(--text-secondary);
   line-height: 1.8;
   font-size: 1rem;
+  margin-bottom: 16px;
+}
+
+.socialLinks {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+
+.socialLink:hover {
+  background: var(--bg-warm);
+  color: var(--accent-gold);
 }
 
 /* 시인의 말 */

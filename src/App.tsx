@@ -25,6 +25,7 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
+const SearchPage = lazy(() => import('./pages/SearchPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 function Loading() {
@@ -63,6 +64,7 @@ export default function App() {
               <Route path="community/gallery" element={<GalleryPage />} />
               <Route path="community/news" element={<NewsPage />} />
               <Route path="about" element={<AboutPage />} />
+              <Route path="search" element={<SearchPage />} />
               <Route path="playlist" element={
                 <AuthGuard><PlaylistPage /></AuthGuard>
               } />

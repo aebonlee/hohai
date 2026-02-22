@@ -4,6 +4,8 @@ import type { Song } from '../../types/song';
 import { usePlayback } from '../../contexts/PlaybackContext';
 import { useYouTubePlayer } from '../../hooks/useYouTubePlayer';
 import AddToPlaylist from './AddToPlaylist';
+import ShareButton from './ShareButton';
+import LikeButton from './LikeButton';
 import { getSunoEmbedUrl } from '../../lib/suno';
 import styles from './SongCard.module.css';
 
@@ -201,7 +203,11 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
       <div className={styles.info}>
         <div className={styles.infoHeader}>
           <h3 className={styles.title}>{song.title}</h3>
-          <AddToPlaylist songId={song.id} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <AddToPlaylist songId={song.id} />
+            <LikeButton targetType="song" targetId={song.id} />
+            <ShareButton title={song.title} text={song.description || song.title} />
+          </div>
         </div>
         {song.description && (
           <p className={styles.description}>{song.description}</p>

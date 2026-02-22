@@ -4,6 +4,9 @@ import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/layout/PageTransition';
 import PoemEffects from '../components/ui/PoemEffects';
 import PoemReaderMode from '../components/ui/PoemReaderMode';
+import ShareButton from '../components/ui/ShareButton';
+import LikeButton from '../components/ui/LikeButton';
+import CommentSection from '../components/ui/CommentSection';
 import { usePoemDetail, usePoems } from '../hooks/usePoems';
 import { CATEGORY_COLORS, CATEGORY_NAMES } from '../lib/constants';
 import type { MoodKey } from '../lib/mood';
@@ -95,14 +98,20 @@ export default function PoemDetailPage() {
             </div>
           )}
 
-          {poem.series_id && seriesPoems.length > 1 && (
-            <button
-              className={styles.readerBtn}
-              onClick={() => setReaderOpen(true)}
-            >
-              읽기 모드
-            </button>
-          )}
+          <div className={styles.actions}>
+            <LikeButton targetType="poem" targetId={poem.id} />
+            <ShareButton title={poem.title} text={poem.excerpt || poem.content.slice(0, 100)} />
+            {poem.series_id && seriesPoems.length > 1 && (
+              <button
+                className={styles.readerBtn}
+                onClick={() => setReaderOpen(true)}
+              >
+                읽기 모드
+              </button>
+            )}
+          </div>
+
+          <CommentSection targetType="poem" targetId={poem.id} />
 
           <nav className={styles.nav}>
             {adjacentPoems.prev ? (
