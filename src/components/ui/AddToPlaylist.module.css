@@ -74,8 +74,8 @@
 
 .dropdown {
   position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
+  bottom: calc(100% + 6px);
+  left: 0;
   z-index: 100;
   min-width: 220px;
   background: var(--bg-primary, #fff);
