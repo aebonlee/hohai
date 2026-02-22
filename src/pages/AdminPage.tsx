@@ -18,6 +18,11 @@ import type { SeriesInsert } from '../types/series';
 import { formatDate } from '../lib/formatDate';
 import styles from './AdminPage.module.css';
 
+/** 한국 표준시(KST, UTC+9) 기준 오늘 날짜 (YYYY-MM-DD) */
+function getTodayKST(): string {
+  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
+}
+
 type Tab = 'dashboard' | 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'suno-import' | 'poem-categories' | 'reviews' | 'gallery' | 'news' | 'batch-seed' | 'data-manage';
 
 const MENU_ITEMS: { group: string; items: { tab: Tab; label: string; icon: string }[] }[] = [
@@ -175,43 +180,68 @@ export default function AdminPage() {
 /* ========================================
    대시보드 컴포넌트
    ======================================== */
+const DASHBOARD_CARDS: {
+  tab: Tab; label: string; icon: string; hint: string;
+  bg: string; border: string; color: string;
+  dataKey: 'poems' | 'songs' | 'series' | 'reviews' | 'gallery' | 'news';
+}[] = [
+  { tab: 'poems', label: '시', icon: '📝', hint: '시 관리로 이동', bg: '#f0f0ff', border: '#c7d2fe', color: '#4338ca', dataKey: 'poems' },
+  { tab: 'songs', label: '노래', icon: '🎵', hint: '노래 관리로 이동', bg: '#fdf2f8', border: '#fbcfe8', color: '#be185d', dataKey: 'songs' },
+  { tab: 'poem-boards', label: '시집/앨범', icon: '📚', hint: '시리즈 관리로 이동', bg: '#ecfeff', border: '#a5f3fc', color: '#0e7490', dataKey: 'series' },
+  { tab: 'reviews', label: '감상 후기', icon: '💬', hint: '후기 관리로 이동', bg: '#f0fdf4', border: '#bbf7d0', color: '#15803d', dataKey: 'reviews' },
+  { tab: 'gallery', label: '갤러리', icon: '🖼️', hint: '갤러리 관리로 이동', bg: '#fffbeb', border: '#fde68a', color: '#b45309', dataKey: 'gallery' },
+  { tab: 'news', label: '소식통', icon: '📰', hint: '소식 관리로 이동', bg: '#f8fafc', border: '#cbd5e1', color: '#475569', dataKey: 'news' },
+];
+
 function DashboardAdmin({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
   const { poems, loading: poemsLoading } = useAllPoems();
   const { songs, loading: songsLoading } = useAllSongs();
   const { series, loading: seriesLoading } = useAllSeries();
   const { reviews, loading: reviewsLoading } = useAllReviews();
+  const { items: galleryItems, loading: galleryLoading } = useAllGallery();
+  const { items: newsItems, loading: newsLoading } = useAllNews();
 
-  const loading = poemsLoading || songsLoading || seriesLoading || reviewsLoading;
-  const poemSeriesCount = series.filter(s => s.type === 'poem').length;
-  const songSeriesCount = series.filter(s => s.type === 'song').length;
+  const loading = poemsLoading || songsLoading || seriesLoading || reviewsLoading || galleryLoading || newsLoading;
+  const counts: Record<string, number> = {
+    poems: poems.length,
+    songs: songs.length,
+    series: series.length,
+    reviews: reviews.length,
+    gallery: galleryItems.length,
+    news: newsItems.length,
+  };
 
   return (
     <>
       <div className={styles.header}>
-        <h2>대시보드</h2>
+        <h2 style={{ fontSize: '1.4rem' }}>대시보드</h2>
+        <span style={{ fontSize: '0.95rem', color: 'var(--text-muted)' }}>
+          {getTodayKST()} (한국 시간)
+        </span>
       </div>
 
       <div className={styles.dashboardGrid}>
-        <div className={styles.statCard} onClick={() => onNavigate('poems')}>
-          <div className={styles.statLabel}>시</div>
-          <div className={styles.statValue}>{loading ? '...' : poems.length}</div>
-          <div className={styles.statHint}>시집 {poemSeriesCount}개 &rarr;</div>
-        </div>
-        <div className={styles.statCard} onClick={() => onNavigate('songs')}>
-          <div className={styles.statLabel}>노래</div>
-          <div className={styles.statValue}>{loading ? '...' : songs.length}</div>
-          <div className={styles.statHint}>앨범 {songSeriesCount}개 &rarr;</div>
-        </div>
-        <div className={styles.statCard} onClick={() => onNavigate('poem-boards')}>
-          <div className={styles.statLabel}>시리즈</div>
-          <div className={styles.statValue}>{loading ? '...' : series.length}</div>
-          <div className={styles.statHint}>시집 + 앨범 &rarr;</div>
-        </div>
-        <div className={styles.statCard} onClick={() => onNavigate('reviews')}>
-          <div className={styles.statLabel}>후기</div>
-          <div className={styles.statValue}>{loading ? '...' : reviews.length}</div>
-          <div className={styles.statHint}>감상 후기 &rarr;</div>
-        </div>
+        {DASHBOARD_CARDS.map(card => (
+          <div
+            key={card.tab}
+            className={styles.statCard}
+            onClick={() => onNavigate(card.tab)}
+            style={{
+              background: card.bg,
+              borderColor: card.border,
+              borderWidth: 2,
+            }}
+          >
+            <div style={{ fontSize: '2.2rem', marginBottom: 6, lineHeight: 1 }}>{card.icon}</div>
+            <div className={styles.statLabel} style={{ color: card.color, fontSize: '1rem' }}>
+              {card.label}
+            </div>
+            <div className={styles.statValue} style={{ color: card.color }}>
+              {loading ? '...' : counts[card.dataKey]}
+            </div>
+            <div className={styles.statHint}>{card.hint} &rarr;</div>
+          </div>
+        ))}
       </div>
     </>
   );
@@ -228,7 +258,7 @@ function PoemsAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('');
   const [searchText, setSearchText] = useState('');
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getTodayKST();
   const [form, setForm] = useState<PoemInsert>({
     title: '',
     content: '',
@@ -1354,29 +1384,6 @@ function BatchSeedAdmin() {
 
   const addLog = (msg: string) => setLog(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
 
-  /* ── 시 관련 ── */
-
-  const handleUpdateWrittenDates = async () => {
-    const today = new Date().toISOString().split('T')[0];
-    if (!window.confirm(`모든 시의 작성일을 ${today}(오늘)로 변경하시겠습니까?`)) return;
-    setRunning(true);
-    setLog([]);
-    addLog(`작성일 일괄 변경 시작 → ${today}`);
-
-    const { data, error: countErr } = await supabase
-      .from('hohai_poems')
-      .update({ written_date: today })
-      .neq('id', '00000000-0000-0000-0000-000000000000')
-      .select('id');
-
-    if (countErr) {
-      addLog(`업데이트 실패: ${countErr.message}`);
-    } else {
-      addLog(`${data?.length ?? 0}편의 작성일을 ${today}로 변경 완료!`);
-    }
-    setRunning(false);
-  };
-
   const handleUpdateCategories = async () => {
     if (!window.confirm('기존 시의 카테고리/태그를 일괄 업데이트하시겠습니까?\n(기존 카테고리 삭제 후 9개 새 카테고리 등록 + 시 분류 업데이트)')) return;
     setRunning(true);
@@ -1489,169 +1496,49 @@ function BatchSeedAdmin() {
     }
   };
 
-  /* ── 노래 가사/태그 일괄 등록 ── */
-
-  const handleSeedSongLyrics = async () => {
-    if (!window.confirm('DB에 있는 Suno 노래의 가사/태그를 일괄 등록하시겠습니까?\n(삭제된 곡은 건너뜁니다)')) return;
-    setRunning(true);
-    setLog([]);
-    addLog('가사/태그 일괄 등록 시작...');
-
-    // 1. DB에서 현재 존재하는 Suno 곡만 조회
-    addLog('DB에서 Suno 곡 조회 중...');
-    const { data: dbSongs, error: fetchErr } = await supabase
-      .from('hohai_songs')
-      .select('id, title, suno_url')
-      .not('suno_url', 'is', null)
-      .neq('suno_url', '');
-
-    if (fetchErr || !dbSongs) {
-      addLog(`DB 조회 실패: ${fetchErr?.message}`);
-      setRunning(false);
-      return;
-    }
-    addLog(`DB에 ${dbSongs.length}곡 존재`);
-
-    // 2. 가사 데이터 로드
-    const { SUNO_LYRICS } = await import('../data/suno-lyrics');
-    addLog(`가사 데이터 ${Object.keys(SUNO_LYRICS).length}곡 로드 완료`);
-
-    // 3. suno_url 기반 매칭 → lyrics + description(style) + tags UPDATE
-    let updated = 0;
-    let skipped = 0;
-    let noData = 0;
-
-    for (const song of dbSongs) {
-      const lyricsData = SUNO_LYRICS[song.suno_url!];
-      if (!lyricsData) {
-        noData++;
-        continue;
-      }
-
-      if (!lyricsData.lyrics && (!lyricsData.tags || lyricsData.tags.length === 0)) {
-        skipped++;
-        continue;
-      }
-
-      const updatePayload: Record<string, unknown> = {};
-      if (lyricsData.lyrics) updatePayload.lyrics = lyricsData.lyrics;
-      if (lyricsData.style) updatePayload.description = lyricsData.style;
-      if (lyricsData.tags && lyricsData.tags.length > 0) updatePayload.tags = lyricsData.tags;
-
-      const { error: upErr } = await supabase
-        .from('hohai_songs')
-        .update(updatePayload)
-        .eq('id', song.id);
-
-      if (upErr) {
-        addLog(`"${song.title}" 업데이트 실패: ${upErr.message}`);
-      } else {
-        updated++;
-      }
-
-      if (updated % 20 === 0 && updated > 0) {
-        addLog(`진행: ${updated}곡 업데이트 완료...`);
-      }
-    }
-
-    // 4. 태그 통계
-    const tagStats: Record<string, number> = {};
-    for (const song of dbSongs) {
-      const d = SUNO_LYRICS[song.suno_url!];
-      if (d?.tags) {
-        for (const t of d.tags) {
-          tagStats[t] = (tagStats[t] || 0) + 1;
-        }
-      }
-    }
-
-    addLog('--- 태그 분포 ---');
-    for (const [tag, count] of Object.entries(tagStats).sort((a, b) => b[1] - a[1])) {
-      addLog(`  #${tag}: ${count}곡`);
-    }
-
-    addLog(`\n업데이트 완료! 성공: ${updated}곡, 데이터없음: ${noData}곡, 스킵: ${skipped}곡`);
-    setRunning(false);
-  };
-
   return (
     <>
       <div className={styles.header}>
         <h2>총괄 관리</h2>
       </div>
 
-      {/* 시 관리 */}
-      <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: '1rem', marginBottom: 10, color: 'var(--text-secondary)' }}>시 관리</h3>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          <button
-            className={styles.saveBtn}
-            onClick={handleUpdateCategories}
-            disabled={running}
-            style={{ padding: '10px 20px', fontSize: '0.95rem' }}
-          >
-            카테고리/태그 일괄 업데이트
-          </button>
-          <button
-            className={styles.saveBtn}
-            onClick={handleUpdateWrittenDates}
-            disabled={running}
-            style={{ padding: '10px 20px', fontSize: '0.95rem' }}
-          >
-            작성일 → 오늘 날짜로 일괄 변경
-          </button>
-          <button
-            className={styles.editBtn}
-            onClick={handleShowStats}
-            disabled={running}
-            style={{ padding: '10px 20px', fontSize: '0.95rem' }}
-          >
-            카테고리 현황 보기
-          </button>
-        </div>
-      </div>
-
-      {/* 노래 관리 */}
-      <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: '1rem', marginBottom: 10, color: 'var(--text-secondary)' }}>노래 관리</h3>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          <button
-            className={styles.addBtn}
-            onClick={handleSeedSongLyrics}
-            disabled={running}
-            style={{ padding: '10px 20px', fontSize: '0.95rem', background: '#6366f1' }}
-          >
-            가사/태그 일괄 등록
-          </button>
-        </div>
+      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 24 }}>
+        <button
+          className={styles.saveBtn}
+          onClick={handleUpdateCategories}
+          disabled={running}
+          style={{ padding: '14px 24px', fontSize: '1rem' }}
+        >
+          카테고리/태그 일괄 업데이트
+        </button>
+        <button
+          className={styles.editBtn}
+          onClick={handleShowStats}
+          disabled={running}
+          style={{ padding: '14px 24px', fontSize: '1rem' }}
+        >
+          카테고리 현황 보기
+        </button>
       </div>
 
       <div style={{
         background: 'var(--bg-secondary)',
-        borderRadius: 8,
-        padding: 16,
+        borderRadius: 10,
+        padding: 20,
         fontFamily: 'monospace',
-        fontSize: '0.85rem',
+        fontSize: '0.95rem',
         maxHeight: 400,
         overflowY: 'auto',
-        lineHeight: 1.6,
+        lineHeight: 1.7,
         whiteSpace: 'pre-wrap',
       }}>
         {log.length === 0 ? (
-          <p style={{ color: 'var(--text-muted)' }}>
-            버튼을 클릭하면 로그가 표시됩니다.
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.8 }}>
+            버튼을 클릭하면 실행 결과가 여기에 표시됩니다.
             <br /><br />
-            <strong>시 관리</strong>
+            &bull; <strong>카테고리/태그 일괄 업데이트</strong> — 시의 카테고리와 태그를 일괄 변경합니다
             <br />
-            &bull; 카테고리/태그 일괄 업데이트: 기존 등록된 시의 카테고리/태그만 일괄 변경
-            <br />
-            &bull; 작성일 변경: 모든 시의 작성일을 오늘 날짜로 일괄 변경
-            <br />
-            &bull; 카테고리 현황: 카테고리별 시 수 + 인기 태그 통계
-            <br /><br />
-            <strong>노래 관리</strong>
-            <br />
-            &bull; 가사/태그 일괄 등록: Suno에서 크롤링한 가사 + 스타일 + 해시태그를 DB에 반영
+            &bull; <strong>카테고리 현황 보기</strong> — 카테고리별 시 수와 인기 태그를 확인합니다
           </p>
         ) : (
           log.map((line, i) => <div key={i}>{line}</div>)
