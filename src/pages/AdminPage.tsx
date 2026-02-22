@@ -1453,6 +1453,136 @@ function BatchSeedAdmin() {
     setRunning(false);
   };
 
+  /** 시집 100편 단위 분리 */
+  const handleSplitSeries = async () => {
+    if (!window.confirm(
+      '시집을 100편 단위로 분리합니다.\n\n' +
+      '제1권: 1~100번 시 (99편)\n' +
+      '제2권: 101~178번 시 (78편)\n\n' +
+      '진행하시겠습니까?'
+    )) return;
+    setRunning(true);
+    setLog([]);
+    addLog('시집 분리 시작...');
+
+    // 1. 기존 시집 조회
+    const { data: existingSeries } = await supabase
+      .from('hohai_series')
+      .select('id, name')
+      .eq('type', 'poem')
+      .order('display_order');
+
+    let series1Id: string | null = null;
+    let series2Id: string | null = null;
+
+    // 기존 "무지개 빛으로 채색된 삶" 시집 → 제1권으로 변경
+    const rainbow = existingSeries?.find(s => s.name.includes('무지개'));
+    if (rainbow) {
+      addLog(`기존 시집 "${rainbow.name}" → 제1권으로 변경`);
+      const { error } = await supabase
+        .from('hohai_series')
+        .update({
+          name: '무지개 빛으로 채색된 삶 제1권',
+          slug: 'rainbow-life-vol1',
+          description: '사랑, 인생, 그리움, 추억... 삶의 전반부를 무지개빛으로 물들인 99편의 시',
+          display_order: 1,
+        })
+        .eq('id', rainbow.id);
+      if (error) { addLog(`제1권 변경 실패: ${error.message}`); }
+      else { series1Id = rainbow.id; addLog('제1권 변경 완료'); }
+    } else {
+      addLog('제1권 시집 새로 생성...');
+      const { data, error } = await supabase
+        .from('hohai_series')
+        .insert({
+          name: '무지개 빛으로 채색된 삶 제1권',
+          slug: 'rainbow-life-vol1',
+          type: 'poem',
+          description: '사랑, 인생, 그리움, 추억... 삶의 전반부를 무지개빛으로 물들인 99편의 시',
+          display_order: 1,
+          is_published: true,
+        })
+        .select('id')
+        .single();
+      if (error) { addLog(`제1권 생성 실패: ${error.message}`); }
+      else { series1Id = data?.id || null; addLog('제1권 생성 완료'); }
+    }
+
+    // 제2권 생성 (이미 있으면 스킵)
+    const vol2 = existingSeries?.find(s => s.name.includes('제2권'));
+    if (vol2) {
+      series2Id = vol2.id;
+      addLog('제2권 시집이 이미 존재합니다.');
+    } else {
+      addLog('제2권 시집 생성...');
+      const { data, error } = await supabase
+        .from('hohai_series')
+        .insert({
+          name: '무지개 빛으로 채색된 삶 제2권',
+          slug: 'rainbow-life-vol2',
+          type: 'poem',
+          description: '세상, 의지, 자연, 가족... 삶의 후반부를 깊이 있게 담아낸 78편의 시',
+          display_order: 2,
+          is_published: true,
+        })
+        .select('id')
+        .single();
+      if (error) { addLog(`제2권 생성 실패: ${error.message}`); }
+      else { series2Id = data?.id || null; addLog('제2권 생성 완료'); }
+    }
+
+    if (!series1Id || !series2Id) {
+      addLog('시집 ID 확보 실패 — 중단');
+      setRunning(false);
+      return;
+    }
+
+    // 2. 시 배정: display_order ≤ 100 → 제1권, > 100 → 제2권
+    addLog('\n시 배정 중...');
+    const { data: vol1 } = await supabase
+      .from('hohai_poems')
+      .update({ series_id: series1Id })
+      .lte('display_order', 100)
+      .gte('display_order', 1)
+      .select('id');
+    addLog(`제1권: ${vol1?.length ?? 0}편 배정`);
+
+    const { data: vol2Data } = await supabase
+      .from('hohai_poems')
+      .update({ series_id: series2Id })
+      .gt('display_order', 100)
+      .select('id');
+    addLog(`제2권: ${vol2Data?.length ?? 0}편 배정`);
+
+    // 3. 카테고리별 분포 표시
+    addLog('\n--- 제1권 카테고리 분포 ---');
+    const { data: vol1Poems } = await supabase
+      .from('hohai_poems')
+      .select('category')
+      .eq('series_id', series1Id);
+    const vol1Stats: Record<string, number> = {};
+    for (const p of vol1Poems || []) vol1Stats[p.category] = (vol1Stats[p.category] || 0) + 1;
+    for (const [cat, count] of Object.entries(vol1Stats).sort((a, b) => b[1] - a[1])) {
+      addLog(`  ${cat}: ${count}편`);
+    }
+
+    addLog('\n--- 제2권 카테고리 분포 ---');
+    const { data: vol2Poems } = await supabase
+      .from('hohai_poems')
+      .select('category')
+      .eq('series_id', series2Id);
+    const vol2Stats: Record<string, number> = {};
+    for (const p of vol2Poems || []) vol2Stats[p.category] = (vol2Stats[p.category] || 0) + 1;
+    for (const [cat, count] of Object.entries(vol2Stats).sort((a, b) => b[1] - a[1])) {
+      addLog(`  ${cat}: ${count}편`);
+    }
+
+    addLog(`\n시집 분리 완료!`);
+    addLog(`"무지개 빛으로 채색된 삶 제1권" — ${vol1?.length ?? 0}편`);
+    addLog(`"무지개 빛으로 채색된 삶 제2권" — ${vol2Data?.length ?? 0}편`);
+    setRunning(false);
+  };
+
   const handleShowStats = async () => {
     setLog([]);
     addLog('카테고리별 현황 조회 중...');
@@ -1502,23 +1632,43 @@ function BatchSeedAdmin() {
         <h2>총괄 관리</h2>
       </div>
 
-      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 24 }}>
+      {/* 시집 관리 */}
+      <div style={{ marginBottom: 28 }}>
+        <h3 style={{ fontSize: '1.05rem', marginBottom: 12, color: 'var(--text-primary)' }}>시집 분리</h3>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: 14, lineHeight: 1.6 }}>
+          시를 100편 단위로 시집에 배정합니다. 제1권(1~100번), 제2권(101~178번)으로 분리됩니다.
+        </p>
         <button
-          className={styles.saveBtn}
-          onClick={handleUpdateCategories}
+          className={styles.addBtn}
+          onClick={handleSplitSeries}
           disabled={running}
-          style={{ padding: '14px 24px', fontSize: '1rem' }}
+          style={{ padding: '14px 24px', fontSize: '1rem', background: '#4338ca' }}
         >
-          카테고리/태그 일괄 업데이트
+          시집 100편 단위 분리 실행
         </button>
-        <button
-          className={styles.editBtn}
-          onClick={handleShowStats}
-          disabled={running}
-          style={{ padding: '14px 24px', fontSize: '1rem' }}
-        >
-          카테고리 현황 보기
-        </button>
+      </div>
+
+      {/* 카테고리 관리 */}
+      <div style={{ marginBottom: 28 }}>
+        <h3 style={{ fontSize: '1.05rem', marginBottom: 12, color: 'var(--text-primary)' }}>카테고리 관리</h3>
+        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+          <button
+            className={styles.saveBtn}
+            onClick={handleUpdateCategories}
+            disabled={running}
+            style={{ padding: '14px 24px', fontSize: '1rem' }}
+          >
+            카테고리/태그 일괄 업데이트
+          </button>
+          <button
+            className={styles.editBtn}
+            onClick={handleShowStats}
+            disabled={running}
+            style={{ padding: '14px 24px', fontSize: '1rem' }}
+          >
+            카테고리 현황 보기
+          </button>
+        </div>
       </div>
 
       <div style={{
@@ -1536,6 +1686,8 @@ function BatchSeedAdmin() {
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.8 }}>
             버튼을 클릭하면 실행 결과가 여기에 표시됩니다.
             <br /><br />
+            &bull; <strong>시집 100편 단위 분리</strong> — 기존 시집을 제1권/제2권으로 분리하고 시를 자동 배정합니다
+            <br />
             &bull; <strong>카테고리/태그 일괄 업데이트</strong> — 시의 카테고리와 태그를 일괄 변경합니다
             <br />
             &bull; <strong>카테고리 현황 보기</strong> — 카테고리별 시 수와 인기 태그를 확인합니다
