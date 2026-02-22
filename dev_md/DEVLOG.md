@@ -2,6 +2,31 @@
 
 ---
 
+## 2026-02-22 — 즐겨찾기 추가 버그 수정 (레이스 컨디션 + 로그인 후 미갱신)
+
+### 배경
+
+♡ 하트 버튼으로 즐겨찾기에 곡을 추가해도 재생목록 페이지에 반영되지 않는 문제.
+
+### 원인 분석
+
+1. **레이스 컨디션**: `createPlaylist()` 후 `addSongToPlaylist()` 호출 시, React 상태(`playlists`)가 아직 갱신 안 됨 → 새 재생목록을 찾지 못해 곡이 추가 안 됨
+2. **로그인 후 미갱신**: `usePlaylists`가 컴포넌트 마운트 시 1회만 fetch → 로그인 후에도 Supabase RLS가 빈 결과 반환했던 초기 값 유지
+
+### 수정 내용
+
+| 파일 | 수정 |
+|------|------|
+| `src/components/ui/AddToPlaylist.tsx` | `createPlaylist` 호출 시 `song_ids: [songId]`를 직접 전달하여 생성과 동시에 곡 포함 (별도 `addSongToPlaylist` 호출 제거) |
+| `src/contexts/PlaylistContext.tsx` | `isLoggedIn` 변경 감지 `useEffect` 추가 → 로그인 시 `hook.refetch()` 호출 |
+
+### 검증 결과
+
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과 (4.52s)
+
+---
+
 ## 2026-02-22 — 즐겨찾기 원클릭 추가 UX 개선
 
 ### 배경

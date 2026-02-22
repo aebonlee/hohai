@@ -1,5 +1,17 @@
 # 개발일지
 
+## 2026-02-22 — 즐겨찾기 추가 버그 수정
+
+### 작업 내용
+- 레이스 컨디션 수정: createPlaylist 시 song_ids 직접 포함 (별도 addSong 호출 제거)
+- 로그인 후 미갱신 수정: PlaylistContext에 isLoggedIn 변경 감지 useEffect 추가
+
+### 검증
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과 (4.52s)
+
+---
+
 ## 2026-02-22 — 즐겨찾기 원클릭 추가 UX 개선
 
 ### 작업 내용

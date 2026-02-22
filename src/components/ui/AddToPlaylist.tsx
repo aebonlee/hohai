@@ -54,11 +54,8 @@ export default function AddToPlaylist({ songId }: Props) {
           await addSongToPlaylist(favorites.id, songId);
         }
       } else {
-        // 즐겨찾기 재생목록 자동 생성 + 곡 추가
-        const { data } = await createPlaylist({ user_id: user!.id, name: FAVORITES_NAME });
-        if (data) {
-          await addSongToPlaylist(data.id, songId);
-        }
+        // 즐겨찾기 재생목록 자동 생성 (곡 포함)
+        await createPlaylist({ user_id: user!.id, name: FAVORITES_NAME, song_ids: [songId] });
       }
     } finally {
       setBusy(false);
@@ -86,10 +83,7 @@ export default function AddToPlaylist({ songId }: Props) {
 
   const handleCreate = async () => {
     if (!newName.trim() || !user) return;
-    const { data } = await createPlaylist({ user_id: user.id, name: newName.trim() });
-    if (data) {
-      await addSongToPlaylist(data.id, songId);
-    }
+    await createPlaylist({ user_id: user.id, name: newName.trim(), song_ids: [songId] });
     setNewName('');
     setCreating(false);
   };
