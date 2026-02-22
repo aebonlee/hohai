@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../contexts/AuthContext';
 import { signInWithGoogle, signInWithKakao, signInWithEmail } from '../lib/auth';
@@ -17,8 +17,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   if (isLoggedIn) {
-    navigate(from, { replace: true });
-    return null;
+    return <Navigate to={from} replace />;
   }
 
   const handleEmailLogin = async (e: FormEvent) => {

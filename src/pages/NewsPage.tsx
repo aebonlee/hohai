@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import PageTransition from '../components/layout/PageTransition';
 import { useNews } from '../hooks/useNews';
 import { useAuth } from '../hooks/useAuth';
+import { formatDate } from '../lib/formatDate';
 import styles from './NewsPage.module.css';
 
 export default function NewsPage() {
@@ -50,11 +51,6 @@ export default function NewsPage() {
       setFeedback({ type: 'success', message: '삭제되었습니다.' });
     }
     setTimeout(() => setFeedback(null), 3000);
-  };
-
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   };
 
   return (

@@ -1,19 +1,32 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 interface Props {
   children: ReactNode;
+  locationKey: string;
 }
 
 interface State {
   hasError: boolean;
+  errorKey: string;
 }
 
-export default class ErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false };
+class ErrorBoundaryInner extends Component<Props, State> {
+  state: State = { hasError: false, errorKey: '' };
 
-  static getDerivedStateFromError(): State {
+  static getDerivedStateFromError(): Partial<State> {
     return { hasError: true };
+  }
+
+  static getDerivedStateFromProps(props: Props, state: State): State | null {
+    // 라우트가 변경되면 에러 상태 리셋
+    if (state.hasError && props.locationKey !== state.errorKey) {
+      return { hasError: false, errorKey: '' };
+    }
+    if (state.hasError && !state.errorKey) {
+      return { hasError: true, errorKey: props.locationKey };
+    }
+    return null;
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
@@ -57,7 +70,6 @@ export default class ErrorBoundary extends Component<Props, State> {
             </button>
             <Link
               to="/"
-              onClick={() => this.setState({ hasError: false })}
               style={{
                 padding: '10px 24px',
                 background: 'none',
@@ -77,4 +89,13 @@ export default class ErrorBoundary extends Component<Props, State> {
 
     return this.props.children;
   }
+}
+
+export default function ErrorBoundary({ children }: { children: ReactNode }) {
+  const location = useLocation();
+  return (
+    <ErrorBoundaryInner locationKey={location.key}>
+      {children}
+    </ErrorBoundaryInner>
+  );
 }

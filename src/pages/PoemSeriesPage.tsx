@@ -19,7 +19,10 @@ export default function PoemSeriesPage() {
   const { categories } = useCategories();
   const { poems, loading } = usePoems(
     selectedCategory || undefined,
-    series?.id
+    series?.id,
+    false,
+    undefined,
+    !!series?.id,
   );
 
   if (seriesLoading) {

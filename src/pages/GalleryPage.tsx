@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import PageTransition from '../components/layout/PageTransition';
 import { useGallery, uploadGalleryImage } from '../hooks/useGallery';
 import { useAuth } from '../hooks/useAuth';
+import { formatDate } from '../lib/formatDate';
 import styles from './GalleryPage.module.css';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -97,11 +98,6 @@ export default function GalleryPage() {
     setDescription('');
     setFile(null);
     setPreview(null);
-  };
-
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   };
 
   return (

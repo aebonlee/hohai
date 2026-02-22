@@ -15,6 +15,7 @@ import { POEM_CLASSIFICATIONS, CATEGORY_LIST } from '../data/poem-categories';
 import type { PoemInsert } from '../types/poem';
 import type { SongInsert } from '../types/song';
 import type { SeriesInsert } from '../types/series';
+import { formatDate } from '../lib/formatDate';
 import styles from './AdminPage.module.css';
 
 type Tab = 'dashboard' | 'poems' | 'poem-boards' | 'songs' | 'song-boards' | 'poem-categories' | 'reviews' | 'gallery' | 'news' | 'batch-seed' | 'data-manage';
@@ -1139,11 +1140,6 @@ function ReviewsAdmin() {
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-  };
-
   return (
     <>
       <div className={styles.header}>
@@ -1212,11 +1208,6 @@ function GalleryAdmin() {
     if (window.confirm('정말 삭제하시겠습니까? (이미지도 함께 삭제됩니다)')) {
       await deleteItem(id, imageUrl);
     }
-  };
-
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   };
 
   return (
@@ -1293,11 +1284,6 @@ function NewsAdmin() {
     if (window.confirm('정말 삭제하시겠습니까?')) {
       await deleteItem(id);
     }
-  };
-
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   };
 
   return (

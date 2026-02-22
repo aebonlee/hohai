@@ -7,6 +7,7 @@ import { usePlayback } from '../contexts/PlaybackContext';
 import { useSongs } from '../hooks/useSongs';
 import type { Song } from '../types/song';
 import type { RepeatMode } from '../contexts/PlaybackContext';
+import PageTransition from '../components/layout/PageTransition';
 import SongCard from '../components/ui/SongCard';
 import styles from './PlaylistPage.module.css';
 
@@ -96,7 +97,7 @@ export default function PlaylistPage() {
   const loading = plLoading || songsLoading;
 
   return (
-    <>
+    <PageTransition>
       <Helmet>
         <title>내 재생목록 | 好海</title>
       </Helmet>
@@ -262,6 +263,6 @@ export default function PlaylistPage() {
           </div>
         )}
       </motion.div>
-    </>
+    </PageTransition>
   );
 }

@@ -27,7 +27,10 @@ export default function PoemCard({ poem, index = 0 }: Props) {
     <motion.article
       className={styles.card}
       style={{ background: gradient }}
+      role="link"
+      tabIndex={0}
       onClick={() => navigate(`/poems/${poem.id}`)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/poems/${poem.id}`); } }}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}

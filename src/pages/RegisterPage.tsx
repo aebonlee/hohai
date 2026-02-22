@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../contexts/AuthContext';
 import { signUp } from '../lib/auth';
@@ -7,7 +7,6 @@ import '../styles/auth.css';
 
 export default function RegisterPage() {
   const { isLoggedIn } = useAuth();
-  const navigate = useNavigate();
 
   const [form, setForm] = useState({ email: '', password: '', passwordConfirm: '', displayName: '' });
   const [error, setError] = useState('');
@@ -15,8 +14,7 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
 
   if (isLoggedIn) {
-    navigate('/', { replace: true });
-    return null;
+    return <Navigate to="/" replace />;
   }
 
   const handleSubmit = async (e: FormEvent) => {

@@ -48,7 +48,7 @@ export function useFeaturedSong() {
         .eq('is_published', true)
         .eq('is_featured', true)
         .limit(1)
-        .single();
+        .maybeSingle();
 
       setSong((data as Song) || null);
       setLoading(false);

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import PageTransition from '../components/layout/PageTransition';
 import { useReviews } from '../hooks/useReviews';
 import { useAuth } from '../hooks/useAuth';
+import { formatDate } from '../lib/formatDate';
 import styles from './ReviewsPage.module.css';
 
 export default function ReviewsPage() {
@@ -47,11 +48,6 @@ export default function ReviewsPage() {
       setFeedback({ type: 'success', message: '후기가 삭제되었습니다.' });
     }
     setTimeout(() => setFeedback(null), 3000);
-  };
-
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   };
 
   return (
