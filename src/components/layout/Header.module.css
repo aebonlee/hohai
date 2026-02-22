@@ -108,20 +108,19 @@
 }
 
 .searchInput {
-  width: 150px;
+  width: 160px;
   padding: 6px 10px 6px 28px;
   border: 1px solid rgba(7, 26, 51, 0.12);
   border-radius: 8px;
   font-size: 0.8rem;
   color: var(--text-primary);
   background: rgba(255, 255, 255, 0.7);
-  transition: all var(--transition);
+  transition: border-color var(--transition), box-shadow var(--transition);
   font-family: var(--font-sans);
 }
 
 .searchInput:focus {
   outline: none;
-  width: 200px;
   border-color: var(--accent-gold);
   box-shadow: 0 0 0 3px rgba(10, 61, 122, 0.08);
 }
