@@ -1,29 +1,68 @@
 .wrapper {
   position: relative;
   display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 
-.addBtn {
+/* 즐겨찾기 하트 버튼 */
+.favBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  border: 1.5px solid var(--accent-gold);
+  border: none;
   background: none;
-  color: var(--accent-gold);
-  font-size: 1rem;
-  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 1.1rem;
   line-height: 1;
   cursor: pointer;
   transition: all var(--transition);
   flex-shrink: 0;
 }
 
-.addBtn:hover {
-  background: var(--accent-gold);
-  color: #fff;
+.favBtn:hover {
+  color: #e74c3c;
+  transform: scale(1.15);
+}
+
+.favBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+}
+
+.favBtn.favActive {
+  color: #e74c3c;
+}
+
+.favBtn.favActive:hover {
+  opacity: 0.7;
+}
+
+/* 드롭다운 화살표 버튼 */
+.moreBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.moreBtn:hover {
+  opacity: 1;
+  background: rgba(10, 25, 41, 0.06);
 }
 
 .dropdown {

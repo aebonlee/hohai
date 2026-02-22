@@ -4,6 +4,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { usePlaylistContext } from '../../contexts/PlaylistContext';
 import styles from './AddToPlaylist.module.css';
 
+const FAVORITES_NAME = '즐겨찾기';
+
 interface Props {
   songId: string;
 }
@@ -15,7 +17,11 @@ export default function AddToPlaylist({ songId }: Props) {
   const [open, setOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
+  const [busy, setBusy] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const favorites = playlists.find((p) => p.name === FAVORITES_NAME);
+  const isInFavorites = favorites ? favorites.song_ids.includes(songId) : false;
 
   // 바깥 클릭 시 닫기
   useEffect(() => {
@@ -30,7 +36,37 @@ export default function AddToPlaylist({ songId }: Props) {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  const handleToggle = (e: React.MouseEvent) => {
+  // 즐겨찾기 토글 (한 번 클릭)
+  const handleFavoriteToggle = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+    if (busy) return;
+    setBusy(true);
+
+    try {
+      if (favorites) {
+        if (isInFavorites) {
+          await removeSongFromPlaylist(favorites.id, songId);
+        } else {
+          await addSongToPlaylist(favorites.id, songId);
+        }
+      } else {
+        // 즐겨찾기 재생목록 자동 생성 + 곡 추가
+        const { data } = await createPlaylist({ user_id: user!.id, name: FAVORITES_NAME });
+        if (data) {
+          await addSongToPlaylist(data.id, songId);
+        }
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // 드롭다운 토글
+  const handleDropdown = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isLoggedIn) {
       navigate('/login');
@@ -66,12 +102,21 @@ export default function AddToPlaylist({ songId }: Props) {
   return (
     <div className={styles.wrapper} ref={dropdownRef}>
       <button
-        className={styles.addBtn}
-        onClick={handleToggle}
-        aria-label="재생목록에 추가"
-        title="재생목록에 추가"
+        className={`${styles.favBtn} ${isInFavorites ? styles.favActive : ''}`}
+        onClick={handleFavoriteToggle}
+        disabled={busy}
+        aria-label={isInFavorites ? '즐겨찾기에서 제거' : '즐겨찾기에 추가'}
+        title={isInFavorites ? '즐겨찾기에서 제거' : '즐겨찾기에 추가'}
       >
-        +
+        {isInFavorites ? '♥' : '♡'}
+      </button>
+      <button
+        className={styles.moreBtn}
+        onClick={handleDropdown}
+        aria-label="다른 재생목록에 추가"
+        title="다른 재생목록에 추가"
+      >
+        ▾
       </button>
 
       {open && (
