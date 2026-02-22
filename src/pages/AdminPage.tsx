@@ -1734,8 +1734,13 @@ interface SunoFormSong {
    Suno 가져오기 컴포넌트
    ======================================== */
 
-/** Suno 페이지 콘솔에서 실행할 스크립트 (곡 정보 추출 → 클립보드 복사) */
-const SUNO_CONSOLE_SCRIPT = `(async()=>{try{let t='',l='',s='',u=location.href;const nd=window.__NEXT_DATA__;if(nd){const f=(o,d)=>{if(d>12||!o||typeof o!=='object')return;if(o.title&&!t)t=o.title;if((o.metadata?.prompt||o.prompt)&&!l)l=o.metadata?.prompt||o.prompt;if((o.metadata?.tags||o.tags)&&!s&&typeof(o.metadata?.tags||o.tags)==='string')s=o.metadata?.tags||o.tags;for(const k of Object.keys(o))f(o[k],d+1);};f(nd,0);}if(!t){const m=document.querySelector('meta[property="og:title"]');t=m?m.content.replace(/\\s*[|\\u2013\\u2014]\\s*Suno.*$/i,'').trim():document.title.replace(/\\s*[|\\u2013\\u2014]\\s*Suno.*$/i,'').trim();}if(!l&&nd?.buildId){try{const r=await fetch('/_next/data/'+nd.buildId+location.pathname+'.json');const d=await r.json();const f2=(o,d2)=>{if(d2>12||!o||typeof o!=='object')return;if((o.metadata?.prompt||o.prompt)&&!l)l=o.metadata?.prompt||o.prompt;if((o.metadata?.tags||o.tags)&&!s&&typeof(o.metadata?.tags||o.tags)==='string')s=o.metadata?.tags||o.tags;if(o.title&&!t)t=o.title;for(const k of Object.keys(o))f2(o[k],d2+1);};f2(d,0);}catch(e){}}if(!l){document.querySelectorAll('div,section,p').forEach(el=>{if(l)return;const txt=el.innerText?.trim()||'';if(txt.length>30&&txt.split('\\n').filter(x=>x.trim()).length>3){const parent=el.parentElement;const isSmall=el.offsetHeight<el.scrollHeight||parent?.classList?.toString()?.match(/lyric|prompt|text/i);if(isSmall||txt.split('\\n').length>5)l=txt;}});}const r=JSON.stringify({url:u,title:t,lyrics:l,style:s});await navigator.clipboard.writeText(r);alert('복사 완료!\\n제목: '+t+'\\n가사: '+(l?l.split('\\n').length+'줄':'없음')+'\\n스타일: '+(s||'없음'));}catch(e){alert('오류: '+e.message);}})()`;
+/** Suno 페이지 콘솔에서 실행할 스크립트 (곡 정보 추출 → 클립보드 복사)
+ *  탐색 순서: __NEXT_DATA__ → React fiber tree → <script> 태그 → Performance API → 내부 API → DOM */
+const SUNO_CONSOLE_SCRIPT = `(async()=>{try{let t='',l='',s='',u=location.href;const id=location.pathname.split('/').pop();const S=(j)=>{if(!l){let p=j.match(/"prompt"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"/);if(!p||p[1].length<10)p=j.match(/"text"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*(?:\\\\n)(?:[^"\\\\]|\\\\.)*)"/);if(p&&p[1].length>10)try{l=JSON.parse('"'+p[1]+'"')}catch{l=p[1].replace(/\\\\n/g,'\\n')}}if(!t){const m=j.match(/"title"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"/);if(m)try{t=JSON.parse('"'+m[1]+'"')}catch{t=m[1]}}if(!s){const m=j.match(/"tags"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"/);if(m)try{s=JSON.parse('"'+m[1]+'"')}catch{s=m[1]}}};if(window.__NEXT_DATA__)S(JSON.stringify(window.__NEXT_DATA__));if(!l){try{const root=document.getElementById('__next');const fk=Object.keys(root||{}).find(k=>k.startsWith('__reactFiber'));if(fk){let c=0;const q=[root[fk]];while(q.length&&!l&&c<500){c++;const n=q.shift();if(!n)continue;const p=n.memoizedProps||n.pendingProps;if(p&&typeof p==='object'){for(const k of['','clip','song','data']){if(l)break;const o=k?p[k]:p;if(!o||typeof o!=='object')continue;if(typeof o.prompt==='string'&&o.prompt.length>30){l=o.prompt;break}if(o.metadata?.prompt&&typeof o.metadata.prompt==='string'&&o.metadata.prompt.length>30){l=o.metadata.prompt;break}if(typeof o.title==='string'&&o.title&&!t)t=o.title;if(typeof o.tags==='string'&&!s)s=o.tags;if(o.metadata?.tags&&typeof o.metadata.tags==='string'&&!s)s=o.metadata.tags}if(!l&&typeof p.text==='string'&&p.text.length>30&&p.text.includes('\\n'))l=p.text}if(n.child)q.push(n.child);if(n.sibling)q.push(n.sibling)}}}catch{}}document.querySelectorAll('script').forEach(sc=>{if(!l)S(sc.textContent||'')});if(!l){const es=performance.getEntriesByType('resource').filter(e=>e.name.includes('/api/')||e.name.includes('/_next/data/'));for(const e of es.slice(0,10)){if(l)break;try{const r=await fetch(e.name);if(r.ok)S(await r.text())}catch{}}}if(!l){for(const a of['/api/clip/'+id,'/api/songs/'+id]){if(l)break;try{const r=await fetch(a);if(r.ok)S(await r.text())}catch{}}}if(!l){const el=document.querySelector('[class*="lyric"],[class*="Lyric"],[class*="prompt"],[class*="Prompt"]');if(el)l=el.innerText?.trim()||''}if(!t){const m=document.querySelector('meta[property="og:title"]');t=m?m.content.replace(/\\s*[|\\u2013\\u2014]\\s*Suno.*$/i,'').trim():document.title.replace(/\\s*[|\\u2013\\u2014]\\s*Suno.*$/i,'').trim()}const r=JSON.stringify({url:u,title:t,lyrics:l,style:s});await navigator.clipboard.writeText(r);alert('복사 완료!\\n제목: '+t+'\\n가사: '+(l?l.split('\\n').length+'줄':'없음')+'\\n스타일: '+(s||'없음'))}catch(e){alert('오류: '+e.message)}})()`;
+
+/** 진단용 스크립트 — Suno 페이지 데이터 구조 확인 (한 줄) */
+const SUNO_DIAG_SCRIPT = `(()=>{const r={};try{r.hasND=!!window.__NEXT_DATA__;r.buildId=window.__NEXT_DATA__?.buildId?.substring(0,10)||'';const j=JSON.stringify(window.__NEXT_DATA__||{});r.hasPrompt=j.includes('"prompt"');r.hasText=j.includes('"text"');r.hasTags=j.includes('"tags"');r.ndSize=j.length;const root=document.getElementById('__next');const fk=Object.keys(root||{}).find(k=>k.startsWith('__reactFiber'));r.hasFiber=!!fk;let fc=0;if(fk){const q=[root[fk]];const found=[];while(q.length&&fc<200){fc++;const n=q.shift();if(!n)continue;const p=n.memoizedProps||n.pendingProps;if(p&&typeof p==='object'){for(const k of Object.keys(p)){const v=p[k];if(typeof v==='string'&&v.length>30)found.push(k+':'+v.length);if(v&&typeof v==='object'&&v.prompt)found.push('obj.'+k+'.prompt:'+String(v.prompt).length);if(v&&typeof v==='object'&&v.metadata?.prompt)found.push('obj.'+k+'.meta.prompt:'+String(v.metadata.prompt).length)}}if(n.child)q.push(n.child);if(n.sibling)q.push(n.sibling)}r.fiberNodes=fc;r.fiberFound=found.slice(0,10)}r.scripts=document.querySelectorAll('script').length;const apis=performance.getEntriesByType('resource').filter(e=>e.name.includes('/api/')||e.name.includes('/_next/data/')).map(e=>e.name);r.apiUrls=apis.slice(0,5);const lyrEl=document.querySelector('[class*="lyric"],[class*="Lyric"],[class*="prompt"],[class*="Prompt"]');r.hasDomLyric=!!lyrEl;if(lyrEl)r.domLyricLen=lyrEl.innerText?.length||0}catch(e){r.error=e.message}const s=JSON.stringify(r,null,2);console.log(s);prompt('결과를 복사하세요:',s)})()`;
+
 
 function SunoImportAdmin() {
   const { songs, createSong } = useAllSongs();
@@ -1772,19 +1777,20 @@ function SunoImportAdmin() {
   };
 
   /** 콘솔 스크립트 복사 */
-  const handleCopyScript = async () => {
+  const handleCopyScript = async (script: string, isDiag = false) => {
     try {
-      await navigator.clipboard.writeText(SUNO_CONSOLE_SCRIPT);
-      setScriptCopied(true);
-      setTimeout(() => setScriptCopied(false), 2000);
+      await navigator.clipboard.writeText(script);
     } catch {
-      // fallback: 텍스트 선택
       const ta = document.createElement('textarea');
-      ta.value = SUNO_CONSOLE_SCRIPT;
+      ta.value = script;
       document.body.appendChild(ta);
       ta.select();
       document.execCommand('copy');
       document.body.removeChild(ta);
+    }
+    if (isDiag) {
+      addLog('[진단] 진단 스크립트가 클립보드에 복사되었습니다. Suno 페이지 콘솔에 붙여넣기 후 결과를 확인하세요.');
+    } else {
       setScriptCopied(true);
       setTimeout(() => setScriptCopied(false), 2000);
     }
@@ -1949,17 +1955,25 @@ function SunoImportAdmin() {
           </div>
         </div>
 
-        <div style={{ marginTop: 16, display: 'flex', gap: 12, alignItems: 'center' }}>
+        <div style={{ marginTop: 16, display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
           <button
             className={styles.addBtn}
             style={{ padding: '10px 24px', fontSize: '0.95rem', fontWeight: 700 }}
-            onClick={handleCopyScript}
+            onClick={() => handleCopyScript(SUNO_CONSOLE_SCRIPT)}
           >
             {scriptCopied ? '복사 완료!' : '스크립트 복사'}
           </button>
           <span style={{ fontSize: '0.8rem', color: '#065f46', opacity: 0.7 }}>
             이 스크립트는 Suno 페이지에서 곡 제목, 가사, 스타일을 자동 추출합니다
           </span>
+          <button
+            className={styles.editBtn}
+            style={{ fontSize: '0.75rem', padding: '6px 12px', marginLeft: 'auto' }}
+            onClick={() => handleCopyScript(SUNO_DIAG_SCRIPT, true)}
+            title="가사 추출이 안 될 때 원인을 파악하기 위한 진단 스크립트"
+          >
+            진단 스크립트
+          </button>
         </div>
 
         {/* JSON 붙여넣기 입력칸 */}
