@@ -35,3 +35,9 @@ pnpm-debug.log*
 *.tsbuildinfo
 
 .vercel
+
+# Claude Code
+.claude/
+
+# Source data (binary)
+poem.pdf

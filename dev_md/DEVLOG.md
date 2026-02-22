@@ -2,6 +2,120 @@
 
 ---
 
+## 2026-02-23 — 프로젝트 종합 분석 & 현황 정리
+
+### 배경
+
+프로젝트 전체 코드베이스 + GitHub 리포지토리(aebonlee/hohai)를 종합 분석하여 현황을 정리.
+
+### 프로젝트 개요
+
+| 항목 | 내용 |
+|------|------|
+| 프로젝트명 | 호해(好海) — 시인/음악가 이성헌 포트폴리오 & 스트리밍 |
+| 유형 | React SPA (Single Page Application) |
+| 배포 | GitHub Pages → `hohai.dreamitbiz.com` |
+| 리포지토리 | github.com/aebonlee/hohai (Public, 81 commits) |
+| 언어 비율 | TypeScript 85.7% / CSS 12.5% |
+| 기여자 | 2명 |
+
+### 기술 스택 현황
+
+| 분류 | 기술 | 버전 |
+|------|------|------|
+| 프레임워크 | React + TypeScript | 19.0.0 / ~5.7.0 |
+| 빌드 | Vite | 6.1.0 |
+| 라우팅 | React Router | 7.1.0 |
+| 애니메이션 | Framer Motion | 11.18.0 |
+| 백엔드/DB | Supabase (PostgreSQL + Auth + RLS) | 2.49.0 |
+| 인증 | Email/Password, Google OAuth, Kakao OAuth | — |
+| 스타일링 | CSS Modules + CSS 변수 | — |
+| SEO | React Helmet Async | 2.0.5 |
+| 배포 | gh-pages → GitHub Pages | — |
+
+### 콘텐츠 규모
+
+- **시(詩)**: 177편, 9개 카테고리 (사랑, 그리움, 작별, 추억, 인생, 가족, 자연, 세상, 의지)
+- **음악**: 229곡 (Suno AI 생성), 7개 앨범
+  - 바다의 노래 / 가슴에 핀 사랑 / 사계의 풍경 / 지나온 길 / Across Borders / 한국의 풍경 / 꿈과 혁신
+
+### 구현 완료 기능
+
+| 기능 | 상태 | 설명 |
+|------|------|------|
+| 시 열람 | ✅ 완료 | 카테고리별 탐색, 시리즈, 추천, 태그 필터링, 무드 배경 |
+| 음악 스트리밍 | ✅ 완료 | YouTube/Suno 임베드, 가사 플레이어, 동시재생 방지 |
+| 재생목록 | ✅ 완료 | CRUD, 셔플/반복, 즐겨찾기 원클릭, 이어듣기 |
+| 커뮤니티 | ✅ 완료 | 리뷰, 갤러리(이미지 업로드), 소식통 |
+| 인증 | ✅ 완료 | 이메일/Google/카카오 OAuth, 비밀번호 재설정 |
+| 관리자 | ✅ 완료 | 대시보드, 시/노래/카테고리/후기/갤러리/소식통 관리 |
+| 반응형 | ✅ 완료 | 모바일/태블릿/데스크톱 3단계 |
+| SEO/접근성 | ✅ 완료 | 메타 태그, 풍선 도움말, ErrorBoundary, 404 |
+
+### 페이지 구성 (20+)
+
+```
+/                    → HomePage (히어로 캐러셀 + 추천 콘텐츠)
+/poems               → PoemsPage (시리즈 목록)
+/poems/featured      → FeaturedPoemsPage (추천 시)
+/poems/series/:id    → PoemSeriesPage (시리즈 상세)
+/poems/:id           → PoemDetailPage (시 읽기 + 무드 배경)
+/songs               → SongsPage (앨범 목록)
+/songs/featured      → FeaturedSongsPage (추천 노래)
+/songs/series/:id    → SongSeriesPage (앨범 상세)
+/playlist            → PlaylistPage (개인 재생목록, 로그인 필수)
+/community           → CommunityPage (커뮤니티 허브)
+/community/reviews   → ReviewsPage (감상 후기)
+/community/gallery   → GalleryPage (이미지 갤러리)
+/community/news      → NewsPage (소식통)
+/about               → AboutPage (시인 소개)
+/mypage              → MyPagePage (내 정보)
+/admin               → AdminPage (관리자)
+/login               → LoginPage
+/register            → RegisterPage
+/forgot-password     → ForgotPasswordPage
+```
+
+### Supabase DB 테이블 (9개)
+
+| 테이블 | 용도 |
+|--------|------|
+| `hohai_poems` | 시 (제목, 내용, 카테고리, 태그, bg_theme) |
+| `hohai_songs` | 노래 (YouTube ID, Suno URL, 가사, 시리즈) |
+| `hohai_series` | 시/노래 시리즈(앨범) |
+| `hohai_categories` | 카테고리 정의 |
+| `hohai_playlists` | 사용자 재생목록 (song_ids 배열) |
+| `hohai_reviews` | 사용자 리뷰 |
+| `hohai_gallery` | 커뮤니티 이미지 |
+| `hohai_news` | 뉴스/공지 |
+| `user_profiles` | 사용자 프로필 |
+
+### 디자인 시스템
+
+- **컬러**: 한지 아이보리(#FAF6F0) 기반, 골드/세이지/스카이/플럼 액센트
+- **폰트**: Noto Serif KR(시), Noto Sans KR(UI), 나눔명조(로고)
+- **타겟 UX**: 40~50대 이상 사용자 고려 (접근성 tooltip)
+
+### 미커밋 파일 현황
+
+```
+scripts/bulk-register.mjs    — 시/노래 일괄 등록 스크립트
+scripts/suno-extract.js      — Suno AI 데이터 추출
+scripts/suno-fetch-test.mjs  — Suno fetch 테스트
+scripts/suno_page.txt        — Suno 페이지 캡처
+scripts/suno_test.html       — Suno 테스트 HTML
+poems_parsed.json             — PDF 파싱 시 데이터
+poem.pdf                      — 원본 시 PDF
+```
+
+### GitHub 리포지토리 현황
+
+- **Stars**: 0 / **Forks**: 0 / **Issues**: 0 / **PRs**: 0
+- **CI/CD**: `.github/workflows` 존재
+- **CNAME**: `hohai.dreamitbiz.com`
+
+---
+
 ## 2026-02-22 — 사이트 점검 & 안정성 개선
 
 ### 배경
