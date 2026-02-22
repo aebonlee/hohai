@@ -1733,16 +1733,18 @@ interface SunoFormSong {
 /* ========================================
    Suno 가져오기 컴포넌트
    ======================================== */
+
+/** Suno 페이지 콘솔에서 실행할 스크립트 (곡 정보 추출 → 클립보드 복사) */
+const SUNO_CONSOLE_SCRIPT = `(async()=>{try{let t='',l='',s='',u=location.href;const nd=window.__NEXT_DATA__;if(nd){const f=(o,d)=>{if(d>12||!o||typeof o!=='object')return;if(o.title&&!t)t=o.title;if((o.metadata?.prompt||o.prompt)&&!l)l=o.metadata?.prompt||o.prompt;if((o.metadata?.tags||o.tags)&&!s&&typeof(o.metadata?.tags||o.tags)==='string')s=o.metadata?.tags||o.tags;for(const k of Object.keys(o))f(o[k],d+1);};f(nd,0);}if(!t){const m=document.querySelector('meta[property="og:title"]');t=m?m.content.replace(/\\s*[|\\u2013\\u2014]\\s*Suno.*$/i,'').trim():document.title.replace(/\\s*[|\\u2013\\u2014]\\s*Suno.*$/i,'').trim();}if(!l&&nd?.buildId){try{const r=await fetch('/_next/data/'+nd.buildId+location.pathname+'.json');const d=await r.json();const f2=(o,d2)=>{if(d2>12||!o||typeof o!=='object')return;if((o.metadata?.prompt||o.prompt)&&!l)l=o.metadata?.prompt||o.prompt;if((o.metadata?.tags||o.tags)&&!s&&typeof(o.metadata?.tags||o.tags)==='string')s=o.metadata?.tags||o.tags;if(o.title&&!t)t=o.title;for(const k of Object.keys(o))f2(o[k],d2+1);};f2(d,0);}catch(e){}}if(!l){document.querySelectorAll('div,section,p').forEach(el=>{if(l)return;const txt=el.innerText?.trim()||'';if(txt.length>30&&txt.split('\\n').filter(x=>x.trim()).length>3){const parent=el.parentElement;const isSmall=el.offsetHeight<el.scrollHeight||parent?.classList?.toString()?.match(/lyric|prompt|text/i);if(isSmall||txt.split('\\n').length>5)l=txt;}});}const r=JSON.stringify({url:u,title:t,lyrics:l,style:s});await navigator.clipboard.writeText(r);alert('복사 완료!\\n제목: '+t+'\\n가사: '+(l?l.split('\\n').length+'줄':'없음')+'\\n스타일: '+(s||'없음'));}catch(e){alert('오류: '+e.message);}})()`;
+
 function SunoImportAdmin() {
   const { songs, createSong } = useAllSongs();
   const { series } = useAllSeries();
   const songSeries = series.filter(s => s.type === 'song');
 
-  // 곡 입력 폼 상태
-  const [formUrl, setFormUrl] = useState('');
-  const [formTitle, setFormTitle] = useState('');
-  const [formLyrics, setFormLyrics] = useState('');
-  const [formStyle, setFormStyle] = useState('');
+  // JSON 붙여넣기 상태
+  const [pasteInput, setPasteInput] = useState('');
+  const [scriptCopied, setScriptCopied] = useState(false);
 
   // 곡 목록 + 등록 상태
   const [songList, setSongList] = useState<SunoFormSong[]>([]);
@@ -1769,46 +1771,65 @@ function SunoImportAdmin() {
     return info ? existingIds.has(info.id) : false;
   };
 
-  /** Suno URL에서 페이지 열기 (새 탭) */
-  const openSunoPage = () => {
-    if (!formUrl.trim()) return;
-    const info = extractSunoInfo(formUrl);
-    if (info) window.open(info.url, '_blank');
+  /** 콘솔 스크립트 복사 */
+  const handleCopyScript = async () => {
+    try {
+      await navigator.clipboard.writeText(SUNO_CONSOLE_SCRIPT);
+      setScriptCopied(true);
+      setTimeout(() => setScriptCopied(false), 2000);
+    } catch {
+      // fallback: 텍스트 선택
+      const ta = document.createElement('textarea');
+      ta.value = SUNO_CONSOLE_SCRIPT;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setScriptCopied(true);
+      setTimeout(() => setScriptCopied(false), 2000);
+    }
   };
 
-  /** 곡 추가 (폼 → 목록) */
-  const handleAddSong = () => {
-    if (!formUrl.trim() || !formTitle.trim()) return;
+  /** JSON 붙여넣기 → 곡 추가 */
+  const handlePasteAdd = () => {
+    const raw = pasteInput.trim();
+    if (!raw) return;
 
-    const info = extractSunoInfo(formUrl);
-    if (!info) {
-      addLog('[오류] 유효한 Suno URL이 아닙니다');
-      return;
+    try {
+      const data = JSON.parse(raw);
+      const title = data.title || '';
+      const lyrics = data.lyrics || '';
+      const style = data.style || '';
+      const url = data.url || '';
+
+      if (!title && !url) {
+        addLog('[실패] 유효한 데이터가 아닙니다. Suno 페이지에서 콘솔 스크립트를 다시 실행해 주세요.');
+        return;
+      }
+
+      const info = url ? extractSunoInfo(url) : null;
+      const sunoUrl = info?.url || url;
+      const already = sunoUrl ? isAlreadyImported(sunoUrl) : false;
+      const tags = style ? style.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
+      const newKey = keyCounter + 1;
+      setKeyCounter(newKey);
+
+      setSongList(prev => [...prev, {
+        key: newKey,
+        suno_url: sunoUrl,
+        title,
+        lyrics,
+        style,
+        tags,
+        already,
+      }]);
+
+      if (!already) setSelectedKeys(prev => new Set([...prev, newKey]));
+      addLog(`[추가] "${title}" — 가사 ${lyrics ? lyrics.split('\n').length + '줄 ✓' : '✗'}, 스타일 ${style ? '✓' : '✗'}${already ? ' (이미 등록됨)' : ''}`);
+      setPasteInput('');
+    } catch {
+      addLog('[실패] JSON 파싱 오류 — 콘솔 스크립트의 결과를 그대로 붙여넣어 주세요');
     }
-
-    const already = isAlreadyImported(info.url);
-    const tags = formStyle ? formStyle.split(',').map(t => t.trim()).filter(Boolean) : [];
-    const newKey = keyCounter + 1;
-    setKeyCounter(newKey);
-
-    setSongList(prev => [...prev, {
-      key: newKey,
-      suno_url: info.url,
-      title: formTitle.trim(),
-      lyrics: formLyrics.trim(),
-      style: formStyle.trim(),
-      tags,
-      already,
-    }]);
-
-    if (!already) setSelectedKeys(prev => new Set([...prev, newKey]));
-    addLog(`[추가] "${formTitle.trim()}"${already ? ' (이미 등록됨)' : formLyrics.trim() ? '' : ' — 가사 없음'}`);
-
-    // 폼 초기화 (URL만 유지하여 같은 URL로 수정할 수 있도록)
-    setFormTitle('');
-    setFormLyrics('');
-    setFormStyle('');
-    setFormUrl('');
   };
 
   /** 곡 삭제 */
@@ -1884,104 +1905,89 @@ function SunoImportAdmin() {
     })));
   };
 
+  const kbdStyle: React.CSSProperties = { background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' };
+  const stepNumStyle: React.CSSProperties = { display: 'inline-flex', width: 28, height: 28, alignItems: 'center', justifyContent: 'center', background: '#059669', color: '#fff', borderRadius: '50%', marginRight: 10, fontSize: '0.8rem', fontWeight: 700, flexShrink: 0 };
+
   return (
     <>
       <div className={styles.header}>
         <h2>Suno 노래 가져오기</h2>
       </div>
 
-      {/* 곡 정보 입력 폼 */}
+      {/* 콘솔 스크립트 방식 안내 */}
       <div style={{
         marginBottom: 24,
         padding: 24,
-        background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+        background: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)',
         borderRadius: 12,
-        border: '1px solid #7dd3fc',
+        border: '1px solid #34d399',
       }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0c4a6e', marginBottom: 16 }}>
-          새 노래 추가
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#065f46', marginBottom: 16 }}>
+          Suno 곡 정보 가져오기
         </h3>
 
-        <p style={{ fontSize: '0.85rem', color: '#075985', marginBottom: 16, lineHeight: 1.8 }}>
-          Suno 페이지에서 제목과 가사를 직접 복사하여 붙여넣으세요.<br />
-          <span style={{ opacity: 0.7 }}>Suno 페이지를 열고 → 제목/가사를 마우스로 선택 → Ctrl+C 복사 → 아래에 Ctrl+V 붙여넣기</span>
-        </p>
-
-        {/* URL 입력 */}
-        <div className={styles.formGroup} style={{ marginBottom: 12 }}>
-          <label className={styles.formLabel}>Suno URL *</label>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <input
-              className={styles.formInput}
-              style={{ flex: 1 }}
-              value={formUrl}
-              onChange={e => setFormUrl(e.target.value)}
-              placeholder="https://suno.com/s/0PUDECh8YKcNKS3X"
-            />
-            <button
-              className={styles.editBtn}
-              style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}
-              onClick={openSunoPage}
-              disabled={!formUrl.trim()}
-            >
-              페이지 열기
-            </button>
+        <div style={{ fontSize: '0.88rem', color: '#064e3b', lineHeight: 2.2 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <span style={stepNumStyle}>1</span>
+            <span>아래 <strong>"스크립트 복사"</strong> 버튼을 클릭합니다</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <span style={stepNumStyle}>2</span>
+            <span>Suno 곡 페이지를 브라우저에서 엽니다 (페이지가 완전히 로드될 때까지 기다리세요)</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <span style={stepNumStyle}>3</span>
+            <span><kbd style={kbdStyle}>F12</kbd> 를 눌러 개발자 도구를 열고, <strong>Console</strong> 탭을 클릭합니다</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <span style={stepNumStyle}>4</span>
+            <span>Console 입력란을 클릭하고 <kbd style={kbdStyle}>Ctrl</kbd>+<kbd style={kbdStyle}>V</kbd> 붙여넣기 → <kbd style={kbdStyle}>Enter</kbd></span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <span style={stepNumStyle}>5</span>
+            <span><strong>"복사 완료!"</strong> 알림이 뜨면, 이 페이지로 돌아와서 아래 입력칸에 <kbd style={kbdStyle}>Ctrl</kbd>+<kbd style={kbdStyle}>V</kbd> → <strong>"곡 추가"</strong></span>
           </div>
         </div>
 
-        {/* 제목 */}
-        <div className={styles.formGroup} style={{ marginBottom: 12 }}>
-          <label className={styles.formLabel}>
-            제목 * <span style={{ fontSize: '0.75rem', color: '#0369a1', fontWeight: 400 }}>— Suno 페이지 상단의 곡 제목을 복사하세요</span>
-          </label>
-          <input
-            className={styles.formInput}
-            value={formTitle}
-            onChange={e => setFormTitle(e.target.value)}
-            placeholder="곡 제목을 입력하세요"
-          />
-        </div>
-
-        {/* 가사 */}
-        <div className={styles.formGroup} style={{ marginBottom: 12 }}>
-          <label className={styles.formLabel}>
-            가사 * <span style={{ fontSize: '0.75rem', color: '#0369a1', fontWeight: 400 }}>— Suno 페이지에서 가사 영역을 선택하여 복사하세요</span>
-          </label>
-          <textarea
-            className={styles.formTextarea}
-            style={{ minHeight: 160 }}
-            value={formLyrics}
-            onChange={e => setFormLyrics(e.target.value)}
-            placeholder="Suno 페이지에서 가사를 복사하여 붙여넣으세요"
-          />
-        </div>
-
-        {/* 스타일 (선택) */}
-        <div className={styles.formGroup} style={{ marginBottom: 16 }}>
-          <label className={styles.formLabel}>
-            스타일/태그 <span style={{ fontSize: '0.75rem', color: '#0369a1', fontWeight: 400 }}>(선택) — 쉼표로 구분</span>
-          </label>
-          <input
-            className={styles.formInput}
-            value={formStyle}
-            onChange={e => setFormStyle(e.target.value)}
-            placeholder="예: Korean ballad, emotional, piano"
-          />
-        </div>
-
-        <button
-          className={styles.addBtn}
-          style={{ padding: '10px 24px', fontSize: '0.9rem', fontWeight: 700 }}
-          onClick={handleAddSong}
-          disabled={!formUrl.trim() || !formTitle.trim()}
-        >
-          목록에 추가
-        </button>
-        {!formLyrics.trim() && formUrl.trim() && formTitle.trim() && (
-          <span style={{ marginLeft: 12, fontSize: '0.8rem', color: '#dc2626' }}>
-            * 가사가 비어있으면 등록할 수 없습니다
+        <div style={{ marginTop: 16, display: 'flex', gap: 12, alignItems: 'center' }}>
+          <button
+            className={styles.addBtn}
+            style={{ padding: '10px 24px', fontSize: '0.95rem', fontWeight: 700 }}
+            onClick={handleCopyScript}
+          >
+            {scriptCopied ? '복사 완료!' : '스크립트 복사'}
+          </button>
+          <span style={{ fontSize: '0.8rem', color: '#065f46', opacity: 0.7 }}>
+            이 스크립트는 Suno 페이지에서 곡 제목, 가사, 스타일을 자동 추출합니다
           </span>
-        )}
+        </div>
+
+        {/* JSON 붙여넣기 입력칸 */}
+        <div style={{ marginTop: 20 }}>
+          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#065f46', marginBottom: 8 }}>
+            결과 붙여넣기:
+          </label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              className={styles.formInput}
+              style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.8rem' }}
+              value={pasteInput}
+              onChange={e => setPasteInput(e.target.value)}
+              placeholder='콘솔에서 복사된 결과를 여기에 Ctrl+V 붙여넣기 ({"url":"...","title":"...","lyrics":"..."})'
+            />
+            <button
+              className={styles.addBtn}
+              style={{ padding: '8px 20px', whiteSpace: 'nowrap' }}
+              onClick={handlePasteAdd}
+              disabled={!pasteInput.trim()}
+            >
+              곡 추가
+            </button>
+          </div>
+          <p style={{ fontSize: '0.75rem', color: '#065f46', opacity: 0.6, marginTop: 6 }}>
+            여러 곡은 곡마다 Suno 페이지에서 스크립트 실행 → 붙여넣기를 반복하세요
+          </p>
+        </div>
       </div>
 
       {/* 앨범 선택 + 등록 버튼 */}
