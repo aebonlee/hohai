@@ -1,5 +1,24 @@
 # 개발 변경 이력 (CHANGELOG)
 
+## 2026-02-22 — 커뮤니티 섹션 추가 + 메뉴 이름 변경
+
+### 추가
+- `hohai_gallery` 테이블 + `gallery` Storage bucket (이미지 게시판용)
+- `hohai_news` 테이블 (소식통 게시판용)
+- `GalleryItem` / `NewsItem` 타입 (`src/types/gallery.ts`, `src/types/news.ts`)
+- `useGallery()` 훅 + `uploadGalleryImage()` — CRUD + Storage 업로드/삭제 (`src/hooks/useGallery.ts`)
+- `useNews()` 훅 — CRUD (`src/hooks/useNews.ts`)
+- CommunityPage — 허브 페이지, 3개 카드(감상 후기/갤러리/소식통) 링크
+- GalleryPage — 이미지 게시판, 드래그&드롭 업로드(5MB), 3열 그리드(4:3)
+- NewsPage — 소식통 게시판, 제목+내용 폼, 카드 리스트
+
+### 변경
+- Header NAV_ITEMS: "앨범별 소개" → "노래모음집", "감상 후기" → "커뮤니티"
+- App.tsx: `/reviews` → `/community` 허브 + `/community/reviews` + `/community/gallery` + `/community/news`
+- ReviewsPage: `← 커뮤니티` 뒤로가기 링크 추가
+
+---
+
 ## 2026-02-22 — 시 해시태그 카테고리 미연결 시 클릭 비활성화
 
 ### 변경

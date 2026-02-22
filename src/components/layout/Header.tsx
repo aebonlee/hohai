@@ -8,9 +8,9 @@ const NAV_ITEMS = [
   { to: '/poems', label: '추천 시(詩)' },
   { to: '/poem-series', label: '시집 소개' },
   { to: '/songs', label: '추천 노래' },
-  { to: '/albums', label: '앨범별 소개' },
+  { to: '/albums', label: '노래모음집' },
   { to: '/playlist', label: '재생목록', title: '내가 만든 재생목록을 관리합니다 (로그인 필요)' },
-  { to: '/reviews', label: '감상 후기' },
+  { to: '/community', label: '커뮤니티' },
   { to: '/about', label: '시인 소개' },
 ] as const;
 

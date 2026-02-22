@@ -2,6 +2,66 @@
 
 ---
 
+## 2026-02-22 — 커뮤니티 섹션 추가 + 메뉴 이름 변경
+
+### 배경
+
+상단 메뉴 "앨범별 소개" → "노래모음집" 이름 변경, "감상 후기" → "커뮤니티" 허브 페이지 전환.
+커뮤니티 하위에 감상 후기(기존) + 갤러리(이미지 업로드) + 소식통(텍스트 게시판) 3개 게시판 구성.
+
+### DB 마이그레이션 (Supabase SQL Editor)
+
+- `hohai_gallery` 테이블 — title, image_url, description, author_name, user_id, RLS 3정책 (public read / auth insert / auth delete own)
+- `hohai_news` 테이블 — title, content, author_name, user_id, RLS 3정책 (동일)
+- `gallery` Storage bucket — public, auth upload/delete own 정책
+
+### 신규 파일 (10개)
+
+| 파일 | 설명 |
+|------|------|
+| `src/types/gallery.ts` | GalleryItem, GalleryItemInsert, GalleryItemUpdate 타입 |
+| `src/types/news.ts` | NewsItem, NewsItemInsert, NewsItemUpdate 타입 |
+| `src/hooks/useGallery.ts` | useGallery() CRUD + uploadGalleryImage() Storage 업로드, 삭제 시 Storage 파일 동시 삭제 |
+| `src/hooks/useNews.ts` | useNews() CRUD 훅 |
+| `src/pages/CommunityPage.tsx` | 커뮤니티 허브 — 3개 카드(💬 감상 후기, 🖼️ 갤러리, 📰 소식통) 링크, motion 애니메이션 |
+| `src/pages/CommunityPage.module.css` | 3열 그리드, hover translateY(-4px) + gold border, 반응형 1열 |
+| `src/pages/GalleryPage.tsx` | 이미지 게시판 — 제목+이미지 드래그/클릭 업로드(5MB)+설명, 3열 카드 그리드(4:3), 삭제 |
+| `src/pages/GalleryPage.module.css` | dropzone, previewImg, 3열→2열→1열 반응형 |
+| `src/pages/NewsPage.tsx` | 소식통 — 제목+내용 폼, 카드 리스트(제목 강조), 삭제 |
+| `src/pages/NewsPage.module.css` | ReviewsPage 기반 + newsTitle 강조 스타일 |
+
+### 수정 파일 (4개)
+
+| 파일 | 변경 |
+|------|------|
+| `src/components/layout/Header.tsx` | NAV_ITEMS: "앨범별 소개" → "노래모음집", "감상 후기" → "커뮤니티" (`/community`) |
+| `src/App.tsx` | `/reviews` 제거, `/community` (허브) + `/community/reviews` + `/community/gallery` + `/community/news` 4개 라우트 추가 |
+| `src/pages/ReviewsPage.tsx` | `← 커뮤니티` 뒤로가기 링크 추가 |
+| `src/pages/ReviewsPage.module.css` | `.backLink` 스타일 추가 |
+
+### 커뮤니티 허브 구조
+
+```
+/community              → CommunityPage (3개 카드)
+/community/reviews      → ReviewsPage (기존 감상 후기)
+/community/gallery      → GalleryPage (이미지 게시판)
+/community/news         → NewsPage (텍스트 게시판)
+```
+
+### 주요 기술 결정
+
+1. **라우팅 구조** — `/community` 허브 + 하위 3개 서브 라우트. NavLink가 `end` 없이 `/community` 매칭하므로 하위 페이지에서도 헤더 active 상태 유지
+2. **갤러리 이미지 Storage** — `gallery/{userId}/{timestamp}_{random}.{ext}` 경로로 업로드, 삭제 시 DB + Storage 동시 제거
+3. **드래그 앤 드롭** — DragEvent + FileReader 미리보기, 5MB 제한 + 이미지 타입 검증
+4. **useReviews 패턴 재사용** — useGallery, useNews 모두 동일한 fetch → create → delete 패턴 적용
+
+### 검증 결과
+
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과 (5.22s)
+
+---
+
 ## 2026-02-22 — 시 해시태그 카테고리 미연결 시 클릭 비활성화
 
 ### 배경

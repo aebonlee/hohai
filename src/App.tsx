@@ -12,6 +12,9 @@ import FeaturedSongsPage from './pages/FeaturedSongsPage';
 import SongsPage from './pages/SongsPage';
 import SongSeriesPage from './pages/SongSeriesPage';
 import ReviewsPage from './pages/ReviewsPage';
+import CommunityPage from './pages/CommunityPage';
+import GalleryPage from './pages/GalleryPage';
+import NewsPage from './pages/NewsPage';
 import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -33,7 +36,10 @@ export default function App() {
           <Route path="songs" element={<FeaturedSongsPage />} />
           <Route path="albums" element={<SongsPage />} />
           <Route path="albums/:slug" element={<SongSeriesPage />} />
-          <Route path="reviews" element={<ReviewsPage />} />
+          <Route path="community" element={<CommunityPage />} />
+          <Route path="community/reviews" element={<ReviewsPage />} />
+          <Route path="community/gallery" element={<GalleryPage />} />
+          <Route path="community/news" element={<NewsPage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="playlist" element={
             <AuthGuard><PlaylistPage /></AuthGuard>
