@@ -8,6 +8,7 @@ const NAV_GROUPS = [
   {
     items: [
       { to: '/', label: '홈' },
+      { to: '/about', label: '시인 소개' },
     ],
   },
   {
@@ -28,7 +29,6 @@ const NAV_GROUPS = [
     items: [
       { to: '/playlist', label: '재생목록', title: '내가 만든 재생목록을 관리합니다 (로그인 필요)' },
       { to: '/community', label: '커뮤니티' },
-      { to: '/about', label: '시인 소개' },
     ],
   },
 ] as const;
