@@ -102,7 +102,7 @@ export default function AddToPlaylist({ songId }: Props) {
         aria-label={isInFavorites ? '즐겨찾기에서 제거' : '즐겨찾기에 추가'}
         title={isInFavorites ? '즐겨찾기에서 이 곡을 제거합니다' : '이 곡을 즐겨찾기에 추가합니다'}
       >
-        {isInFavorites ? '♥' : '♡'}
+        {isInFavorites ? '★' : '☆'}
       </button>
       <button
         className={styles.moreBtn}

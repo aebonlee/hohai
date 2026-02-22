@@ -5,7 +5,7 @@
   gap: 2px;
 }
 
-/* 즐겨찾기 하트 버튼 */
+/* 즐겨찾기 별 버튼 (★/☆) */
 .favBtn {
   display: inline-flex;
   align-items: center;
@@ -16,7 +16,7 @@
   border: none;
   background: none;
   color: var(--text-muted);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   line-height: 1;
   cursor: pointer;
   transition: all var(--transition);
@@ -24,7 +24,7 @@
 }
 
 .favBtn:hover {
-  color: #e74c3c;
+  color: #e6a817;
   transform: scale(1.15);
 }
 
@@ -35,7 +35,7 @@
 }
 
 .favBtn.favActive {
-  color: #e74c3c;
+  color: #e6a817;
 }
 
 .favBtn.favActive:hover {

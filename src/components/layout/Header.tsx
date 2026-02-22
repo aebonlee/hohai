@@ -19,6 +19,7 @@ const NAV_GROUPS = [
   },
   {
     items: [
+      { to: '/songs', label: '추천 노래' },
       { to: '/latest-songs', label: '최신 노래' },
       { to: '/albums', label: '노래모음집' },
     ],

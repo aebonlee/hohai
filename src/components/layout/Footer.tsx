@@ -21,6 +21,7 @@ export default function Footer() {
           </div>
           <div className={styles.linkGroup}>
             <span className={styles.linkGroupLabel}>노래</span>
+            <Link to="/songs" className={styles.link}>추천 노래</Link>
             <Link to="/latest-songs" className={styles.link}>최신 노래</Link>
             <Link to="/albums" className={styles.link}>노래모음집</Link>
           </div>
