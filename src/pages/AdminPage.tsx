@@ -1833,7 +1833,11 @@ function SunoImportAdmin() {
           lyrics = data.metadata?.prompt || '';
           style = data.metadata?.tags || '';
           if (style) tags = style.split(',').map((t: string) => t.trim()).filter(Boolean);
-          addLog(`[성공] "${title}" — 가사 ${lyrics ? '있음' : '없음'}`);
+          if (lyrics) {
+            addLog(`[성공] "${title}" — 가사 있음`);
+          } else {
+            addLog(`[경고] "${title}" — 가사 없음! 편집에서 직접 입력하세요`);
+          }
         } else {
           fetchFailed = true;
           addLog(`[API ${res.status}] ${id} — 편집 버튼으로 수동 입력하세요`);
@@ -1911,11 +1915,16 @@ function SunoImportAdmin() {
         continue;
       }
 
+      if (!song.lyrics.trim()) {
+        addLog(`[건너뜀] "${song.title}" — 가사가 없습니다. 편집에서 가사를 입력해 주세요.`);
+        continue;
+      }
+
       const insert: SongInsert = {
         title: song.title,
         suno_url: song.suno_url,
-        lyrics: song.lyrics || null,
-        description: song.style || null,
+        lyrics: song.lyrics,
+        description: null,
         tags: song.tags,
         series_id: targetSeriesId || null,
         display_order: 0,
@@ -2051,8 +2060,8 @@ function SunoImportAdmin() {
                         placeholder="제목을 입력하세요"
                       />
                     </td>
-                    <td style={{ fontSize: '0.75rem', color: song.lyrics ? 'var(--text-secondary)' : 'var(--text-muted)', maxWidth: 200 }}>
-                      {song.lyrics ? (song.lyrics.length > 50 ? song.lyrics.slice(0, 50) + '...' : song.lyrics) : '(없음)'}
+                    <td style={{ fontSize: '0.75rem', color: song.lyrics ? 'var(--text-secondary)' : '#dc2626', maxWidth: 200, fontWeight: song.lyrics ? 400 : 600 }}>
+                      {song.lyrics ? (song.lyrics.length > 50 ? song.lyrics.slice(0, 50) + '...' : song.lyrics) : '⚠ 가사 없음 (편집 필요)'}
                     </td>
                     <td style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                       {song.style || '(없음)'}
@@ -2097,7 +2106,7 @@ function SunoImportAdmin() {
                               />
                             </div>
                             <div className={styles.formGroup}>
-                              <label className={styles.formLabel}>스타일 (description으로 저장)</label>
+                              <label className={styles.formLabel}>스타일 (태그 참고용)</label>
                               <input
                                 className={styles.formInput}
                                 value={song.style}
