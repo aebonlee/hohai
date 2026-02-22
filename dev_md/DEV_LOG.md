@@ -1,5 +1,18 @@
 # 개발일지
 
+## 2026-02-22 — 재생목록 곡 클릭 시 이어듣기 연동
+
+### 작업 내용
+- SongCard에 `contextPlaylist` prop 추가 → 재생 시 PlaybackContext playlist 자동 세팅
+- PlaylistPage에서 SongCard에 `contextPlaylist={playlistSongs}` 전달
+- 개별 곡 클릭 시에도 이어듣기/반복/셔플 정상 동작
+
+### 검증
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과 (12.28s)
+
+---
+
 ## 2026-02-22 — 즐겨찾기 추가 버그 수정
 
 ### 작업 내용

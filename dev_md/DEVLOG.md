@@ -2,6 +2,40 @@
 
 ---
 
+## 2026-02-22 — 재생목록 곡 클릭 시 이어듣기 연동
+
+### 배경
+
+PlaylistPage에서 "전체재생" 버튼은 이어듣기가 작동하지만,
+개별 곡 카드를 직접 클릭하면 해당 곡만 단독 재생되고 다음 곡으로 넘어가지 않는 문제.
+원인: SongCard의 `play(song.id)` 호출이 PlaybackContext의 playlist를 세팅하지 않음.
+
+### 변경 내용
+
+| 파일 | 변경 |
+|------|------|
+| `src/components/ui/SongCard.tsx` | `contextPlaylist?: Song[]` prop 추가. 재생 시 `setPlaylist(contextPlaylist)` 호출 후 `play()` |
+| `src/pages/PlaylistPage.tsx` | SongCard에 `contextPlaylist={playlistSongs}` 전달 |
+
+### 동작 흐름
+
+1. PlaylistPage에서 곡 카드 재생 버튼 클릭
+2. `playWithContext()` → `setPlaylist(재생목록 전체 곡)` → `play(해당 곡 ID)`
+3. PlaybackContext에 playlist가 세팅됨 → 곡 끝나면 `onSongEnd()`이 다음 곡 자동 재생
+4. SongCard에 ⏮/⏭ 네비게이션 표시, 반복/셔플도 정상 동작
+
+### 주요 기술 결정
+
+- **contextPlaylist prop 방식**: PlaylistPage 외 다른 페이지의 SongCard는 영향 없음 (prop 미전달 시 기존 동작 유지)
+- **setPlaylist + play 순서**: setPlaylist이 먼저 호출되어야 currentIndex 계산이 정확함
+
+### 검증 결과
+
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과 (12.28s)
+
+---
+
 ## 2026-02-22 — 즐겨찾기 추가 버그 수정 (레이스 컨디션 + 로그인 후 미갱신)
 
 ### 배경

@@ -230,7 +230,7 @@ export default function PlaylistPage() {
                     <div className={styles.songGrid}>
                       {playlistSongs.map((song, i) => (
                         <div key={song.id} className={styles.songCardWrapper}>
-                          <SongCard song={song} index={i} />
+                          <SongCard song={song} index={i} contextPlaylist={playlistSongs} />
                           <button
                             className={styles.removeBtn}
                             onClick={() => handleRemoveSong(song.id)}

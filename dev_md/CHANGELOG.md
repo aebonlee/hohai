@@ -1,5 +1,16 @@
 # 개발 변경 이력 (CHANGELOG)
 
+## 2026-02-22 — 재생목록 곡 클릭 시 이어듣기 연동
+
+### 추가
+- SongCard에 `contextPlaylist` prop — 재생 시 자동으로 PlaybackContext playlist 세팅
+- PlaylistPage에서 SongCard에 재생목록 곡 배열 전달
+
+### 변경
+- SongCard: 재생 핸들러에 `playWithContext()` 래핑 (contextPlaylist → setPlaylist → play)
+
+---
+
 ## 2026-02-22 — 즐겨찾기 추가 버그 수정
 
 ### 수정

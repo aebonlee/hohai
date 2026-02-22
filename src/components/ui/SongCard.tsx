@@ -16,13 +16,15 @@ function getSunoEmbedUrl(sunoUrl: string): string {
 interface Props {
   song: Song;
   index?: number;
+  /** 이 카드가 속한 재생목록 — 곡 재생 시 자동으로 PlaybackContext에 세팅 */
+  contextPlaylist?: Song[];
 }
 
-export default function SongCard({ song, index = 0 }: Props) {
+export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
   const {
     currentId, play, onSongEnd,
     playlist, currentIndex, hasNext, hasPrev, next, prev,
-    autoPlayIntent, openLyricsPlayer,
+    setPlaylist, autoPlayIntent, openLyricsPlayer,
   } = usePlayback();
 
   const [ytPlaying, setYtPlaying] = useState(false);
@@ -74,18 +76,26 @@ export default function SongCard({ song, index = 0 }: Props) {
     },
   });
 
+  /** contextPlaylist가 있으면 PlaybackContext에 재생목록 세팅 후 재생 */
+  const playWithContext = (songId: string) => {
+    if (contextPlaylist && contextPlaylist.length > 0) {
+      setPlaylist(contextPlaylist);
+    }
+    play(songId);
+  };
+
   const handleYtPlay = () => {
-    play(song.id);
+    playWithContext(song.id);
     setYtPlaying(true);
   };
 
   const handleSunoPlay = () => {
-    play(song.id);
+    playWithContext(song.id);
     setSunoPlaying(true);
   };
 
   const handleLyricsPlayerOpen = () => {
-    play(song.id);
+    playWithContext(song.id);
     openLyricsPlayer();
   };
 
