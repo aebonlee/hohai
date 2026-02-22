@@ -296,43 +296,144 @@
   background: rgba(10, 25, 41, 0.1);
 }
 
-/* 곡 그리드 */
-.songGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+/* 곡 리스트 */
+.songList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(10, 25, 41, 0.08);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
 }
 
-.songCardWrapper {
-  position: relative;
+.songRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(10, 25, 41, 0.06);
+  transition: background var(--transition);
+}
+
+.songRow:last-child {
+  border-bottom: none;
+}
+
+.songRow:hover {
+  background: rgba(10, 61, 122, 0.04);
+}
+
+.songRow.songRowPlaying {
+  background: rgba(10, 61, 122, 0.08);
+}
+
+.songIndex {
+  width: 24px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.songRowPlaying .songIndex {
+  color: var(--accent-gold);
+}
+
+.songPlayBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(10, 25, 41, 0.06);
+  color: var(--text-primary);
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition);
+}
+
+.songPlayBtn:hover {
+  background: var(--accent-gold);
+  color: #fff;
+}
+
+.songRowPlaying .songPlayBtn {
+  background: var(--accent-gold);
+  color: #fff;
+}
+
+.songInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.songTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.songRowPlaying .songTitle {
+  color: var(--accent-gold);
+}
+
+.songDesc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.songTags {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.songTag {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  background: rgba(10, 25, 41, 0.05);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
 .removeBtn {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 10;
   width: 28px;
   height: 28px;
   border-radius: 50%;
   border: none;
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  background: none;
+  color: var(--text-muted);
   font-size: 0.75rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   opacity: 0;
-  transition: opacity var(--transition);
+  transition: all var(--transition);
 }
 
-.songCardWrapper:hover .removeBtn {
+.songRow:hover .removeBtn {
   opacity: 1;
 }
 
 .removeBtn:hover {
-  background: #c0392b;
+  background: rgba(192, 57, 43, 0.1);
+  color: #c0392b;
 }
 
 /* 빈 상태 */
@@ -404,8 +505,13 @@
     width: 100%;
   }
 
-  .songGrid {
-    grid-template-columns: 1fr;
+  .songTags {
+    display: none;
+  }
+
+  .songRow {
+    padding: 8px 12px;
+    gap: 8px;
   }
 
   .actions {

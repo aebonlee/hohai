@@ -8,7 +8,6 @@ import { useSongs } from '../hooks/useSongs';
 import type { Song } from '../types/song';
 import type { RepeatMode } from '../contexts/PlaybackContext';
 import PageTransition from '../components/layout/PageTransition';
-import SongCard from '../components/ui/SongCard';
 import styles from './PlaylistPage.module.css';
 
 export default function PlaylistPage() {
@@ -18,7 +17,7 @@ export default function PlaylistPage() {
     createPlaylist, updatePlaylist, deletePlaylist, removeSongFromPlaylist,
   } = usePlaylistContext();
   const { songs, loading: songsLoading } = useSongs();
-  const { setPlaylist, play, playShuffled, repeatMode, setRepeatMode } = usePlayback();
+  const { currentId, setPlaylist, play, playShuffled, repeatMode, setRepeatMode } = usePlayback();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState(false);
@@ -69,6 +68,13 @@ export default function PlaylistPage() {
   const handleRemoveSong = async (songId: string) => {
     if (!effectiveSelected) return;
     await removeSongFromPlaylist(effectiveSelected.id, songId);
+  };
+
+  const handlePlaySong = (songId: string) => {
+    if (playlistSongs.length > 0) {
+      setPlaylist(playlistSongs);
+    }
+    play(songId);
   };
 
   const handlePlayAll = () => {
@@ -233,24 +239,48 @@ export default function PlaylistPage() {
                   {playlistSongs.length === 0 ? (
                     <div className={styles.emptyState}>
                       <p>재생목록이 비어 있습니다</p>
-                      <p className={styles.emptyHint}>노래 카드의 <strong>+</strong> 버튼으로 곡을 추가해 보세요</p>
+                      <p className={styles.emptyHint}>노래 카드의 <strong>☆</strong> 버튼으로 곡을 추가해 보세요</p>
                     </div>
                   ) : (
-                    <div className={styles.songGrid}>
-                      {playlistSongs.map((song, i) => (
-                        <div key={song.id} className={styles.songCardWrapper}>
-                          <SongCard song={song} index={i} contextPlaylist={playlistSongs} />
-                          <button
-                            className={styles.removeBtn}
-                            onClick={() => handleRemoveSong(song.id)}
-                            aria-label={`${song.title} 제거`}
-                            title="재생목록에서 제거"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                    <ul className={styles.songList}>
+                      {playlistSongs.map((song, i) => {
+                        const isPlaying = currentId === song.id;
+                        return (
+                          <li key={song.id} className={`${styles.songRow} ${isPlaying ? styles.songRowPlaying : ''}`}>
+                            <span className={styles.songIndex}>{i + 1}</span>
+                            <button
+                              className={styles.songPlayBtn}
+                              onClick={() => handlePlaySong(song.id)}
+                              aria-label={`${song.title} 재생`}
+                              title="재생"
+                            >
+                              {isPlaying ? '⏸' : '▶'}
+                            </button>
+                            <div className={styles.songInfo}>
+                              <span className={styles.songTitle}>{song.title}</span>
+                              {song.description && (
+                                <span className={styles.songDesc}>{song.description}</span>
+                              )}
+                            </div>
+                            {song.tags && song.tags.length > 0 && (
+                              <div className={styles.songTags}>
+                                {song.tags.slice(0, 3).map((tag) => (
+                                  <span key={tag} className={styles.songTag}>#{tag}</span>
+                                ))}
+                              </div>
+                            )}
+                            <button
+                              className={styles.removeBtn}
+                              onClick={() => handleRemoveSong(song.id)}
+                              aria-label={`${song.title} 제거`}
+                              title="재생목록에서 제거"
+                            >
+                              ✕
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   )}
                 </>
               ) : (
