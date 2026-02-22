@@ -20,11 +20,12 @@
 .inner {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 20px;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
 .logo {
@@ -51,50 +52,52 @@
   margin-top: -2px;
 }
 
+/* ===== 데스크톱 네비게이션 ===== */
 .nav {
   display: flex;
   align-items: center;
+  gap: 0;
+}
+
+.navGroup {
+  display: flex;
+  align-items: center;
   gap: 2px;
-  background: rgba(7, 26, 51, 0.04);
-  border-radius: 12px;
-  padding: 3px;
+}
+
+.navDivider {
+  width: 1px;
+  height: 16px;
+  background: rgba(10, 25, 41, 0.12);
+  margin: 0 6px;
+  flex-shrink: 0;
 }
 
 .navLink {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 500;
   color: var(--text-secondary);
   transition: all var(--transition);
   position: relative;
-  padding: 5px 7px;
+  padding: 6px 9px;
   border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 4px;
   white-space: nowrap;
-}
-
-.navIcon {
-  font-size: 0.85rem;
-  display: inline-block;
-}
-
-.navDivider {
-  display: none;
 }
 
 .navLink:hover {
   color: var(--text-primary);
-  background: rgba(10, 61, 122, 0.08);
+  background: rgba(10, 61, 122, 0.07);
 }
 
 .navLink.active {
   color: var(--accent-gold);
-  background: rgba(10, 61, 122, 0.12);
+  background: rgba(10, 61, 122, 0.1);
   font-weight: 600;
 }
 
-/* Search */
+/* ===== Search ===== */
 .searchForm {
   position: relative;
   display: flex;
@@ -116,7 +119,7 @@
   font-size: 0.8rem;
   color: var(--text-primary);
   background: rgba(255, 255, 255, 0.7);
-  transition: border-color var(--transition), box-shadow var(--transition);
+  transition: border-color var(--transition), box-shadow var(--transition), width var(--transition);
   font-family: var(--font-sans);
 }
 
@@ -124,7 +127,7 @@
   outline: none;
   border-color: var(--accent-gold);
   box-shadow: 0 0 0 3px rgba(10, 61, 122, 0.08);
-  width: 180px;
+  width: 170px;
 }
 
 .searchToggle {
@@ -186,7 +189,7 @@
   font-family: var(--font-sans);
 }
 
-/* Header right area */
+/* ===== Header right ===== */
 .headerRight {
   display: flex;
   align-items: center;
@@ -209,7 +212,7 @@
   background: rgba(10, 61, 122, 0.06);
 }
 
-/* User avatar & dropdown */
+/* ===== User avatar & dropdown ===== */
 .userMenu {
   position: relative;
 }
@@ -292,6 +295,7 @@
   color: var(--text-primary);
 }
 
+/* ===== Hamburger ===== */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -321,7 +325,7 @@
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* 모바일 메뉴 */
+/* ===== 모바일 메뉴 ===== */
 .mobileMenu {
   display: none;
   position: fixed;
@@ -333,23 +337,32 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 99;
-  padding: 24px 24px;
+  padding: 20px 24px;
   overflow-y: auto;
 }
 
 .mobileMenu.open {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
+}
+
+.mobileGroup {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(10, 25, 41, 0.06);
+}
+
+.mobileGroup:last-child {
+  border-bottom: none;
 }
 
 .mobileLink {
   font-family: var(--font-serif);
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: var(--text-secondary);
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(10, 25, 41, 0.06);
+  padding: 11px 12px;
+  border-radius: 10px;
   transition: all var(--transition);
   display: flex;
   align-items: center;
@@ -360,13 +373,18 @@
   font-size: 1.1rem;
 }
 
-.mobileLink:hover,
-.mobileLink.active {
-  color: var(--accent-gold);
-  padding-left: 8px;
+.mobileLink:hover {
+  color: var(--text-primary);
+  background: rgba(10, 61, 122, 0.05);
 }
 
-/* 태블릿 (1024px 이하): 네비 → 햄버거 전환 */
+.mobileLink.active {
+  color: var(--accent-gold);
+  background: rgba(10, 61, 122, 0.08);
+  font-weight: 700;
+}
+
+/* ===== 태블릿 (1024px 이하) ===== */
 @media (max-width: 1024px) {
   .nav {
     display: none;
@@ -393,20 +411,11 @@
   .inner {
     padding: 0 16px;
   }
-
-  .mobileMenu {
-    padding: 20px 20px;
-  }
-
-  .mobileLink {
-    font-size: 1.05rem;
-    padding: 10px 0;
-  }
 }
 
 @media (max-width: 480px) {
   .mobileLink {
-    font-size: 0.95rem;
-    padding: 10px 0;
+    font-size: 1rem;
+    padding: 10px 10px;
   }
 }

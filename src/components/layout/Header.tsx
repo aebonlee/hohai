@@ -3,17 +3,35 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Header.module.css';
 
-const NAV_ITEMS = [
-  { to: '/', label: '홈' },
-  { to: '/poems', label: '추천 시(詩)' },
-  { to: '/poem-series', label: '시(詩)모음집' },
-  { to: '/published-books', label: '출간시집' },
-  { to: '/latest-songs', label: '최신 노래' },
-  { to: '/albums', label: '노래모음집' },
-  { to: '/playlist', label: '재생목록', title: '내가 만든 재생목록을 관리합니다 (로그인 필요)' },
-  { to: '/community', label: '커뮤니티' },
-  { to: '/about', label: '시인 소개' },
+/** 네비게이션 그룹 (그룹 사이에 구분선 표시) */
+const NAV_GROUPS = [
+  {
+    items: [
+      { to: '/', label: '홈' },
+    ],
+  },
+  {
+    items: [
+      { to: '/poems', label: '추천 시' },
+      { to: '/poem-series', label: '시 모음집' },
+      { to: '/published-books', label: '출간시집' },
+    ],
+  },
+  {
+    items: [
+      { to: '/latest-songs', label: '최신 노래' },
+      { to: '/albums', label: '노래모음집' },
+    ],
+  },
+  {
+    items: [
+      { to: '/playlist', label: '재생목록', title: '내가 만든 재생목록을 관리합니다 (로그인 필요)' },
+      { to: '/community', label: '커뮤니티' },
+      { to: '/about', label: '시인 소개' },
+    ],
+  },
 ] as const;
+
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -75,19 +93,23 @@ export default function Header() {
           </Link>
 
           <nav className={styles.nav}>
-            {NAV_ITEMS.map((item, i) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
-                className={({ isActive }) =>
-                  `${styles.navLink} ${isActive ? styles.active : ''}`
-                }
-                title={'title' in item ? item.title : undefined}
-              >
-                {item.label}
-                {i < NAV_ITEMS.length - 1 && <span className={styles.navDivider} />}
-              </NavLink>
+            {NAV_GROUPS.map((group, gi) => (
+              <div key={gi} className={styles.navGroup}>
+                {gi > 0 && <span className={styles.navDivider} />}
+                {group.items.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === '/'}
+                    className={({ isActive }) =>
+                      `${styles.navLink} ${isActive ? styles.active : ''}`
+                    }
+                    title={'title' in item ? item.title : undefined}
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </div>
             ))}
           </nav>
 
@@ -183,18 +205,22 @@ export default function Header() {
       )}
 
       <div className={`${styles.mobileMenu} ${menuOpen ? styles.open : ''}`}>
-        {NAV_ITEMS.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === '/'}
-            className={({ isActive }) =>
-              `${styles.mobileLink} ${isActive ? styles.active : ''}`
-            }
-            onClick={() => setMenuOpen(false)}
-          >
-            {item.label}
-          </NavLink>
+        {NAV_GROUPS.map((group, gi) => (
+          <div key={gi} className={styles.mobileGroup}>
+            {group.items.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/'}
+                className={({ isActive }) =>
+                  `${styles.mobileLink} ${isActive ? styles.active : ''}`
+                }
+                onClick={() => setMenuOpen(false)}
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </div>
         ))}
         <div style={{ borderTop: '1px solid rgba(10, 25, 41, 0.08)', marginTop: '8px', paddingTop: '8px' }}>
           {isLoggedIn ? (
