@@ -34,6 +34,7 @@
   color: var(--text-primary);
   letter-spacing: 0.05em;
   transition: color var(--transition);
+  flex-shrink: 0;
 }
 
 .logo:hover {
@@ -53,23 +54,23 @@
 .nav {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   background: rgba(7, 26, 51, 0.04);
   border-radius: 12px;
-  padding: 4px 4px;
+  padding: 3px;
 }
 
 .navLink {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 500;
   color: var(--text-secondary);
   transition: all var(--transition);
   position: relative;
-  padding: 6px 10px;
+  padding: 5px 7px;
   border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   white-space: nowrap;
 }
 
@@ -108,7 +109,7 @@
 }
 
 .searchInput {
-  width: 160px;
+  width: 130px;
   padding: 6px 10px 6px 28px;
   border: 1px solid rgba(7, 26, 51, 0.12);
   border-radius: 8px;
@@ -123,6 +124,7 @@
   outline: none;
   border-color: var(--accent-gold);
   box-shadow: 0 0 0 3px rgba(10, 61, 122, 0.08);
+  width: 180px;
 }
 
 .searchToggle {
@@ -188,17 +190,19 @@
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .loginBtn {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--accent-gold);
-  padding: 6px 16px;
+  padding: 5px 14px;
   border-radius: 6px;
   border: 1px solid rgba(10, 61, 122, 0.2);
   transition: all var(--transition);
+  white-space: nowrap;
 }
 
 .loginBtn:hover {
@@ -211,12 +215,12 @@
 }
 
 .userAvatar {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--accent-gold);
   color: white;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -329,30 +333,31 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 99;
-  padding: 40px 24px;
+  padding: 24px 24px;
+  overflow-y: auto;
 }
 
 .mobileMenu.open {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .mobileLink {
   font-family: var(--font-serif);
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--text-secondary);
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(10, 25, 41, 0.08);
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(10, 25, 41, 0.06);
   transition: all var(--transition);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .mobileIcon {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
 }
 
 .mobileLink:hover,
@@ -361,17 +366,14 @@
   padding-left: 8px;
 }
 
-@media (max-width: 768px) {
+/* 태블릿 (1024px 이하): 네비 → 햄버거 전환 */
+@media (max-width: 1024px) {
   .nav {
     display: none;
   }
 
   .hamburger {
     display: flex;
-  }
-
-  .inner {
-    padding: 0 16px;
   }
 
   .searchForm {
@@ -384,5 +386,27 @@
 
   .mobileSearchBar {
     display: flex;
+  }
+}
+
+@media (max-width: 768px) {
+  .inner {
+    padding: 0 16px;
+  }
+
+  .mobileMenu {
+    padding: 20px 20px;
+  }
+
+  .mobileLink {
+    font-size: 1.05rem;
+    padding: 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobileLink {
+    font-size: 0.95rem;
+    padding: 10px 0;
   }
 }

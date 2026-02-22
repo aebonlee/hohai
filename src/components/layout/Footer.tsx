@@ -12,13 +12,23 @@ export default function Footer() {
             호해 이성헌 시인의 작품 세계를 만나보세요.
           </p>
         </div>
-        <div className={styles.links}>
-          <Link to="/poems" className={styles.link}>추천 시</Link>
-          <Link to="/poem-series" className={styles.link}>시집 소개</Link>
-          <Link to="/songs" className={styles.link}>추천 노래</Link>
-          <Link to="/albums" className={styles.link}>노래모음집</Link>
-          <Link to="/community" className={styles.link}>커뮤니티</Link>
-          <Link to="/about" className={styles.link}>시인 소개</Link>
+        <div className={styles.linkGroups}>
+          <div className={styles.linkGroup}>
+            <span className={styles.linkGroupLabel}>시(詩)</span>
+            <Link to="/poems" className={styles.link}>추천 시</Link>
+            <Link to="/poem-series" className={styles.link}>시(詩)모음집</Link>
+            <Link to="/published-books" className={styles.link}>출간시집</Link>
+          </div>
+          <div className={styles.linkGroup}>
+            <span className={styles.linkGroupLabel}>노래</span>
+            <Link to="/latest-songs" className={styles.link}>최신 노래</Link>
+            <Link to="/albums" className={styles.link}>노래모음집</Link>
+          </div>
+          <div className={styles.linkGroup}>
+            <span className={styles.linkGroupLabel}>더보기</span>
+            <Link to="/community" className={styles.link}>커뮤니티</Link>
+            <Link to="/about" className={styles.link}>시인 소개</Link>
+          </div>
         </div>
       </div>
       <div className={styles.bottom}>

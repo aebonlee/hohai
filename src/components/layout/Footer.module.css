@@ -31,15 +31,31 @@
   max-width: 300px;
 }
 
-.links {
+.linkGroups {
   display: flex;
-  gap: 24px;
+  gap: 40px;
+}
+
+.linkGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.linkGroupLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
 }
 
 .link {
   color: var(--text-secondary);
   font-size: 0.875rem;
   transition: color var(--transition);
+  white-space: nowrap;
 }
 
 .link:hover {
@@ -65,5 +81,34 @@
   .inner {
     flex-direction: column;
     padding: 0 16px;
+    gap: 24px;
+  }
+
+  .linkGroups {
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .linkGroup {
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 400px) {
+  .linkGroups {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .linkGroup {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    align-items: center;
+  }
+
+  .linkGroupLabel {
+    width: 100%;
+    margin-bottom: 0;
   }
 }
