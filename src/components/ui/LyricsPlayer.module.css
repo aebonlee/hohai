@@ -164,10 +164,38 @@
   line-height: 1.4;
 }
 
+.songCounts {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.songCountHeart {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f87171;
+}
+
+.songCountStar {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fbbf24;
+}
+
+.songActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .songDescription {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid rgba(255, 255, 255, 0.15);
 }
 
 .songTags {

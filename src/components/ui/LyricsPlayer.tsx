@@ -3,9 +3,14 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Song } from '../../types/song';
 import { usePlayback } from '../../contexts/PlaybackContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useYouTubePlayer } from '../../hooks/useYouTubePlayer';
+import { useLikes, useFavoritesCount } from '../../hooks/useLikes';
 import { detectMood, MOOD_GRADIENTS } from '../../lib/mood';
 import LyricsEffects from './LyricsEffects';
+import AddToPlaylist from './AddToPlaylist';
+import LikeButton from './LikeButton';
+import ShareButton from './ShareButton';
 import { getSunoEmbedUrl } from '../../lib/suno';
 import { cleanLyrics } from '../../lib/cleanLyrics';
 import styles from './LyricsPlayer.module.css';
@@ -25,6 +30,10 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<Element | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+
+  const { user } = useAuth();
+  const { count: likeCount } = useLikes('song', song.id, user?.id);
+  const favCount = useFavoritesCount(song.id);
 
   const hasYoutube = !!song.youtube_id;
   const hasSuno = !!song.suno_url;
@@ -214,9 +223,27 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
               {/* 노래 메타 */}
               <div className={styles.songMeta}>
                 <h2 className={styles.songTitle}>{song.title}</h2>
+
+                {/* 좋아요·즐겨찾기 카운트 */}
+                {(likeCount > 0 || favCount > 0) && (
+                  <div className={styles.songCounts}>
+                    {likeCount > 0 && <span className={styles.songCountHeart}>♥ {likeCount}</span>}
+                    {favCount > 0 && <span className={styles.songCountStar}>★ {favCount}</span>}
+                  </div>
+                )}
+
+                {/* 액션 버튼 */}
+                <div className={styles.songActions}>
+                  <LikeButton targetType="song" targetId={song.id} />
+                  <AddToPlaylist songId={song.id} />
+                  <ShareButton title={song.title} text={song.description || song.title} />
+                </div>
+
+                {/* 시인 소개글 */}
                 {song.description && (
                   <p className={styles.songDescription}>{song.description}</p>
                 )}
+
                 {hasTags && (
                   <div className={styles.songTags}>
                     {song.tags.map((tag) => (
