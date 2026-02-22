@@ -1860,13 +1860,33 @@ function SunoImportAdmin() {
   const existingUrls = new Set(songs.filter(s => s.suno_url).map(s => s.suno_url!));
   const isAlreadyImported = (id: string, url: string) => existingUrls.has(url) || existingIds.has(id);
 
-  /** 페이지 소스 붙여넣기로 곡 추가 (핵심 방법) */
+  /** 페이지 소스/북마클릿 데이터 붙여넣기로 곡 추가 (핵심 방법) */
   const handlePasteAdd = () => {
     if (!pastedSource.trim()) return;
-    const parsed = parseSunoPageSource(pastedSource);
+
+    // 북마클릿 JSON 출력 감지
+    let parsed: { title: string; lyrics: string; style: string; url: string };
+    const bookmarkletMatch = pastedSource.trim().match(/^SUNO_DATA:([\s\S]+)$/);
+    if (bookmarkletMatch) {
+      try {
+        const bData = JSON.parse(bookmarkletMatch[1]);
+        parsed = {
+          title: bData.title || '',
+          lyrics: bData.lyrics || '',
+          style: bData.style || '',
+          url: bData.url || '',
+        };
+        addLog('[북마클릿] 데이터 수신 성공');
+      } catch {
+        addLog('[실패] 북마클릿 데이터 파싱 오류');
+        return;
+      }
+    } else {
+      parsed = parseSunoPageSource(pastedSource);
+    }
 
     if (!parsed.title && !parsed.lyrics) {
-      addLog('[실패] 붙여넣은 내용에서 곡 정보를 찾을 수 없습니다');
+      addLog('[실패] 붙여넣은 내용에서 곡 정보를 찾을 수 없습니다. 아래의 "북마클릿" 방법을 사용해 보세요.');
       return;
     }
 
@@ -2130,7 +2150,7 @@ function SunoImportAdmin() {
             marginBottom: -2,
           }}
         >
-          페이지 소스 붙여넣기 (권장)
+          곡 정보 붙여넣기 (권장)
         </button>
         <button
           onClick={() => setActiveMethod('url')}
@@ -2150,54 +2170,106 @@ function SunoImportAdmin() {
         </button>
       </div>
 
-      {/* 방법 1: 페이지 소스 붙여넣기 (권장) */}
+      {/* 방법 1: 붙여넣기 (권장) */}
       {activeMethod === 'paste' && (
-        <div style={{
-          marginBottom: 24,
-          padding: 20,
-          background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-          borderRadius: 12,
-          border: '1px solid #fbbf24',
-        }}>
-          <div style={{ marginBottom: 16 }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#92400e', marginBottom: 12 }}>
-              Suno 페이지 소스로 곡 정보 가져오기
+        <div style={{ marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {/* 북마클릿 안내 (가장 쉬운 방법) */}
+          <div style={{
+            padding: 20,
+            background: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)',
+            borderRadius: 12,
+            border: '1px solid #34d399',
+          }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#065f46', marginBottom: 12 }}>
+              방법 A: 북마클릿으로 한 번에 가져오기 (가장 쉬움)
             </h3>
-            <div style={{ fontSize: '0.85rem', color: '#78350f', lineHeight: 2 }}>
-              <div><strong style={{ display: 'inline-block', width: 28, height: 28, lineHeight: '28px', textAlign: 'center', background: '#f59e0b', color: '#fff', borderRadius: '50%', marginRight: 8, fontSize: '0.8rem' }}>1</strong> Suno 곡 페이지를 브라우저에서 엽니다</div>
-              <div><strong style={{ display: 'inline-block', width: 28, height: 28, lineHeight: '28px', textAlign: 'center', background: '#f59e0b', color: '#fff', borderRadius: '50%', marginRight: 8, fontSize: '0.8rem' }}>2</strong> 키보드에서 <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>Ctrl</kbd> + <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>U</kbd> 를 눌러 페이지 소스를 엽니다</div>
-              <div><strong style={{ display: 'inline-block', width: 28, height: 28, lineHeight: '28px', textAlign: 'center', background: '#f59e0b', color: '#fff', borderRadius: '50%', marginRight: 8, fontSize: '0.8rem' }}>3</strong> <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>Ctrl</kbd> + <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>A</kbd> (전체 선택) → <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>Ctrl</kbd> + <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>C</kbd> (복사)</div>
-              <div><strong style={{ display: 'inline-block', width: 28, height: 28, lineHeight: '28px', textAlign: 'center', background: '#f59e0b', color: '#fff', borderRadius: '50%', marginRight: 8, fontSize: '0.8rem' }}>4</strong> 아래 입력칸에 <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>Ctrl</kbd> + <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>V</kbd> (붙여넣기) → "<strong>곡 추가</strong>" 클릭</div>
+            <div style={{ fontSize: '0.85rem', color: '#064e3b', lineHeight: 2, marginBottom: 16 }}>
+              <div style={{ marginBottom: 8 }}>
+                <strong>처음 한 번만 설정:</strong> 아래 버튼을 마우스로 끌어서 <strong>북마크 바</strong>에 놓으세요
+              </div>
+              {/* eslint-disable-next-line */}
+              <a
+                href={`javascript:void((async()=>{try{let t='',l='',s='',u=location.href;const nd=window.__NEXT_DATA__;if(nd){const findClip=(o)=>{if(!o||typeof o!=='object')return null;if(o.title&&(o.metadata||o.prompt))return o;for(const k of Object.keys(o)){const r=findClip(o[k]);if(r)return r;}return null;};const c=findClip(nd);if(c){t=c.title||'';l=c.metadata?.prompt||c.prompt||c.lyrics||'';s=c.metadata?.tags||c.tags||c.style||'';}}if(!t){const m=document.querySelector('meta[property="og:title"]');t=m?m.content.replace(/\\s*[|\\u2013\\u2014]\\s*Suno.*$/i,'').trim():document.title.replace(/\\s*[|\\u2013\\u2014]\\s*Suno.*$/i,'').trim();}if(!l){const els=document.querySelectorAll('[class*=lyric],[class*=Lyric],[class*=prompt],[class*=Prompt]');for(const el of els){const txt=el.innerText?.trim();if(txt&&txt.length>20&&txt.includes('\\n')){l=txt;break;}}}const r='SUNO_DATA:'+JSON.stringify({url:u,title:t,lyrics:l,style:s});await navigator.clipboard.writeText(r);alert('복사 완료!\\n제목: '+t+'\\n가사: '+(l?'O ('+l.split('\\n').length+'줄)':'X')+'\\n스타일: '+(s||'X'));}catch(e){alert('오류: '+e.message);}})())`}
+                onClick={e => e.preventDefault()}
+                draggable
+                style={{
+                  display: 'inline-block',
+                  padding: '10px 20px',
+                  background: 'linear-gradient(135deg, #059669, #047857)',
+                  color: '#fff',
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  borderRadius: 8,
+                  textDecoration: 'none',
+                  cursor: 'grab',
+                  boxShadow: '0 2px 8px rgba(5,150,105,0.3)',
+                  userSelect: 'none',
+                }}
+              >
+                Suno 곡 가져오기
+              </a>
+              <span style={{ marginLeft: 12, fontSize: '0.8rem', color: '#065f46', opacity: 0.7 }}>
+                ← 이 버튼을 북마크 바로 드래그하세요
+              </span>
+            </div>
+            <div style={{ fontSize: '0.85rem', color: '#064e3b', lineHeight: 2 }}>
+              <div><strong style={{ display: 'inline-block', width: 28, height: 28, lineHeight: '28px', textAlign: 'center', background: '#059669', color: '#fff', borderRadius: '50%', marginRight: 8, fontSize: '0.8rem' }}>1</strong> Suno 곡 페이지를 브라우저에서 엽니다 (페이지가 완전히 로드될 때까지 기다리세요)</div>
+              <div><strong style={{ display: 'inline-block', width: 28, height: 28, lineHeight: '28px', textAlign: 'center', background: '#059669', color: '#fff', borderRadius: '50%', marginRight: 8, fontSize: '0.8rem' }}>2</strong> 북마크 바의 "<strong>Suno 곡 가져오기</strong>" 를 클릭합니다</div>
+              <div><strong style={{ display: 'inline-block', width: 28, height: 28, lineHeight: '28px', textAlign: 'center', background: '#059669', color: '#fff', borderRadius: '50%', marginRight: 8, fontSize: '0.8rem' }}>3</strong> "복사 완료!" 알림이 뜨면, 이 페이지로 돌아와서 아래 입력칸에 <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>Ctrl</kbd> + <kbd style={{ background: '#fff', padding: '2px 8px', borderRadius: 4, border: '1px solid #d1d5db', fontFamily: 'monospace', fontSize: '0.85rem' }}>V</kbd> → "<strong>곡 추가</strong>" 클릭</div>
             </div>
           </div>
 
-          <textarea
-            className={styles.formTextarea}
-            style={{
-              width: '100%',
-              minHeight: 120,
-              fontFamily: 'monospace',
-              fontSize: '0.78rem',
-              background: '#fff',
-              border: '2px solid #f59e0b',
-              borderRadius: 8,
-              marginBottom: 12,
-            }}
-            value={pastedSource}
-            onChange={e => setPastedSource(e.target.value)}
-            placeholder="Suno 페이지 소스(Ctrl+U로 열리는 소스 코드)를 여기에 붙여넣으세요...&#10;&#10;제목, 가사, 스타일, URL이 자동으로 추출됩니다."
-          />
-          <button
-            className={styles.addBtn}
-            style={{ padding: '10px 24px', fontSize: '0.9rem', fontWeight: 700 }}
-            onClick={handlePasteAdd}
-            disabled={!pastedSource.trim()}
-          >
-            곡 추가
-          </button>
-          <span style={{ marginLeft: 12, fontSize: '0.8rem', color: '#92400e' }}>
-            여러 곡은 한 곡씩 붙여넣기 → 추가를 반복하세요
-          </span>
+          {/* 소스 붙여넣기 (대체 방법) */}
+          <div style={{
+            padding: 20,
+            background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+            borderRadius: 12,
+            border: '1px solid #fbbf24',
+          }}>
+            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#92400e', marginBottom: 8 }}>
+              방법 B: 페이지 소스 붙여넣기
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: '#78350f', marginBottom: 12, lineHeight: 1.6 }}>
+              북마클릿이 작동하지 않을 경우: Suno 페이지에서{' '}
+              <kbd style={{ background: '#fff', padding: '2px 6px', borderRadius: 3, border: '1px solid #d1d5db', fontSize: '0.8rem' }}>Ctrl</kbd>+<kbd style={{ background: '#fff', padding: '2px 6px', borderRadius: 3, border: '1px solid #d1d5db', fontSize: '0.8rem' }}>U</kbd>{' '}
+              → <kbd style={{ background: '#fff', padding: '2px 6px', borderRadius: 3, border: '1px solid #d1d5db', fontSize: '0.8rem' }}>Ctrl</kbd>+<kbd style={{ background: '#fff', padding: '2px 6px', borderRadius: 3, border: '1px solid #d1d5db', fontSize: '0.8rem' }}>A</kbd>{' '}
+              → <kbd style={{ background: '#fff', padding: '2px 6px', borderRadius: 3, border: '1px solid #d1d5db', fontSize: '0.8rem' }}>Ctrl</kbd>+<kbd style={{ background: '#fff', padding: '2px 6px', borderRadius: 3, border: '1px solid #d1d5db', fontSize: '0.8rem' }}>C</kbd>{' '}
+              → 아래에 붙여넣기
+            </p>
+          </div>
+
+          {/* 공통 입력칸 */}
+          <div>
+            <textarea
+              className={styles.formTextarea}
+              style={{
+                width: '100%',
+                minHeight: 120,
+                fontFamily: 'monospace',
+                fontSize: '0.78rem',
+                background: '#fff',
+                border: '2px solid var(--accent-gold)',
+                borderRadius: 8,
+                marginBottom: 12,
+              }}
+              value={pastedSource}
+              onChange={e => setPastedSource(e.target.value)}
+              placeholder="북마클릿 결과 또는 페이지 소스를 여기에 붙여넣으세요 (Ctrl+V)&#10;&#10;제목, 가사, 스타일, URL이 자동으로 추출됩니다."
+            />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <button
+                className={styles.addBtn}
+                style={{ padding: '10px 24px', fontSize: '0.9rem', fontWeight: 700 }}
+                onClick={handlePasteAdd}
+                disabled={!pastedSource.trim()}
+              >
+                곡 추가
+              </button>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                여러 곡은 한 곡씩 붙여넣기 → 추가를 반복하세요
+              </span>
+            </div>
+          </div>
         </div>
       )}
 
