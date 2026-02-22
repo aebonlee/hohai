@@ -72,12 +72,14 @@ export default function PlaylistPage() {
 
   const handlePlayAll = () => {
     if (playlistSongs.length === 0) return;
+    setRepeatMode('all');
     setPlaylist(playlistSongs);
     play(playlistSongs[0].id);
   };
 
   const handleShuffle = () => {
     if (playlistSongs.length === 0) return;
+    setRepeatMode('all');
     playShuffled(playlistSongs);
   };
 

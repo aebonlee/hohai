@@ -1,5 +1,17 @@
 # 개발일지
 
+## 2026-02-22 — 재생목록 전체재생/셔플 시 반복 모드 자동 설정
+
+### 작업 내용
+- PlaylistPage: handlePlayAll/handleShuffle에서 setRepeatMode('all') 자동 호출
+- 마지막 곡 끝나면 첫 곡으로 순환, 사용자가 반복 버튼으로 변경 가능
+
+### 검증
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과 (12.10s)
+
+---
+
 ## 2026-02-22 — 재생목록 곡 클릭 시 이어듣기 연동
 
 ### 작업 내용
