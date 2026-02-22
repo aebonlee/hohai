@@ -125,6 +125,7 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
                 className={styles.playBtn}
                 onClick={handleYtPlay}
                 aria-label={`${song.title} 재생`}
+                title="클릭하면 노래가 재생됩니다"
               />
               {hasSuno && <span className={styles.sourceBadge}>YouTube</span>}
             </>
@@ -139,7 +140,7 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
               frameBorder="0"
             />
           ) : (
-            <div className={styles.sunoPlaceholder} onClick={handleSunoPlay}>
+            <div className={styles.sunoPlaceholder} onClick={handleSunoPlay} title="AI가 부른 버전을 재생합니다">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M9 18V5l12-2v13" strokeLinecap="round" strokeLinejoin="round" />
                 <circle cx="6" cy="18" r="3" />
@@ -164,7 +165,7 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
               frameBorder="0"
             />
           ) : (
-            <button className={styles.sunoBtn} onClick={handleSunoPlay}>
+            <button className={styles.sunoBtn} onClick={handleSunoPlay} title="AI가 부른 버전을 재생합니다">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9 18V5l12-2v13" strokeLinecap="round" strokeLinejoin="round" />
                 <circle cx="6" cy="18" r="3" />
@@ -184,6 +185,7 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
             onClick={prev}
             disabled={!hasPrev}
             aria-label="이전 곡"
+            title="이전 곡으로 이동합니다"
           >
             ⏮
           </button>
@@ -195,6 +197,7 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
             onClick={next}
             disabled={!hasNext}
             aria-label="다음 곡"
+            title="다음 곡으로 이동합니다"
           >
             ⏭
           </button>
@@ -222,12 +225,14 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
               <button
                 className={styles.lyricsToggle}
                 onClick={() => setLyricsOpen((v) => !v)}
+                title="가사를 펼치거나 접습니다"
               >
                 {lyricsOpen ? '가사 접기 ▲' : '가사 보기 ▼'}
               </button>
               <button
                 className={styles.lyricsPlayerBtn}
                 onClick={handleLyricsPlayerOpen}
+                title="전체 화면으로 가사를 보면서 들을 수 있습니다"
               >
                 가사 플레이어
               </button>

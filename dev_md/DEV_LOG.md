@@ -1,5 +1,30 @@
 # 개발일지
 
+## 2026-02-22 — 풍선 도움말(Tooltip) 추가
+
+### 작업 내용
+- 40~50대 사용자층을 위해 모든 주요 인터랙티브 요소에 네이티브 `title` 속성 풍선 도움말 추가
+- PlaylistPage: 전체재생, 셔플, 반복(상태별 동적), 이름변경, 삭제, 새 재생목록, 사이드바 항목 (7개)
+- SongCard: 재생 버튼, Suno AI 영역(2곳), 가사 보기/접기, 가사 플레이어, ⏮/⏭ (7개)
+- AddToPlaylist: ♡/♥ 즐겨찾기(동적), ▾ 드롭다운 — 더 친절한 문구로 업데이트 (2개)
+- Header: 재생목록 nav, 로그인 버튼 (2개)
+- CategoryFilter: 전체 pill, 카테고리 pill (2개)
+- LyricsPlayer: ✕ 닫기(ESC 안내 포함), ⏮/⏭ (3개)
+
+### 수정 파일 (6개)
+- `src/pages/PlaylistPage.tsx`
+- `src/components/ui/SongCard.tsx`
+- `src/components/ui/AddToPlaylist.tsx`
+- `src/components/layout/Header.tsx`
+- `src/components/ui/CategoryFilter.tsx`
+- `src/components/ui/LyricsPlayer.tsx`
+
+### 검증
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과 (6.32s)
+
+---
+
 ## 2026-02-22 — 시 해시태그 카테고리 미연결 시 클릭 비활성화
 
 ### 작업 내용

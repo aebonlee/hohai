@@ -9,10 +9,10 @@ const NAV_ITEMS = [
   { to: '/poem-series', label: '시집 소개' },
   { to: '/songs', label: '추천 노래' },
   { to: '/albums', label: '앨범별 소개' },
-  { to: '/playlist', label: '재생목록' },
+  { to: '/playlist', label: '재생목록', title: '내가 만든 재생목록을 관리합니다 (로그인 필요)' },
   { to: '/reviews', label: '감상 후기' },
   { to: '/about', label: '시인 소개' },
-];
+] as const;
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -70,6 +70,7 @@ export default function Header() {
                 className={({ isActive }) =>
                   `${styles.navLink} ${isActive ? styles.active : ''}`
                 }
+                title={'title' in item ? item.title : undefined}
               >
                 {item.label}
                 {i < NAV_ITEMS.length - 1 && <span className={styles.navDivider} />}
@@ -108,7 +109,7 @@ export default function Header() {
                 )}
               </div>
             ) : (
-              <Link to="/login" className={styles.loginBtn}>로그인</Link>
+              <Link to="/login" className={styles.loginBtn} title="로그인하면 재생목록, 즐겨찾기를 이용할 수 있습니다">로그인</Link>
             )}
 
             <button

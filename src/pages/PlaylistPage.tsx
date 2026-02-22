@@ -91,6 +91,7 @@ export default function PlaylistPage() {
 
   const repeatLabel = repeatMode === 'one' ? '한곡 반복' : repeatMode === 'all' ? '전체 반복' : '반복 끔';
   const repeatIcon = repeatMode === 'one' ? '🔂' : '🔁';
+  const repeatTitle = repeatMode === 'none' ? '전체 반복으로 전환' : repeatMode === 'all' ? '한곡 반복으로 전환' : '반복을 끕니다';
 
   const loading = plLoading || songsLoading;
 
@@ -125,6 +126,7 @@ export default function PlaylistPage() {
                     key={pl.id}
                     className={`${styles.sidebarItem} ${effectiveSelected?.id === pl.id ? styles.active : ''}`}
                     onClick={() => setSelectedId(pl.id)}
+                    title="클릭하면 이 재생목록의 곡 목록을 봅니다"
                   >
                     <span className={styles.sidebarIcon}>♫</span>
                     <span className={styles.sidebarName}>{pl.name}</span>
@@ -154,7 +156,7 @@ export default function PlaylistPage() {
                   </div>
                 </div>
               ) : (
-                <button className={styles.newPlaylistBtn} onClick={() => setCreatingNew(true)}>
+                <button className={styles.newPlaylistBtn} onClick={() => setCreatingNew(true)} title="새로운 재생목록을 만듭니다">
                   + 새 재생목록
                 </button>
               )}
@@ -194,6 +196,7 @@ export default function PlaylistPage() {
                         className={styles.actionBtn}
                         onClick={handlePlayAll}
                         disabled={playlistSongs.length === 0}
+                        title="재생목록의 모든 곡을 처음부터 이어서 재생합니다"
                       >
                         ▶ 전체재생
                       </button>
@@ -201,12 +204,14 @@ export default function PlaylistPage() {
                         className={styles.actionBtn}
                         onClick={handleShuffle}
                         disabled={playlistSongs.length === 0}
+                        title="곡 순서를 무작위로 섞어서 재생합니다"
                       >
                         🔀 셔플
                       </button>
                       <button
                         className={`${styles.actionBtn} ${repeatMode !== 'none' ? styles.actionActive : ''}`}
                         onClick={cycleRepeat}
+                        title={repeatTitle}
                       >
                         {repeatIcon} {repeatLabel}
                       </button>
@@ -214,10 +219,11 @@ export default function PlaylistPage() {
                       <button
                         className={styles.actionBtnMuted}
                         onClick={() => { setNameInput(effectiveSelected.name); setEditingName(true); }}
+                        title="재생목록 이름을 변경합니다"
                       >
                         이름변경
                       </button>
-                      <button className={styles.actionBtnDanger} onClick={handleDelete}>
+                      <button className={styles.actionBtnDanger} onClick={handleDelete} title="이 재생목록을 삭제합니다">
                         삭제
                       </button>
                     </div>

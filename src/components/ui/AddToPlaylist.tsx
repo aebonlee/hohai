@@ -100,7 +100,7 @@ export default function AddToPlaylist({ songId }: Props) {
         onClick={handleFavoriteToggle}
         disabled={busy}
         aria-label={isInFavorites ? '즐겨찾기에서 제거' : '즐겨찾기에 추가'}
-        title={isInFavorites ? '즐겨찾기에서 제거' : '즐겨찾기에 추가'}
+        title={isInFavorites ? '즐겨찾기에서 이 곡을 제거합니다' : '이 곡을 즐겨찾기에 추가합니다'}
       >
         {isInFavorites ? '♥' : '♡'}
       </button>
@@ -108,7 +108,7 @@ export default function AddToPlaylist({ songId }: Props) {
         className={styles.moreBtn}
         onClick={handleDropdown}
         aria-label="다른 재생목록에 추가"
-        title="다른 재생목록에 추가"
+        title="다른 재생목록을 선택하여 곡을 추가합니다"
       >
         ▾
       </button>

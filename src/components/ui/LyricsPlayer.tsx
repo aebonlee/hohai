@@ -147,6 +147,7 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
             className={styles.closeBtn}
             onClick={onClose}
             aria-label="닫기"
+            title="가사 플레이어를 닫습니다 (ESC키로도 닫을 수 있습니다)"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
@@ -196,6 +197,7 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
                     onClick={prev}
                     disabled={!hasPrev}
                     aria-label="이전 곡"
+                    title="이전 곡"
                   >
                     ⏮ 이전
                   </button>
@@ -207,6 +209,7 @@ export default function LyricsPlayer({ song, isOpen, onClose }: Props) {
                     onClick={next}
                     disabled={!hasNext}
                     aria-label="다음 곡"
+                    title="다음 곡"
                   >
                     다음 ⏭
                   </button>

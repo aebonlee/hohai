@@ -14,6 +14,7 @@ export default function CategoryFilter({ categories, selected, onSelect }: Props
       <button
         className={`${styles.pill} ${selected === '' ? styles.active : ''}`}
         onClick={() => onSelect('')}
+        title="모든 카테고리의 시를 봅니다"
       >
         전체
       </button>
@@ -25,6 +26,7 @@ export default function CategoryFilter({ categories, selected, onSelect }: Props
             key={cat.id}
             className={`${styles.pill} ${isActive ? styles.active : ''}`}
             onClick={() => onSelect(cat.slug)}
+            title="이 카테고리의 시만 봅니다"
             style={isActive && color ? { background: color, borderColor: color } : undefined}
           >
             {color && !isActive && <span className={styles.dot} style={{ background: color }} />}
