@@ -1,11 +1,9 @@
 /* ========================================
-   레이아웃 — 홈 1600px 히어로 / 콘텐츠 1400px / 하위 1400px
+   레이아웃 — 홈 전체화면 / 하위 1400px + 사이드바
    ======================================== */
 
-/* 홈페이지 — 히어로 전체 화면, 콘텐츠 1400px */
+/* 홈페이지 — 전체 화면 (max-width 없음) */
 .mainDefault {
-  max-width: var(--max-width-hero);
-  margin: 0 auto;
   padding-top: var(--header-height);
   min-height: 100vh;
 }
