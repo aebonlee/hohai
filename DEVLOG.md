@@ -540,22 +540,37 @@ D:/hohai/
 
 ---
 
-## 2026-02-23 (Day 5) — 좌측 사이드바 + 홈페이지 위젯
+## 2026-02-23 (Day 5) — 사이드바 + 위젯 + 레이아웃 + 보기 모드
 
-### 배경
+### 커밋 히스토리
 
+| 커밋 | 내용 |
+|------|------|
+| `7d9cc9e` | 좌측 사이드바 + 홈페이지 바로가기·최신노래 위젯 |
+| `7e32eb7` | 전체 레이아웃 1400px 중앙 정렬 + 양쪽 여백 |
+| `9346c67` | 홈 히어로 1600px + 콘텐츠 1400px + 하위페이지 여백 |
+| `62715fb` | 홈페이지 max-width 제거 — 전체 화면 채움 |
+| `b814a18` | 보기 모드 전환 (갤러리/게시판/블로그) + 푸터 간격 수정 |
+| `2cfc272` | ViewModeSelector 상태 공유 버그 수정 |
+| `8f5e01f` | 시 모음집 상세 페이지에 보기 모드 추가 |
+
+---
+
+### 1. 좌측 사이드바 + 홈페이지 위젯
+
+#### 배경
 - 50대 이상 사용자 대상으로 네이버 카페 스타일의 좌측 사이드 메뉴 필요
 - 홈페이지에 히어로 아래 바로가기 위젯 + 최신 노래 목록 위젯 추가
 
-### 기능 1: 좌측 사이드바 (카페 스타일)
+#### 좌측 사이드바 (카페 스타일)
 
-#### 설계 원칙
+##### 설계 원칙
 - **데스크톱 전용**: 1024px 이상에서만 표시, 모바일은 CSS `display: none`
 - **홈페이지 제외**: `useLocation().pathname === '/'`로 판별, 홈에서는 사이드바 없음
 - **Layout 레벨 처리**: 개별 페이지 컴포넌트 수정 없음
 - **sticky 고정**: 스크롤 시 헤더 아래에 고정 (`position: sticky; top: var(--header-height)`)
 
-#### 메뉴 구조 (4개 섹션)
+##### 메뉴 구조 (4개 섹션)
 | 섹션 | 메뉴 항목 |
 |------|----------|
 | 소개 | 홈, 시인 소개 |
@@ -563,64 +578,59 @@ D:/hohai/
 | 노래 | 추천 노래, 최신 노래, 노래모음집 |
 | 참여 | 재생목록, 커뮤니티, 감상후기, 갤러리, 소식통 |
 
-#### 신규 파일
-- `src/components/layout/Sidebar.tsx` — 사이드바 컴포넌트 (NavLink, 섹션별 메뉴)
-- `src/components/layout/Sidebar.module.css` — 사이드바 스타일 (모바일 hidden, 데스크톱 sticky)
-- `src/components/layout/Layout.module.css` — 레이아웃 flex 컨테이너
+##### 파일
+- **신규**: `Sidebar.tsx`, `Sidebar.module.css`, `Layout.module.css`
+- **수정**: `Layout.tsx`, `globals.css`
 
-#### 수정 파일
-- `src/components/layout/Layout.tsx` — `useLocation`으로 홈페이지 판별, Sidebar 조건부 렌더링
-- `src/styles/globals.css` — `--sidebar-width: 220px` CSS 변수 추가
+#### 홈페이지 위젯
 
-### 기능 2: 홈페이지 위젯
-
-#### 바로가기 위젯 (히어로 바로 아래)
+##### 바로가기 위젯 (히어로 바로 아래)
 - 4개 카드 그리드: 추천 시(詩), 시 모음집(冊), 추천 노래(歌), 커뮤니티(友)
 - 한자 아이콘 + 제목 + 부제 구성
 - 호버 시 상승 효과 + 그림자
 
-#### 최신 노래 목록 (노래 하이라이트 아래)
+##### 최신 노래 목록 (노래 하이라이트 아래)
 - `useLatestSongs()` 훅으로 최신 노래 5곡 표시
 - 썸네일 + 제목 + 설명 리스트 형태
 - framer-motion 순차 등장 애니메이션
 
-#### 수정 파일
-- `src/pages/HomePage.tsx` — 바로가기 위젯 섹션 + 최신 노래 목록 섹션 추가
-- `src/pages/HomePage.module.css` — 위젯 그리드/카드 + 노래 리스트 스타일 + 반응형
-
-### 파일 변경 요약
-
-```
- 신규:
-  src/components/layout/Sidebar.tsx         | 80+ (사이드바 컴포넌트)
-  src/components/layout/Sidebar.module.css  | 80+ (사이드바 스타일)
-  src/components/layout/Layout.module.css   | 30+ (flex 레이아웃)
-
- 수정:
-  src/components/layout/Layout.tsx          | 전면 개편 (15줄 → 20줄)
-  src/styles/globals.css                    | 1  (--sidebar-width 변수)
-  src/pages/HomePage.tsx                    | 50+ (위젯 섹션 2개 추가)
-  src/pages/HomePage.module.css             | 120+ (위젯 + 노래 리스트 스타일)
-```
-
-### 검증
-- `npx tsc --noEmit` — 타입 체크 통과
-- `npx vite build` — 빌드 성공
-- 홈페이지: 사이드바 없음, 바로가기 위젯 + 최신 노래 목록 표시
-- 하위 페이지 데스크톱: 사이드바 표시, 활성 링크 하이라이트
-- 모바일: 사이드바 숨김, 기존 레이아웃 유지
+##### 파일
+- **수정**: `HomePage.tsx`, `HomePage.module.css`
 
 ---
 
-## 2026-02-23 (Day 5, 2차) — 보기 모드 전환 + 푸터 간격 수정
+### 2. 레이아웃 폭 조정
 
-### 배경
+#### 변경 이력
+1. **1400px 중앙 정렬** (`7e32eb7`): `--max-width-page: 1400px` 추가, 헤더/메인/푸터 적용
+2. **히어로 1600px + 콘텐츠 1400px** (`9346c67`): `--max-width-hero: 1600px`, 하위페이지 콘텐츠 여백 추가
+3. **홈페이지 전체화면** (`62715fb`): 홈페이지 `mainDefault` max-width 제거, 푸터처럼 화면 전체 채움
 
-- 리스트 페이지(추천시, 시 모음집, 추천노래, 최신노래, 노래모음집)가 갤러리(카드) 형태만 지원
-- 사용자 요청: 게시판/갤러리/블로그 3가지 보기 모드 전환 기능
-- 푸터와 본문 사이 불필요한 간격(margin-top: 80px) 수정
+#### 최종 레이아웃 구조
+| 영역 | 홈페이지 | 하위 페이지 |
+|------|---------|-----------|
+| 메인 | 전체 화면 (제한 없음) | max-width 1400px + 양쪽 여백 |
+| 사이드바 | 없음 | 220px (데스크톱만) |
+| 콘텐츠 | flex: 1 | flex: 1 + padding 24px |
 
-### 기능 1: ViewModeSelector (보기 모드 전환)
+#### CSS 변수
+```css
+--max-width-page: 1400px;   /* 하위 페이지 전체 폭 */
+--max-width-hero: 1600px;   /* 히어로 영역 폭 */
+--max-width: 1400px;        /* container 기본 폭 */
+--sidebar-width: 220px;     /* 사이드바 폭 */
+```
+
+#### 파일
+- **수정**: `globals.css`, `Layout.module.css`, `Header.module.css`, `Footer.module.css`
+
+---
+
+### 3. 보기 모드 전환 (ViewModeSelector)
+
+#### 배경
+- 리스트 페이지가 갤러리(카드) 형태만 지원 → 게시판/블로그 보기 추가 요청
+- 푸터 `margin-top: 80px` 불필요 간격 수정
 
 #### 3가지 보기 모드
 | 모드 | 아이콘 | 설명 |
@@ -634,51 +644,26 @@ D:/hohai/
 - `ViewModeSelector` 컴포넌트: 부모로부터 `mode`/`onChange` props 수신 (단일 상태 소스)
 - 페이지별 고유 storageKey로 각 페이지 독립적 설정 유지
 
-#### 신규 파일
-- `src/components/ui/ViewModeSelector.tsx` — 보기 모드 토글 컴포넌트 + useViewMode 훅
-- `src/components/ui/ViewModeSelector.module.css` — 필 스타일 토글 버튼
-
-#### 적용 페이지 (5개)
+#### 적용 페이지 (6개)
 | 페이지 | storageKey | 게시판 컬럼 |
 |--------|-----------|------------|
 | FeaturedPoemsPage | `poems` | #, 제목, 카테고리, 날짜 |
 | PoemsPage | `poemSeries` | #, 시집, 설명 |
+| PoemSeriesPage | `poemSeriesDetail` | #, 제목, 카테고리, 날짜 |
 | FeaturedSongsPage | `featuredSongs` | #, 제목, 설명 |
 | LatestSongsPage | `latestSongs` | #, 제목, 설명 |
 | SongsPage | `songSeries` | #, 앨범, 설명 |
 
-### 기능 2: 푸터 간격 수정
-- `Footer.module.css`의 `.footer { margin-top: 80px }` 제거
-- 본문과 푸터가 자연스럽게 연결
+#### 버그 수정: ViewModeSelector 상태 공유
+- **문제**: 컴포넌트 내부에서 `useViewMode`를 별도 호출 → 페이지와 독립된 useState 2개 → 버튼 클릭해도 뷰 변경 안 됨
+- **해결**: 외부에서 `mode`/`onChange` props를 받도록 변경
 
-### 버그 수정: ViewModeSelector 상태 공유
-- **문제**: ViewModeSelector 내부에서 `useViewMode`를 별도로 호출하여 페이지의 상태와 동기화되지 않음
-- **원인**: 두 개의 독립된 `useState` 인스턴스 → 버튼 클릭해도 페이지 뷰 변경 안 됨
-- **해결**: ViewModeSelector가 외부에서 `mode`/`onChange` props를 받도록 변경, 페이지가 단일 상태 소스 역할
-
-### 파일 변경 요약
-
-```
- 신규:
-  src/components/ui/ViewModeSelector.tsx      | 65  (토글 컴포넌트 + 훅)
-  src/components/ui/ViewModeSelector.module.css | 45  (필 스타일)
-
- 수정:
-  src/components/layout/Footer.module.css     |  -2  (margin-top 제거)
-  src/pages/FeaturedPoemsPage.tsx              | +100 (board/blog 뷰 추가)
-  src/pages/FeaturedPoemsPage.module.css       | +170 (board/blog 스타일)
-  src/pages/PoemsPage.tsx                      | +40  (board/blog 뷰 추가)
-  src/pages/PoemsPage.module.css               | +120 (board/blog 스타일)
-  src/pages/FeaturedSongsPage.tsx              | +40  (board/blog 뷰 추가)
-  src/pages/FeaturedSongsPage.module.css       | +80  (board/blog 스타일)
-  src/pages/LatestSongsPage.tsx                | +40  (board/blog 뷰 추가)
-  src/pages/LatestSongsPage.module.css         | +80  (board/blog 스타일)
-  src/pages/SongsPage.tsx                      | +40  (board/blog 뷰 추가)
-  src/pages/SongsPage.module.css               | +120 (board/blog 스타일)
-```
+#### 파일
+- **신규**: `ViewModeSelector.tsx`, `ViewModeSelector.module.css`
+- **수정**: `Footer.module.css` (margin-top 제거), `FeaturedPoemsPage.*`, `PoemsPage.*`, `PoemSeriesPage.*`, `FeaturedSongsPage.*`, `LatestSongsPage.*`, `SongsPage.*`
 
 ### 검증
 - `npx tsc --noEmit` — 타입 체크 통과
 - `npx vite build` — 빌드 성공
-- 5개 페이지에서 갤러리/게시판/블로그 전환 정상 작동
-- localStorage에 선택 모드 저장 확인
+- 6개 페이지 갤러리/게시판/블로그 전환 정상
+- 시 모음집 상세: 읽기 모드 버튼 유지 + 보기 모드 전환 병행
