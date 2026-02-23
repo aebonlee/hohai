@@ -27,7 +27,8 @@
 
   /* 레이아웃 */
   --max-width-page: 1400px;
-  --max-width: 1100px;
+  --max-width-hero: 1600px;
+  --max-width: 1400px;
   --poem-max-width: 680px;
   --header-height: 64px;
   --sidebar-width: 220px;

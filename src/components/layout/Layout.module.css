@@ -1,8 +1,16 @@
 /* ========================================
-   레이아웃 — 1400px 중앙 정렬 + 사이드바
+   레이아웃 — 홈 1600px 히어로 / 콘텐츠 1400px / 하위 1400px
    ======================================== */
 
-/* 사이드바가 있을 때의 메인 영역 */
+/* 홈페이지 — 히어로 전체 화면, 콘텐츠 1400px */
+.mainDefault {
+  max-width: var(--max-width-hero);
+  margin: 0 auto;
+  padding-top: var(--header-height);
+  min-height: 100vh;
+}
+
+/* 하위 페이지 — 사이드바 + 콘텐츠 1400px */
 .mainWithSidebar {
   display: flex;
   max-width: var(--max-width-page);
@@ -13,18 +21,11 @@
   min-height: 100vh;
 }
 
-/* 사이드바 없을 때 (홈페이지) */
-.mainDefault {
-  max-width: var(--max-width-page);
-  margin: 0 auto;
-  padding-top: var(--header-height);
-  min-height: 100vh;
-}
-
-/* 콘텐츠 영역 — 사이드바 옆에서 flex:1 */
+/* 콘텐츠 영역 — 사이드바 오른쪽, 여백 포함 */
 .content {
   flex: 1;
   min-width: 0;
+  padding: 0 24px;
 }
 
 /* 데스크톱: 사이드바가 있을 때 콘텐츠 내부 .container max-width 제거 */
@@ -38,5 +39,9 @@
   .mainWithSidebar {
     padding-left: 0;
     padding-right: 0;
+  }
+
+  .content {
+    padding: 0;
   }
 }
