@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /mypage
+Disallow: /playlist
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+
+Sitemap: https://hohai.dreamitbiz.com/sitemap.xml
