@@ -3,12 +3,14 @@ import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/layout/PageTransition';
 import SongCard from '../components/ui/SongCard';
 import LyricsPlayer from '../components/ui/LyricsPlayer';
+import ViewModeSelector, { useViewMode } from '../components/ui/ViewModeSelector';
 import { useSongs } from '../hooks/useSongs';
 import { usePlayback } from '../contexts/PlaybackContext';
 import styles from './FeaturedSongsPage.module.css';
 
 export default function FeaturedSongsPage() {
   const { songs, loading } = useSongs(undefined, true);
+  const [viewMode] = useViewMode('featuredSongs');
   const {
     setPlaylist, clearPlaylist,
     playlist, currentIndex,
@@ -37,14 +39,43 @@ export default function FeaturedSongsPage() {
             <p className={styles.subtitle}>시에 멜로디를 입혀 노래로 전합니다</p>
           </div>
 
+          <div className={styles.toolbar}>
+            <ViewModeSelector storageKey="featuredSongs" />
+          </div>
+
           {loading ? (
             <p className={styles.empty}>불러오는 중...</p>
           ) : songs.length > 0 ? (
-            <div className={styles.grid}>
-              {songs.map((song, i) => (
-                <SongCard key={song.id} song={song} index={i} />
-              ))}
-            </div>
+            viewMode === 'board' ? (
+              <div className={styles.boardList}>
+                <div className={styles.boardHeader}>
+                  <span className={styles.boardColNum}>#</span>
+                  <span className={styles.boardColTitle}>제목</span>
+                  <span className={styles.boardColDesc}>설명</span>
+                </div>
+                {songs.map((song, i) => (
+                  <div key={song.id} className={styles.boardRow}>
+                    <span className={styles.boardColNum}>{i + 1}</span>
+                    <span className={styles.boardColTitle}>{song.title}</span>
+                    <span className={styles.boardColDesc}>{song.description || ''}</span>
+                  </div>
+                ))}
+              </div>
+            ) : viewMode === 'blog' ? (
+              <div className={styles.blogList}>
+                {songs.map((song) => (
+                  <div key={song.id} className={styles.blogItem}>
+                    <SongCard song={song} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.grid}>
+                {songs.map((song, i) => (
+                  <SongCard key={song.id} song={song} index={i} />
+                ))}
+              </div>
+            )
           ) : (
             <p className={styles.empty}>아직 추천 노래가 없습니다.</p>
           )}

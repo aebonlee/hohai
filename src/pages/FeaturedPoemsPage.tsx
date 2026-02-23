@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/layout/PageTransition';
 import PoemCard from '../components/ui/PoemCard';
 import CategoryFilter from '../components/ui/CategoryFilter';
+import ViewModeSelector, { useViewMode } from '../components/ui/ViewModeSelector';
 import { usePoems } from '../hooks/usePoems';
 import { useCategories } from '../hooks/useCategories';
 import { CATEGORY_COLORS } from '../lib/constants';
@@ -14,6 +15,8 @@ export default function FeaturedPoemsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tagParam = searchParams.get('tag') || '';
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [viewMode] = useViewMode('poems');
+  const navigate = useNavigate();
   const { categories } = useCategories();
   const { poems, loading } = usePoems(
     tagParam ? undefined : selectedCategory || undefined,
@@ -70,6 +73,10 @@ export default function FeaturedPoemsPage() {
             <p className={styles.subtitle}>마음을 담아 쓴 시를 만나보세요</p>
           </div>
 
+          <div className={styles.toolbar}>
+            <ViewModeSelector storageKey="poems" />
+          </div>
+
           <CategoryFilter
             categories={categories}
             selected={selectedCategory}
@@ -107,47 +114,102 @@ export default function FeaturedPoemsPage() {
           {loading ? (
             <p className={styles.empty}>불러오는 중...</p>
           ) : poems.length > 0 ? (
-            // 카테고리 선택 시: 평탄한 그리드
-            selectedCategory ? (
-              <div className={styles.grid}>
+            viewMode === 'board' ? (
+              /* 게시판 보기 */
+              <div className={styles.boardList}>
+                <div className={styles.boardHeader}>
+                  <span className={styles.boardColNum}>#</span>
+                  <span className={styles.boardColTitle}>제목</span>
+                  <span className={styles.boardColCat}>카테고리</span>
+                  <span className={styles.boardColDate}>날짜</span>
+                </div>
                 {poems.map((poem, i) => (
-                  <PoemCard key={poem.id} poem={poem} index={i} />
+                  <div
+                    key={poem.id}
+                    className={styles.boardRow}
+                    onClick={() => navigate(`/poems/${poem.id}`)}
+                  >
+                    <span className={styles.boardColNum}>{i + 1}</span>
+                    <span className={styles.boardColTitle}>
+                      {poem.title}
+                      {poem.tags && poem.tags.length > 0 && (
+                        <span className={styles.boardTags}>
+                          {poem.tags.slice(0, 2).map(t => <span key={t}>#{t}</span>)}
+                        </span>
+                      )}
+                    </span>
+                    <span className={styles.boardColCat} style={{ color: CATEGORY_COLORS[poem.category] }}>{poem.category}</span>
+                    <span className={styles.boardColDate}>{poem.written_date || ''}</span>
+                  </div>
+                ))}
+              </div>
+            ) : viewMode === 'blog' ? (
+              /* 블로그 보기 */
+              <div className={styles.blogList}>
+                {poems.map((poem) => (
+                  <article
+                    key={poem.id}
+                    className={styles.blogItem}
+                    onClick={() => navigate(`/poems/${poem.id}`)}
+                  >
+                    <span className={styles.blogCategory} style={{ color: CATEGORY_COLORS[poem.category] }}>{poem.category}</span>
+                    <h3 className={styles.blogTitle}>{poem.title}</h3>
+                    <p className={styles.blogExcerpt}>
+                      {poem.excerpt || poem.content.split('\n').slice(0, 4).join('\n')}
+                    </p>
+                    <div className={styles.blogMeta}>
+                      {poem.tags && poem.tags.length > 0 && (
+                        <span className={styles.blogTags}>
+                          {poem.tags.slice(0, 4).map(t => <span key={t}>#{t}</span>)}
+                        </span>
+                      )}
+                      {poem.written_date && <span>{poem.written_date}</span>}
+                    </div>
+                  </article>
                 ))}
               </div>
             ) : (
-              // 전체 보기: 카테고리별 섹션으로 그룹
-              groupedByCategory.length > 1 ? (
-                <div className={styles.sections}>
-                  {groupedByCategory.map(group => (
-                    <section key={group.name} className={styles.categorySection}>
-                      <div className={styles.sectionHeader}>
-                        <span
-                          className={styles.sectionDot}
-                          style={{ background: CATEGORY_COLORS[group.name] }}
-                        />
-                        <h2 className={styles.sectionTitle}>{group.name}</h2>
-                        <span className={styles.sectionCount}>{group.poems.length}편</span>
-                        <button
-                          className={styles.sectionMore}
-                          onClick={() => setSelectedCategory(group.name)}
-                        >
-                          전체 보기 →
-                        </button>
-                      </div>
-                      <div className={styles.grid}>
-                        {group.poems.slice(0, 6).map((poem, i) => (
-                          <PoemCard key={poem.id} poem={poem} index={i} />
-                        ))}
-                      </div>
-                    </section>
-                  ))}
-                </div>
-              ) : (
+              /* 갤러리 보기 (기본) */
+              selectedCategory ? (
                 <div className={styles.grid}>
                   {poems.map((poem, i) => (
                     <PoemCard key={poem.id} poem={poem} index={i} />
                   ))}
                 </div>
+              ) : (
+                groupedByCategory.length > 1 ? (
+                  <div className={styles.sections}>
+                    {groupedByCategory.map(group => (
+                      <section key={group.name} className={styles.categorySection}>
+                        <div className={styles.sectionHeader}>
+                          <span
+                            className={styles.sectionDot}
+                            style={{ background: CATEGORY_COLORS[group.name] }}
+                          />
+                          <h2 className={styles.sectionTitle}>{group.name}</h2>
+                          <span className={styles.sectionCount}>{group.poems.length}편</span>
+                          <button
+                            className={styles.sectionMore}
+                            onClick={() => setSelectedCategory(group.name)}
+                          >
+                            전체 보기 →
+                          </button>
+                        </div>
+                        <div className={styles.grid}>
+                          {group.poems.slice(0, 6).map((poem, i) => (
+                            <PoemCard key={poem.id} poem={poem} index={i} />
+                          ))}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
+                ) : (
+                  <div className={styles.grid}>
+                    {poems.map((poem, i) => (
+                      <PoemCard key={poem.id} poem={poem} index={i} />
+                    ))}
+                  </div>
+                )
               )
             )
           ) : (

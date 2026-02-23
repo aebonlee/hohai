@@ -20,6 +20,81 @@
   gap: 24px;
 }
 
+/* 툴바 */
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+/* ========== 게시판 보기 ========== */
+.boardList {
+  border: 1px solid rgba(7, 26, 51, 0.08);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.boardHeader {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  background: rgba(7, 26, 51, 0.04);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(7, 26, 51, 0.08);
+}
+
+.boardRow {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(7, 26, 51, 0.05);
+  transition: background 0.15s ease;
+}
+
+.boardRow:last-child { border-bottom: none; }
+.boardRow:hover { background: rgba(10, 61, 122, 0.03); }
+
+.boardColNum {
+  width: 40px;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.boardColTitle {
+  width: 240px;
+  flex-shrink: 0;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.boardColDesc {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ========== 블로그 보기 ========== */
+.blogList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 800px;
+}
+
+.blogItem {
+  /* single column card */
+}
+
 .empty {
   text-align: center;
   padding: 80px 0;
@@ -42,6 +117,10 @@
   .grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
+  }
+
+  .boardColDesc {
+    display: none;
   }
 }
 
