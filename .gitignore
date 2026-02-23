@@ -41,3 +41,4 @@ pnpm-debug.log*
 
 # Source data (binary)
 poem.pdf
+supabase/.temp/

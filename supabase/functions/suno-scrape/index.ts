@@ -57,25 +57,51 @@ Deno.serve(async (req) => {
             }
           }
 
-          // 가사: "prompt" 필드
+          // 가사: "prompt" 필드 (일반 JSON)
           const promptMatch = html.match(/"prompt"\s*:\s*"((?:[^"\\]|\\.)*)"/);
-          if (promptMatch) {
+          if (promptMatch && promptMatch[1].length > 20) {
             try { lyrics = JSON.parse(`"${promptMatch[1]}"`); }
             catch { lyrics = promptMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"'); }
           }
-          if (!lyrics) {
-            const textMatch = html.match(/"text"\s*:\s*"((?:[^"\\]|\\.)*(?:\\n)(?:[^"\\]|\\.)*)"/);
-            if (textMatch) {
-              try { lyrics = JSON.parse(`"${textMatch[1]}"`); }
-              catch { lyrics = textMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"'); }
-            }
-          }
 
-          // 스타일: "tags" 필드
+          // 스타일: "tags" 필드 (일반 JSON)
           const tagsMatch = html.match(/"tags"\s*:\s*"((?:[^"\\]|\\.)*)"/);
           if (tagsMatch) {
             try { style = JSON.parse(`"${tagsMatch[1]}"`); }
             catch { style = tagsMatch[1]; }
+          }
+
+          // RSC 스트리밍 형식 (Next.js App Router) — self.__next_f.push() 데이터 디코딩
+          if (!lyrics || !style) {
+            const pushRegex = /self\.__next_f\.push\(\[1,"((?:[^"\\]|\\[\s\S])*)"\]\)/g;
+            const decoded: string[] = [];
+            let pm;
+            while ((pm = pushRegex.exec(html)) !== null) {
+              try { decoded.push(JSON.parse(`"${pm[1]}"`)); } catch { /* skip */ }
+            }
+            const rscData = decoded.join('');
+
+            if (!lyrics) {
+              const rscPrompt = rscData.match(/"prompt"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+              if (rscPrompt && rscPrompt[1].length > 20) {
+                try { lyrics = JSON.parse(`"${rscPrompt[1]}"`); }
+                catch { lyrics = rscPrompt[1].replace(/\\n/g, '\n').replace(/\\"/g, '"'); }
+              }
+            }
+            if (!style) {
+              const rscTags = rscData.match(/"tags"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+              if (rscTags) {
+                try { style = JSON.parse(`"${rscTags[1]}"`); }
+                catch { style = rscTags[1]; }
+              }
+            }
+            if (!title) {
+              const rscTitle = rscData.match(/"title"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+              if (rscTitle) {
+                try { title = JSON.parse(`"${rscTitle[1]}"`); }
+                catch { title = rscTitle[1]; }
+              }
+            }
           }
         }
       } catch {
