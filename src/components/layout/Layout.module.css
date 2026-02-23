@@ -1,0 +1,29 @@
+/* ========================================
+   레이아웃 — 사이드바 + 콘텐츠 flex 컨테이너
+   ======================================== */
+
+/* 사이드바가 있을 때의 메인 영역 */
+.mainWithSidebar {
+  display: flex;
+  padding-top: var(--header-height);
+  min-height: 100vh;
+}
+
+/* 사이드바 없을 때 (홈페이지) */
+.mainDefault {
+  padding-top: var(--header-height);
+  min-height: 100vh;
+}
+
+/* 콘텐츠 영역 — 사이드바 옆에서 flex:1 */
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 데스크톱: 사이드바가 있을 때 콘텐츠 내부 .container max-width 제거 */
+@media (min-width: 1024px) {
+  .content :global(.container) {
+    max-width: 100%;
+  }
+}

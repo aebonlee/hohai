@@ -1,0 +1,82 @@
+/* ========================================
+   사이드바 — 네이버 카페 스타일 좌측 메뉴
+   ======================================== */
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.6);
+  border-right: 1px solid rgba(7, 26, 51, 0.08);
+  z-index: 10;
+}
+
+/* 사이드바 스크롤바 */
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(7, 26, 51, 0.12);
+  border-radius: 2px;
+}
+
+.nav {
+  padding: 20px 0;
+}
+
+/* 섹션 */
+.section {
+  margin-bottom: 8px;
+}
+
+.sectionTitle {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 8px 20px 6px;
+  margin: 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* 링크 */
+.link {
+  display: block;
+  padding: 9px 20px 9px 28px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.link:hover {
+  color: var(--text-primary);
+  background: rgba(10, 61, 122, 0.04);
+}
+
+/* 활성 링크 */
+.active {
+  color: var(--accent-gold);
+  background: rgba(10, 61, 122, 0.07);
+  border-left-color: var(--accent-gold);
+  font-weight: 600;
+}
+
+/* 모바일: 사이드바 숨김 */
+@media (max-width: 1023px) {
+  .sidebar {
+    display: none;
+  }
+}

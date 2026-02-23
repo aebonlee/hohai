@@ -8,7 +8,7 @@ import YouTubeEmbed from '../components/ui/YouTubeEmbed';
 import SunoEmbed from '../components/ui/SunoEmbed';
 import HeroEffects from '../components/ui/HeroEffects';
 import { useFeaturedPoems } from '../hooks/usePoems';
-import { useFeaturedSong } from '../hooks/useSongs';
+import { useFeaturedSong, useLatestSongs } from '../hooks/useSongs';
 import { SITE } from '../lib/constants';
 import styles from './HomePage.module.css';
 
@@ -35,6 +35,7 @@ const SLIDE_INTERVAL = 6000;
 export default function HomePage() {
   const { poems, loading: poemsLoading } = useFeaturedPoems();
   const { song, loading: songLoading } = useFeaturedSong();
+  const { songs: latestSongs, loading: latestSongsLoading } = useLatestSongs();
   const [active, setActive] = useState(0);
   const [heroReady, setHeroReady] = useState(false);
   const preloadedRef = useRef(false);
@@ -176,6 +177,42 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 바로가기 위젯 */}
+      <section className={styles.widgetSection}>
+        <div className="container">
+          <div className={styles.widgetGrid}>
+            <Link to="/poems" className={styles.widget}>
+              <span className={styles.widgetIcon}>詩</span>
+              <div className={styles.widgetText}>
+                <strong>추천 시</strong>
+                <span>엄선된 시를 만나보세요</span>
+              </div>
+            </Link>
+            <Link to="/poem-series" className={styles.widget}>
+              <span className={styles.widgetIcon}>冊</span>
+              <div className={styles.widgetText}>
+                <strong>시 모음집</strong>
+                <span>주제별로 묶은 시 모음</span>
+              </div>
+            </Link>
+            <Link to="/songs" className={styles.widget}>
+              <span className={styles.widgetIcon}>歌</span>
+              <div className={styles.widgetText}>
+                <strong>추천 노래</strong>
+                <span>시에 담긴 노래를 들어보세요</span>
+              </div>
+            </Link>
+            <Link to="/community" className={styles.widget}>
+              <span className={styles.widgetIcon}>友</span>
+              <div className={styles.widgetText}>
+                <strong>커뮤니티</strong>
+                <span>함께 나누는 감상과 이야기</span>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* 최신 시 */}
       <section className={styles.poemsSection}>
         <div className="container">
@@ -215,6 +252,45 @@ export default function HomePage() {
               ) : null}
               <p className={styles.songTitle}>{song.title}</p>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* 최신 노래 목록 */}
+      {!latestSongsLoading && latestSongs.length > 0 && (
+        <section className={styles.latestSongsSection}>
+          <div className="container">
+            <div className={styles.sectionHeader}>
+              <h2 className="section-title">최신 노래</h2>
+              <Link to="/latest-songs" className={styles.viewAll}>전체 보기 →</Link>
+            </div>
+            <ul className={styles.songList}>
+              {latestSongs.slice(0, 5).map((s, i) => (
+                <motion.li
+                  key={s.id}
+                  className={styles.songListItem}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.08 }}
+                >
+                  <Link to={s.youtube_id ? `/songs` : `/latest-songs`} className={styles.songListLink}>
+                    {s.youtube_id && (
+                      <img
+                        className={styles.songListThumb}
+                        src={`https://img.youtube.com/vi/${s.youtube_id}/default.jpg`}
+                        alt=""
+                        loading="lazy"
+                      />
+                    )}
+                    <div className={styles.songListInfo}>
+                      <strong>{s.title}</strong>
+                      {s.description && <span>{s.description}</span>}
+                    </div>
+                  </Link>
+                </motion.li>
+              ))}
+            </ul>
           </div>
         </section>
       )}

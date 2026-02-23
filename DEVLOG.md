@@ -537,3 +537,75 @@ D:/hohai/
 ### 검증
 - `npx tsc --noEmit` — 타입 체크 통과
 - `npx vite build` — 빌드 성공
+
+---
+
+## 2026-02-23 (Day 5) — 좌측 사이드바 + 홈페이지 위젯
+
+### 배경
+
+- 50대 이상 사용자 대상으로 네이버 카페 스타일의 좌측 사이드 메뉴 필요
+- 홈페이지에 히어로 아래 바로가기 위젯 + 최신 노래 목록 위젯 추가
+
+### 기능 1: 좌측 사이드바 (카페 스타일)
+
+#### 설계 원칙
+- **데스크톱 전용**: 1024px 이상에서만 표시, 모바일은 CSS `display: none`
+- **홈페이지 제외**: `useLocation().pathname === '/'`로 판별, 홈에서는 사이드바 없음
+- **Layout 레벨 처리**: 개별 페이지 컴포넌트 수정 없음
+- **sticky 고정**: 스크롤 시 헤더 아래에 고정 (`position: sticky; top: var(--header-height)`)
+
+#### 메뉴 구조 (4개 섹션)
+| 섹션 | 메뉴 항목 |
+|------|----------|
+| 소개 | 홈, 시인 소개 |
+| 시(詩) | 추천 시, 시 모음집, 출간시집 |
+| 노래 | 추천 노래, 최신 노래, 노래모음집 |
+| 참여 | 재생목록, 커뮤니티, 감상후기, 갤러리, 소식통 |
+
+#### 신규 파일
+- `src/components/layout/Sidebar.tsx` — 사이드바 컴포넌트 (NavLink, 섹션별 메뉴)
+- `src/components/layout/Sidebar.module.css` — 사이드바 스타일 (모바일 hidden, 데스크톱 sticky)
+- `src/components/layout/Layout.module.css` — 레이아웃 flex 컨테이너
+
+#### 수정 파일
+- `src/components/layout/Layout.tsx` — `useLocation`으로 홈페이지 판별, Sidebar 조건부 렌더링
+- `src/styles/globals.css` — `--sidebar-width: 220px` CSS 변수 추가
+
+### 기능 2: 홈페이지 위젯
+
+#### 바로가기 위젯 (히어로 바로 아래)
+- 4개 카드 그리드: 추천 시(詩), 시 모음집(冊), 추천 노래(歌), 커뮤니티(友)
+- 한자 아이콘 + 제목 + 부제 구성
+- 호버 시 상승 효과 + 그림자
+
+#### 최신 노래 목록 (노래 하이라이트 아래)
+- `useLatestSongs()` 훅으로 최신 노래 5곡 표시
+- 썸네일 + 제목 + 설명 리스트 형태
+- framer-motion 순차 등장 애니메이션
+
+#### 수정 파일
+- `src/pages/HomePage.tsx` — 바로가기 위젯 섹션 + 최신 노래 목록 섹션 추가
+- `src/pages/HomePage.module.css` — 위젯 그리드/카드 + 노래 리스트 스타일 + 반응형
+
+### 파일 변경 요약
+
+```
+ 신규:
+  src/components/layout/Sidebar.tsx         | 80+ (사이드바 컴포넌트)
+  src/components/layout/Sidebar.module.css  | 80+ (사이드바 스타일)
+  src/components/layout/Layout.module.css   | 30+ (flex 레이아웃)
+
+ 수정:
+  src/components/layout/Layout.tsx          | 전면 개편 (15줄 → 20줄)
+  src/styles/globals.css                    | 1  (--sidebar-width 변수)
+  src/pages/HomePage.tsx                    | 50+ (위젯 섹션 2개 추가)
+  src/pages/HomePage.module.css             | 120+ (위젯 + 노래 리스트 스타일)
+```
+
+### 검증
+- `npx tsc --noEmit` — 타입 체크 통과
+- `npx vite build` — 빌드 성공
+- 홈페이지: 사이드바 없음, 바로가기 위젯 + 최신 노래 목록 표시
+- 하위 페이지 데스크톱: 사이드바 표시, 활성 링크 하이라이트
+- 모바일: 사이드바 숨김, 기존 레이아웃 유지
