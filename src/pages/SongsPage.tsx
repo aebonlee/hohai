@@ -9,7 +9,7 @@ import styles from './SongsPage.module.css';
 
 export default function SongsPage() {
   const { series, loading } = useSongSeries();
-  const [viewMode] = useViewMode('songSeries');
+  const [viewMode, setViewMode] = useViewMode('songSeries');
 
   return (
     <PageTransition>
@@ -26,7 +26,7 @@ export default function SongsPage() {
           </div>
 
           <div className={styles.toolbar}>
-            <ViewModeSelector storageKey="songSeries" />
+            <ViewModeSelector mode={viewMode} onChange={setViewMode} />
           </div>
 
           {loading ? (

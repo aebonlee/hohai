@@ -9,7 +9,7 @@ import styles from './PoemsPage.module.css';
 
 export default function PoemsPage() {
   const { series, loading } = usePoemSeries();
-  const [viewMode] = useViewMode('poemSeries');
+  const [viewMode, setViewMode] = useViewMode('poemSeries');
 
   return (
     <PageTransition>
@@ -26,7 +26,7 @@ export default function PoemsPage() {
           </div>
 
           <div className={styles.toolbar}>
-            <ViewModeSelector storageKey="poemSeries" />
+            <ViewModeSelector mode={viewMode} onChange={setViewMode} />
           </div>
 
           {loading ? (

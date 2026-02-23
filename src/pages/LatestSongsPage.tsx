@@ -10,7 +10,7 @@ import styles from './LatestSongsPage.module.css';
 
 export default function LatestSongsPage() {
   const { songs, loading } = useLatestSongs();
-  const [viewMode] = useViewMode('latestSongs');
+  const [viewMode, setViewMode] = useViewMode('latestSongs');
   const {
     setPlaylist, clearPlaylist,
     playlist, currentIndex,
@@ -42,7 +42,7 @@ export default function LatestSongsPage() {
           </div>
 
           <div className={styles.toolbar}>
-            <ViewModeSelector storageKey="latestSongs" />
+            <ViewModeSelector mode={viewMode} onChange={setViewMode} />
           </div>
 
           {loading ? (

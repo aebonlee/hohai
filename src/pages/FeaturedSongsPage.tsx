@@ -10,7 +10,7 @@ import styles from './FeaturedSongsPage.module.css';
 
 export default function FeaturedSongsPage() {
   const { songs, loading } = useSongs(undefined, true);
-  const [viewMode] = useViewMode('featuredSongs');
+  const [viewMode, setViewMode] = useViewMode('featuredSongs');
   const {
     setPlaylist, clearPlaylist,
     playlist, currentIndex,
@@ -40,7 +40,7 @@ export default function FeaturedSongsPage() {
           </div>
 
           <div className={styles.toolbar}>
-            <ViewModeSelector storageKey="featuredSongs" />
+            <ViewModeSelector mode={viewMode} onChange={setViewMode} />
           </div>
 
           {loading ? (

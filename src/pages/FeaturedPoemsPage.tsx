@@ -15,7 +15,7 @@ export default function FeaturedPoemsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tagParam = searchParams.get('tag') || '';
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [viewMode] = useViewMode('poems');
+  const [viewMode, setViewMode] = useViewMode('poems');
   const navigate = useNavigate();
   const { categories } = useCategories();
   const { poems, loading } = usePoems(
@@ -74,7 +74,7 @@ export default function FeaturedPoemsPage() {
           </div>
 
           <div className={styles.toolbar}>
-            <ViewModeSelector storageKey="poems" />
+            <ViewModeSelector mode={viewMode} onChange={setViewMode} />
           </div>
 
           <CategoryFilter

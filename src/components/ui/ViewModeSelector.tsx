@@ -4,8 +4,8 @@ import styles from './ViewModeSelector.module.css';
 export type ViewMode = 'gallery' | 'board' | 'blog';
 
 interface Props {
-  storageKey: string;
-  onChange?: (mode: ViewMode) => void;
+  mode: ViewMode;
+  onChange: (m: ViewMode) => void;
 }
 
 const LABELS: Record<ViewMode, string> = {
@@ -38,21 +38,14 @@ export function useViewMode(storageKey: string): [ViewMode, (m: ViewMode) => voi
   return [mode, setMode];
 }
 
-export default function ViewModeSelector({ storageKey, onChange }: Props) {
-  const [mode, setMode] = useViewMode(storageKey);
-
-  const handleChange = (m: ViewMode) => {
-    setMode(m);
-    onChange?.(m);
-  };
-
+export default function ViewModeSelector({ mode, onChange }: Props) {
   return (
     <div className={styles.selector}>
       {(['gallery', 'board', 'blog'] as ViewMode[]).map((m) => (
         <button
           key={m}
           className={`${styles.btn} ${mode === m ? styles.active : ''}`}
-          onClick={() => handleChange(m)}
+          onClick={() => onChange(m)}
           title={`${LABELS[m]} 보기`}
         >
           <span className={styles.icon}>{ICONS[m]}</span>

@@ -609,3 +609,76 @@ D:/hohai/
 - 홈페이지: 사이드바 없음, 바로가기 위젯 + 최신 노래 목록 표시
 - 하위 페이지 데스크톱: 사이드바 표시, 활성 링크 하이라이트
 - 모바일: 사이드바 숨김, 기존 레이아웃 유지
+
+---
+
+## 2026-02-23 (Day 5, 2차) — 보기 모드 전환 + 푸터 간격 수정
+
+### 배경
+
+- 리스트 페이지(추천시, 시 모음집, 추천노래, 최신노래, 노래모음집)가 갤러리(카드) 형태만 지원
+- 사용자 요청: 게시판/갤러리/블로그 3가지 보기 모드 전환 기능
+- 푸터와 본문 사이 불필요한 간격(margin-top: 80px) 수정
+
+### 기능 1: ViewModeSelector (보기 모드 전환)
+
+#### 3가지 보기 모드
+| 모드 | 아이콘 | 설명 |
+|------|--------|------|
+| 갤러리 | ▦ | 기존 3열 카드 그리드 (기본값) |
+| 게시판 | ☰ | 테이블형 리스트 (#, 제목, 카테고리/설명, 날짜) |
+| 블로그 | ▤ | 단일 컬럼 상세 보기 (제목, 발췌, 태그) |
+
+#### 설계
+- `useViewMode(storageKey)` 훅: localStorage로 선택 상태 영속화
+- `ViewModeSelector` 컴포넌트: 부모로부터 `mode`/`onChange` props 수신 (단일 상태 소스)
+- 페이지별 고유 storageKey로 각 페이지 독립적 설정 유지
+
+#### 신규 파일
+- `src/components/ui/ViewModeSelector.tsx` — 보기 모드 토글 컴포넌트 + useViewMode 훅
+- `src/components/ui/ViewModeSelector.module.css` — 필 스타일 토글 버튼
+
+#### 적용 페이지 (5개)
+| 페이지 | storageKey | 게시판 컬럼 |
+|--------|-----------|------------|
+| FeaturedPoemsPage | `poems` | #, 제목, 카테고리, 날짜 |
+| PoemsPage | `poemSeries` | #, 시집, 설명 |
+| FeaturedSongsPage | `featuredSongs` | #, 제목, 설명 |
+| LatestSongsPage | `latestSongs` | #, 제목, 설명 |
+| SongsPage | `songSeries` | #, 앨범, 설명 |
+
+### 기능 2: 푸터 간격 수정
+- `Footer.module.css`의 `.footer { margin-top: 80px }` 제거
+- 본문과 푸터가 자연스럽게 연결
+
+### 버그 수정: ViewModeSelector 상태 공유
+- **문제**: ViewModeSelector 내부에서 `useViewMode`를 별도로 호출하여 페이지의 상태와 동기화되지 않음
+- **원인**: 두 개의 독립된 `useState` 인스턴스 → 버튼 클릭해도 페이지 뷰 변경 안 됨
+- **해결**: ViewModeSelector가 외부에서 `mode`/`onChange` props를 받도록 변경, 페이지가 단일 상태 소스 역할
+
+### 파일 변경 요약
+
+```
+ 신규:
+  src/components/ui/ViewModeSelector.tsx      | 65  (토글 컴포넌트 + 훅)
+  src/components/ui/ViewModeSelector.module.css | 45  (필 스타일)
+
+ 수정:
+  src/components/layout/Footer.module.css     |  -2  (margin-top 제거)
+  src/pages/FeaturedPoemsPage.tsx              | +100 (board/blog 뷰 추가)
+  src/pages/FeaturedPoemsPage.module.css       | +170 (board/blog 스타일)
+  src/pages/PoemsPage.tsx                      | +40  (board/blog 뷰 추가)
+  src/pages/PoemsPage.module.css               | +120 (board/blog 스타일)
+  src/pages/FeaturedSongsPage.tsx              | +40  (board/blog 뷰 추가)
+  src/pages/FeaturedSongsPage.module.css       | +80  (board/blog 스타일)
+  src/pages/LatestSongsPage.tsx                | +40  (board/blog 뷰 추가)
+  src/pages/LatestSongsPage.module.css         | +80  (board/blog 스타일)
+  src/pages/SongsPage.tsx                      | +40  (board/blog 뷰 추가)
+  src/pages/SongsPage.module.css               | +120 (board/blog 스타일)
+```
+
+### 검증
+- `npx tsc --noEmit` — 타입 체크 통과
+- `npx vite build` — 빌드 성공
+- 5개 페이지에서 갤러리/게시판/블로그 전환 정상 작동
+- localStorage에 선택 모드 저장 확인
