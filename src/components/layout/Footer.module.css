@@ -6,7 +6,7 @@
 }
 
 .inner {
-  max-width: var(--max-width);
+  max-width: var(--max-width-page);
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
@@ -63,7 +63,7 @@
 }
 
 .bottom {
-  max-width: var(--max-width);
+  max-width: var(--max-width-page);
   margin: 24px auto 0;
   padding: 16px 24px 0;
   border-top: 1px solid rgba(10, 25, 41, 0.06);

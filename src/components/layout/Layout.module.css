@@ -1,16 +1,22 @@
 /* ========================================
-   레이아웃 — 사이드바 + 콘텐츠 flex 컨테이너
+   레이아웃 — 1400px 중앙 정렬 + 사이드바
    ======================================== */
 
 /* 사이드바가 있을 때의 메인 영역 */
 .mainWithSidebar {
   display: flex;
+  max-width: var(--max-width-page);
+  margin: 0 auto;
   padding-top: var(--header-height);
+  padding-left: 24px;
+  padding-right: 24px;
   min-height: 100vh;
 }
 
 /* 사이드바 없을 때 (홈페이지) */
 .mainDefault {
+  max-width: var(--max-width-page);
+  margin: 0 auto;
   padding-top: var(--header-height);
   min-height: 100vh;
 }
@@ -25,5 +31,12 @@
 @media (min-width: 1024px) {
   .content :global(.container) {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .mainWithSidebar {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
