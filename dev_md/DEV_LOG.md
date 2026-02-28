@@ -1,5 +1,19 @@
 # 개발일지
 
+## 2026-02-28 — 가입 사이트 자동 추적 + 차단/탈퇴 유저 강제 로그아웃
+
+### 작업 내용
+- AuthContext의 `loadProfile()`에 `check_user_status` RPC 호출 추가
+- 로그인/세션 복원 시 `target_user_id` + `current_domain`(hostname) 전달
+- `signup_domain` 미설정 시 자동 설정 + `visited_sites`에 현재 도메인 추가
+- 차단/탈퇴 유저(`status !== 'active'`) 감지 시 강제 로그아웃 + 상태 초기화
+- DB 함수 미존재 환경에서도 정상 동작하도록 try/catch 처리
+
+### 수정 파일 (1개)
+- `src/contexts/AuthContext.tsx` — loadProfile 콜백 내 RPC 호출 + 차단 유저 로그아웃 로직
+
+---
+
 ## 2026-02-22 — 풍선 도움말(Tooltip) 추가
 
 ### 작업 내용

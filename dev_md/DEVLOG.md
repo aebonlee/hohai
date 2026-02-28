@@ -2,6 +2,52 @@
 
 ---
 
+## 2026-02-28 — 가입 사이트 자동 추적 + 차단/탈퇴 유저 강제 로그아웃
+
+### 배경
+
+서브도메인 간 공유 Supabase를 사용하는 구조에서, 사용자가 어느 사이트에서 가입했는지(`signup_domain`)와
+방문한 사이트 목록(`visited_sites`)을 자동 추적하는 기능이 필요.
+또한 차단/탈퇴 상태의 유저가 로그인을 시도할 경우 강제 로그아웃 처리가 필요.
+
+DB 함수(`check_user_status`)는 공유 Supabase에 이미 설치되어 있으므로,
+프론트엔드에서 로그인/세션 복원 시점에 RPC 호출만 추가하면 됨.
+
+### 변경 내용
+
+| 파일 | 변경 |
+|------|------|
+| `src/contexts/AuthContext.tsx` | `loadProfile()` 함수 내 프로필 조회 후 `check_user_status` RPC 호출 추가 |
+
+### 구현 상세
+
+`loadProfile` 콜백에서 `getProfile()` 호출 이후 다음 로직 추가:
+
+1. **`supabase.rpc('check_user_status')` 호출** — `target_user_id`(유저 ID)와 `current_domain`(`window.location.hostname`) 전달
+2. **차단/탈퇴 유저 감지** — 응답의 `status`가 `active`가 아닌 경우:
+   - 콘솔에 계정 상태 및 사유 출력
+   - `supabase.auth.signOut()` 강제 로그아웃
+   - `setUser(null)` + `setProfile(null)` 상태 초기화
+3. **에러 핸들링** — `check_user_status` 함수 미존재 시 `catch`로 무시 (구버전 호환)
+
+### 적용 범위
+
+이 코드는 `loadProfile`이 호출되는 모든 시점에서 자동 실행:
+
+| 시점 | 트리거 |
+|------|--------|
+| 앱 시작 | `getSession()` 성공 후 `loadProfile()` |
+| 로그인 | `onAuthStateChange` → `SIGNED_IN` → `loadProfile()` |
+| 프로필 수동 갱신 | `refreshProfile()` → `loadProfile()` |
+
+### 주요 기술 결정
+
+1. **`loadProfile` 내 삽입** — AuthContext에 인증 로직이 중앙 집중되어 있어, 한 곳만 수정하면 모든 인증 시점에서 동작
+2. **프로필 조회 후 실행** — `getProfile()` 이후에 RPC를 호출하여, 차단 유저도 프로필 로드까지는 정상 진행 후 판별
+3. **try/catch 구버전 호환** — DB 함수가 아직 없는 환경에서도 앱이 정상 동작하도록 에러 무시
+
+---
+
 ## 2026-02-23 — 프로젝트 종합 분석 & 현황 정리
 
 ### 배경
