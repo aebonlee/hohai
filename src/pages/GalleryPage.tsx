@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import PageTransition from '../components/layout/PageTransition';
 import { useGallery, uploadGalleryImage } from '../hooks/useGallery';
+import { useIncrementView } from '../hooks/useViewCount';
 import { useAuth } from '../hooks/useAuth';
 import { formatDate } from '../lib/formatDate';
 import styles from './GalleryPage.module.css';
@@ -12,6 +13,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export default function GalleryPage() {
   const { items, loading, createItem, deleteItem } = useGallery();
+  const incrementView = useIncrementView('hohai_gallery');
   const { isLoggedIn, profile, user } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
@@ -203,7 +205,7 @@ export default function GalleryPage() {
                   viewport={{ once: true, margin: '-20px' }}
                   transition={{ duration: 0.4, delay: i * 0.05 }}
                 >
-                  <div className={styles.galleryImageWrap}>
+                  <div className={styles.galleryImageWrap} onClick={() => incrementView(item.id)}>
                     <img src={item.image_url} alt={item.title} className={styles.galleryImage} />
                   </div>
                   <div className={styles.galleryInfo}>
@@ -213,7 +215,10 @@ export default function GalleryPage() {
                     )}
                     <div className={styles.galleryMeta}>
                       <span className={styles.galleryAuthor}>{item.author_name}</span>
-                      <span className={styles.galleryDate}>{formatDate(item.created_at)}</span>
+                      <span className={styles.galleryMetaRight}>
+                        <span className={styles.galleryViewCount}>조회 {item.view_count ?? 0}</span>
+                        <span className={styles.galleryDate}>{formatDate(item.created_at)}</span>
+                      </span>
                     </div>
                     {isLoggedIn && user?.id === item.user_id && (
                       <button

@@ -11,6 +11,7 @@ export interface Poem {
   is_featured: boolean;
   is_published: boolean;
   written_date: string | null;
+  view_count: number;
   created_at: string;
   updated_at: string;
 }

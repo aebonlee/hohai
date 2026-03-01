@@ -88,6 +88,7 @@ export default function PoemSeriesPage() {
                   <span className={styles.boardColNum}>#</span>
                   <span className={styles.boardColTitle}>제목</span>
                   <span className={styles.boardColCat}>카테고리</span>
+                  <span className={styles.boardColView}>조회</span>
                   <span className={styles.boardColDate}>날짜</span>
                 </div>
                 {poems.map((poem, i) => (
@@ -106,6 +107,7 @@ export default function PoemSeriesPage() {
                       )}
                     </span>
                     <span className={styles.boardColCat} style={{ color: CATEGORY_COLORS[poem.category] }}>{poem.category}</span>
+                    <span className={styles.boardColView}>{poem.view_count || 0}</span>
                     <span className={styles.boardColDate}>{poem.written_date || ''}</span>
                   </div>
                 ))}
@@ -129,6 +131,7 @@ export default function PoemSeriesPage() {
                           {poem.tags.slice(0, 4).map(t => <span key={t}>#{t}</span>)}
                         </span>
                       )}
+                      <span>조회 {poem.view_count ?? 0}</span>
                       {poem.written_date && <span>{poem.written_date}</span>}
                     </div>
                   </article>

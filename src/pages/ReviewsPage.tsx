@@ -124,6 +124,7 @@ export default function ReviewsPage() {
                   <div className={styles.reviewHeader}>
                     <span className={styles.reviewAuthor}>{review.author_name}</span>
                     <div className={styles.reviewHeaderRight}>
+                      <span className={styles.reviewViewCount}>조회 {review.view_count ?? 0}</span>
                       <span className={styles.reviewDate}>{formatDate(review.created_at)}</span>
                       {isLoggedIn && user?.id === review.user_id && (
                         <button

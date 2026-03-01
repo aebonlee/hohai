@@ -220,3 +220,82 @@ CREATE POLICY "hohai_reviews_auth_insert" ON hohai_reviews
 
 CREATE POLICY "hohai_reviews_auth_manage" ON hohai_reviews
   FOR ALL USING (auth.role() = 'authenticated');
+
+-- ============================================================
+-- 7. hohai_news 테이블 (소식통)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS hohai_news (
+  id            UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title         TEXT NOT NULL,
+  content       TEXT NOT NULL,
+  author_name   TEXT NOT NULL,
+  user_id       UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  is_published  BOOLEAN DEFAULT TRUE,
+  view_count    INTEGER DEFAULT 0,
+  created_at    TIMESTAMPTZ DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TRIGGER hohai_news_updated_at
+  BEFORE UPDATE ON hohai_news
+  FOR EACH ROW EXECUTE FUNCTION hohai_update_updated_at();
+
+ALTER TABLE hohai_news ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "hohai_news_public_read" ON hohai_news
+  FOR SELECT USING (is_published = TRUE);
+
+CREATE POLICY "hohai_news_auth_insert" ON hohai_news
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "hohai_news_auth_manage" ON hohai_news
+  FOR ALL USING (auth.role() = 'authenticated');
+
+-- ============================================================
+-- 8. hohai_gallery 테이블 (갤러리)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS hohai_gallery (
+  id            UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title         TEXT NOT NULL,
+  image_url     TEXT NOT NULL,
+  description   TEXT DEFAULT '',
+  author_name   TEXT NOT NULL,
+  user_id       UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  is_published  BOOLEAN DEFAULT TRUE,
+  view_count    INTEGER DEFAULT 0,
+  created_at    TIMESTAMPTZ DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TRIGGER hohai_gallery_updated_at
+  BEFORE UPDATE ON hohai_gallery
+  FOR EACH ROW EXECUTE FUNCTION hohai_update_updated_at();
+
+ALTER TABLE hohai_gallery ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "hohai_gallery_public_read" ON hohai_gallery
+  FOR SELECT USING (is_published = TRUE);
+
+CREATE POLICY "hohai_gallery_auth_insert" ON hohai_gallery
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "hohai_gallery_auth_manage" ON hohai_gallery
+  FOR ALL USING (auth.role() = 'authenticated');
+
+-- ============================================================
+-- view_count 컬럼 추가 (모든 콘텐츠 테이블)
+-- ============================================================
+ALTER TABLE hohai_poems ADD COLUMN IF NOT EXISTS view_count INTEGER DEFAULT 0;
+ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS view_count INTEGER DEFAULT 0;
+ALTER TABLE hohai_news ADD COLUMN IF NOT EXISTS view_count INTEGER DEFAULT 0;
+ALTER TABLE hohai_gallery ADD COLUMN IF NOT EXISTS view_count INTEGER DEFAULT 0;
+ALTER TABLE hohai_reviews ADD COLUMN IF NOT EXISTS view_count INTEGER DEFAULT 0;
+
+-- RPC 함수: 원자적 조회수 증가 (SECURITY DEFINER로 RLS 우회)
+CREATE OR REPLACE FUNCTION hohai_increment_view(p_table TEXT, p_id UUID)
+RETURNS void AS $$
+BEGIN
+  EXECUTE format('UPDATE %I SET view_count = COALESCE(view_count, 0) + 1 WHERE id = $1', p_table)
+  USING p_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

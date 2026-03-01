@@ -2,6 +2,50 @@
 
 ---
 
+## 2026-03-01 — 모든 콘텐츠에 조회수(view_count) 기능 추가
+
+### 배경
+
+시, 노래, 소식, 갤러리, 감상후기 5개 콘텐츠 타입에 좋아요/즐겨찾기/댓글은 있지만 조회수가 없었음.
+사용자 요청으로 전체 콘텐츠에 조회수 추적 + 표시 기능을 일괄 추가.
+
+### 변경 내용
+
+| 파일 | 변경 |
+|------|------|
+| `dev_md/migration.sql` | `hohai_news`, `hohai_gallery` 테이블 생성 + 5개 테이블 `view_count` 컬럼 + `hohai_increment_view` RPC 함수 |
+| `src/types/poem.ts` | `Poem` 인터페이스에 `view_count: number` 추가 |
+| `src/types/song.ts` | `Song` 인터페이스에 `view_count: number` 추가 |
+| `src/types/news.ts` | `NewsItem` 인터페이스에 `view_count: number` 추가 |
+| `src/types/gallery.ts` | `GalleryItem` 인터페이스에 `view_count: number` 추가 |
+| `src/types/review.ts` | `Review` 인터페이스에 `view_count: number` 추가 |
+| `src/hooks/useViewCount.ts` | **새 파일** — `useViewCount` 훅(자동 증가) + `useIncrementView` 함수(이벤트 기반 증가) |
+| `src/pages/PoemDetailPage.tsx` | 마운트 시 조회수 증가 + 제목 아래 `조회 N` 표시 |
+| `src/components/ui/PoemCard.tsx` | 카드 footer에 조회수 표시 |
+| `src/components/ui/SongCard.tsx` | 재생 버튼 클릭 시 조회수 증가 + `▶ N` 표시 |
+| `src/pages/FeaturedPoemsPage.tsx` | 게시판 보기에 "조회" 컬럼 + 블로그 보기에 `조회 N` 표시 |
+| `src/pages/PoemSeriesPage.tsx` | 게시판/블로그 보기에 조회수 표시 |
+| `src/pages/NewsPage.tsx` | 뉴스 카드 헤더에 `조회 N` 표시 |
+| `src/pages/GalleryPage.tsx` | 이미지 클릭 시 조회수 증가 + 갤러리 메타에 표시 |
+| `src/pages/ReviewsPage.tsx` | 후기 헤더에 `조회 N` 표시 |
+| `*.module.css` (7개) | 조회수 표시 관련 CSS 클래스 추가 |
+
+### 구현 상세
+
+1. **DB 스키마** — 각 테이블에 `view_count INTEGER DEFAULT 0` 컬럼 추가. `hohai_increment_view(p_table, p_id)` RPC 함수로 원자적 +1 증가 (SECURITY DEFINER로 RLS 우회)
+2. **useViewCount 훅** — 페이지 마운트 시 자동 호출. `sessionStorage`에 `viewed_{table}_{id}` 키로 세션당 1회만 증가
+3. **useIncrementView** — 재생/클릭 등 이벤트 기반 증가용. 동일하게 sessionStorage 중복 방지
+4. **조회수 증가 시점** — 시(상세 페이지 마운트), 노래(재생 클릭), 갤러리(이미지 클릭)
+5. **조회수 표시** — 0이어도 항상 표시. `?? 0` fallback으로 null 안전 처리
+
+### 주요 기술 결정
+
+1. **SECURITY DEFINER** — 비로그인 사용자도 조회수 증가 가능하도록 RLS 우회
+2. **sessionStorage 기반 중복 방지** — 같은 세션에서 같은 콘텐츠 재방문 시 조회수 미증가. 탭/브라우저 닫으면 초기화
+3. **누락 테이블 생성** — `hohai_news`, `hohai_gallery`가 DB에 미존재하여 마이그레이션에 CREATE TABLE 포함
+
+---
+
 ## 2026-02-28 — 가입 사이트 자동 추적 + 차단/탈퇴 유저 강제 로그아웃
 
 ### 배경

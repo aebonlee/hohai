@@ -169,6 +169,11 @@
   color: var(--text-primary);
 }
 
+.reviewViewCount {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 .reviewDate {
   font-size: 0.8rem;
   color: var(--text-muted);

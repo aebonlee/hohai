@@ -7,6 +7,7 @@ import AddToPlaylist from './AddToPlaylist';
 import ShareButton from './ShareButton';
 import LikeButton from './LikeButton';
 import { useLikes, useFavoritesCount } from '../../hooks/useLikes';
+import { useIncrementView } from '../../hooks/useViewCount';
 import { useAuth } from '../../contexts/AuthContext';
 import { getSunoEmbedUrl } from '../../lib/suno';
 import { cleanLyrics } from '../../lib/cleanLyrics';
@@ -35,6 +36,7 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
   const { user } = useAuth();
   const { count: likeCount } = useLikes('song', song.id, user?.id);
   const favCount = useFavoritesCount(song.id);
+  const incrementView = useIncrementView('hohai_songs');
   const hasLyrics = !!song.lyrics;
   const hasTags = song.tags && song.tags.length > 0;
   const isInPlaylist = playlist !== null;
@@ -87,11 +89,13 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
   };
 
   const handleYtPlay = () => {
+    incrementView(song.id);
     playWithContext(song.id);
     setYtPlaying(true);
   };
 
   const handleSunoPlay = () => {
+    incrementView(song.id);
     playWithContext(song.id);
     setSunoPlaying(true);
   };
@@ -211,12 +215,11 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
 
         {/* 좋아요·즐겨찾기 카운트 + 액션 버튼 */}
         <div className={styles.statsRow}>
-          {(likeCount > 0 || favCount > 0) && (
             <div className={styles.counts}>
+              <span className={styles.countItem}>▶ {song.view_count ?? 0}</span>
               {likeCount > 0 && <span className={styles.countItem}>♥ {likeCount}</span>}
               {favCount > 0 && <span className={styles.countItem}>★ {favCount}</span>}
             </div>
-          )}
           <div className={styles.actions}>
             <AddToPlaylist songId={song.id} />
             <LikeButton targetType="song" targetId={song.id} />

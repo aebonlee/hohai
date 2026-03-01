@@ -8,6 +8,7 @@ import ShareButton from '../components/ui/ShareButton';
 import LikeButton from '../components/ui/LikeButton';
 import CommentSection from '../components/ui/CommentSection';
 import { usePoemDetail, usePoems } from '../hooks/usePoems';
+import { useViewCount } from '../hooks/useViewCount';
 import { CATEGORY_COLORS, CATEGORY_NAMES } from '../lib/constants';
 import type { MoodKey } from '../lib/mood';
 import { MOOD_LIGHT_GRADIENTS, MOOD_ACCENT_COLORS } from '../lib/mood';
@@ -17,6 +18,7 @@ export default function PoemDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { poem, loading, adjacentPoems } = usePoemDetail(id);
   const [readerOpen, setReaderOpen] = useState(false);
+  useViewCount('hohai_poems', id);
 
   // 시집에 속한 시일 때만 같은 시리즈의 시 목록 로드
   const hasSeriesId = !!poem?.series_id;
@@ -74,9 +76,11 @@ export default function PoemDetailPage() {
 
           <div className={styles.category} style={{ color: CATEGORY_COLORS[poem.category] }}>{poem.category}</div>
           <h1 className={styles.title}>{poem.title}</h1>
-          {poem.written_date && (
-            <p className={styles.meta}>{poem.written_date}</p>
-          )}
+          <p className={styles.meta}>
+            {poem.written_date && <span>{poem.written_date}</span>}
+            {poem.written_date && <span className={styles.metaSep}> · </span>}
+            <span>조회 {poem.view_count ?? 0}</span>
+          </p>
 
           <div className={styles.content}>
             {stanzas.map((stanza, i) => (

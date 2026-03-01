@@ -11,6 +11,7 @@ export interface Song {
   is_featured: boolean;
   is_published: boolean;
   recorded_date: string | null;
+  view_count: number;
   created_at: string;
   updated_at: string;
 }

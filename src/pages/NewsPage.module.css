@@ -179,6 +179,11 @@
   flex-shrink: 0;
 }
 
+.newsViewCount {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 .newsDate {
   font-size: 0.8rem;
   color: var(--text-muted);

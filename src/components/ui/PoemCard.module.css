@@ -89,6 +89,20 @@
   text-decoration: underline;
 }
 
+.footerRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.viewCount {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
 .date {
   font-size: 0.78rem;
   color: var(--text-muted);

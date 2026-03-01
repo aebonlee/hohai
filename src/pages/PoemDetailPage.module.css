@@ -75,6 +75,10 @@
   margin-bottom: 40px;
 }
 
+.metaSep {
+  margin: 0 2px;
+}
+
 .content {
   font-family: var(--font-serif);
   font-size: 1.05rem;

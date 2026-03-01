@@ -51,9 +51,10 @@ export default function PoemCard({ poem, index = 0 }: Props) {
             )}
           </span>
         )}
-        {poem.written_date && (
-          <span className={styles.date}>{poem.written_date}</span>
-        )}
+        <span className={styles.footerRight}>
+          <span className={styles.viewCount}>{poem.view_count ?? 0}</span>
+          {poem.written_date && <span className={styles.date}>{poem.written_date}</span>}
+        </span>
       </div>
     </motion.article>
   );

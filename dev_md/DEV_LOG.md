@@ -1,5 +1,35 @@
 # 개발일지
 
+## 2026-03-01 — 모든 콘텐츠에 조회수(view_count) 기능 추가
+
+### 작업 내용
+- 시, 노래, 소식, 갤러리, 감상후기 5개 콘텐츠에 `view_count` 컬럼 + RPC 함수 추가
+- `useViewCount` 훅 생성 — 페이지 마운트 시 자동 증가 (sessionStorage 세션당 1회 제한)
+- `useIncrementView` 함수 생성 — 재생/클릭 이벤트 기반 증가
+- 시 상세: 마운트 시 증가 + 제목 아래 `조회 N` 표시
+- 시 카드/게시판/블로그: 조회수 항상 표시
+- 노래 카드: 재생 클릭 시 증가 + `▶ N` 표시 (좋아요/즐겨찾기 옆)
+- 소식/갤러리/감상후기: 각 카드에 `조회 N` 표시
+- 갤러리: 이미지 클릭 시 조회수 증가
+- 누락된 `hohai_news`, `hohai_gallery` 테이블 마이그레이션 추가
+
+### 수정 파일 (16개 + 신규 1개)
+- `dev_md/migration.sql` — 테이블 생성 + view_count + RPC 함수
+- `src/types/poem.ts`, `song.ts`, `news.ts`, `gallery.ts`, `review.ts` — view_count 필드
+- `src/hooks/useViewCount.ts` — **신규** 조회수 훅
+- `src/pages/PoemDetailPage.tsx` — 증가 + 표시
+- `src/components/ui/PoemCard.tsx` — 표시
+- `src/components/ui/SongCard.tsx` — 증가 + 표시
+- `src/pages/FeaturedPoemsPage.tsx`, `PoemSeriesPage.tsx` — 게시판/블로그 조회수
+- `src/pages/NewsPage.tsx`, `GalleryPage.tsx`, `ReviewsPage.tsx` — 표시
+- CSS 모듈 7개 — 조회수 스타일
+
+### 검증
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과
+
+---
+
 ## 2026-02-28 — 가입 사이트 자동 추적 + 차단/탈퇴 유저 강제 로그아웃
 
 ### 작업 내용

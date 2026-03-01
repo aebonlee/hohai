@@ -6,6 +6,7 @@ export interface GalleryItem {
   author_name: string;
   user_id: string | null;
   is_published: boolean;
+  view_count: number;
   created_at: string;
   updated_at: string;
 }

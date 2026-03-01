@@ -243,6 +243,16 @@
   font-weight: 500;
 }
 
+.galleryMetaRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.galleryViewCount {
+  font-size: 0.75rem;
+}
+
 .galleryDate {
   font-size: 0.75rem;
 }

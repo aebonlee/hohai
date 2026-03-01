@@ -135,6 +135,7 @@ export default function NewsPage() {
                   <div className={styles.newsHeader}>
                     <h3 className={styles.newsTitle}>{item.title}</h3>
                     <div className={styles.newsHeaderRight}>
+                      <span className={styles.newsViewCount}>조회 {item.view_count ?? 0}</span>
                       <span className={styles.newsDate}>{formatDate(item.created_at)}</span>
                       {isLoggedIn && user?.id === item.user_id && (
                         <button
