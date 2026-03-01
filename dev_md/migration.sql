@@ -299,3 +299,20 @@ BEGIN
   USING p_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================
+-- hohai_songs 테이블에 category 컬럼 추가 (v4 마이그레이션)
+-- 시(poem)와 동일한 카테고리 시스템 적용
+-- ============================================================
+ALTER TABLE hohai_songs ADD COLUMN IF NOT EXISTS category TEXT DEFAULT '기타';
+
+-- 기존 tags 데이터를 기반으로 category 자동 매핑
+UPDATE hohai_songs SET category = '사랑' WHERE '사랑' = ANY(tags) AND category = '기타';
+UPDATE hohai_songs SET category = '그리움' WHERE '그리움' = ANY(tags) AND category = '기타';
+UPDATE hohai_songs SET category = '자연' WHERE ('자연' = ANY(tags) OR '바다' = ANY(tags) OR '계절' = ANY(tags)) AND category = '기타';
+UPDATE hohai_songs SET category = '인생' WHERE '인생' = ANY(tags) AND category = '기타';
+UPDATE hohai_songs SET category = '가족' WHERE ('가족' = ANY(tags) OR '고향' = ANY(tags) OR '동행' = ANY(tags)) AND category = '기타';
+UPDATE hohai_songs SET category = '의지' WHERE ('의지' = ANY(tags) OR '비상' = ANY(tags) OR '꿈' = ANY(tags)) AND category = '기타';
+UPDATE hohai_songs SET category = '세상' WHERE ('세상' = ANY(tags) OR '일상' = ANY(tags) OR '지역' = ANY(tags)) AND category = '기타';
+UPDATE hohai_songs SET category = '작별' WHERE '이별' = ANY(tags) AND category = '기타';
+UPDATE hohai_songs SET category = '추억' WHERE '추억' = ANY(tags) AND category = '기타';

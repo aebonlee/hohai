@@ -608,6 +608,7 @@ function SongsAdmin() {
     suno_url: '',
     description: '',
     lyrics: '',
+    category: '기타',
     series_id: null,
     display_order: 0,
     is_featured: false,
@@ -618,7 +619,7 @@ function SongsAdmin() {
   const resetForm = () => {
     setForm({
       title: '', youtube_id: '', suno_url: '', description: '', lyrics: '',
-      series_id: null, display_order: 0, is_featured: false, is_published: true, recorded_date: null,
+      category: '기타', series_id: null, display_order: 0, is_featured: false, is_published: true, recorded_date: null,
     });
     setEditingId(null);
   };
@@ -637,6 +638,7 @@ function SongsAdmin() {
       suno_url: song.suno_url || '',
       description: song.description || '',
       lyrics: song.lyrics || '',
+      category: song.category || '기타',
       series_id: song.series_id,
       display_order: song.display_order,
       is_featured: song.is_featured,
@@ -678,6 +680,7 @@ function SongsAdmin() {
           <thead>
             <tr>
               <th>제목</th>
+              <th>카테고리</th>
               <th>앨범</th>
               <th>소스</th>
               <th>추천</th>
@@ -690,6 +693,7 @@ function SongsAdmin() {
             {songs.map((song) => (
               <tr key={song.id}>
                 <td className={styles.titleCell}>{song.title}</td>
+                <td>{song.category || '기타'}</td>
                 <td>{songSeries.find(s => s.id === song.series_id)?.name || '-'}</td>
                 <td style={{ fontSize: '0.75rem' }}>
                   {song.youtube_id && <span style={{ display: 'block', color: '#c00' }}>YouTube</span>}
@@ -758,6 +762,18 @@ function SongsAdmin() {
                   <option value="">미분류</option>
                   {songSeries.map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>카테고리 (장르)</label>
+                <select
+                  className={styles.formInput}
+                  value={form.category || '기타'}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                >
+                  {['사랑', '그리움', '작별', '추억', '인생', '가족', '자연', '세상', '의지', '기타'].map(c => (
+                    <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
               </div>

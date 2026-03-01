@@ -1,15 +1,20 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import PageTransition from '../components/layout/PageTransition';
 import SongCard from '../components/ui/SongCard';
 import LyricsPlayer from '../components/ui/LyricsPlayer';
+import CategoryFilter from '../components/ui/CategoryFilter';
 import ViewModeSelector, { useViewMode } from '../components/ui/ViewModeSelector';
 import { useSongs } from '../hooks/useSongs';
+import { useCategories } from '../hooks/useCategories';
 import { usePlayback } from '../contexts/PlaybackContext';
+import { CATEGORY_COLORS } from '../lib/constants';
 import styles from './FeaturedSongsPage.module.css';
 
 export default function FeaturedSongsPage() {
-  const { songs, loading } = useSongs(undefined, true);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const { categories } = useCategories();
+  const { songs, loading } = useSongs(undefined, true, selectedCategory || undefined);
   const [viewMode, setViewMode] = useViewMode('featuredSongs');
   const {
     setPlaylist, clearPlaylist,
@@ -43,6 +48,12 @@ export default function FeaturedSongsPage() {
             <ViewModeSelector mode={viewMode} onChange={setViewMode} />
           </div>
 
+          <CategoryFilter
+            categories={categories}
+            selected={selectedCategory}
+            onSelect={setSelectedCategory}
+          />
+
           {loading ? (
             <p className={styles.empty}>불러오는 중...</p>
           ) : songs.length > 0 ? (
@@ -51,12 +62,16 @@ export default function FeaturedSongsPage() {
                 <div className={styles.boardHeader}>
                   <span className={styles.boardColNum}>#</span>
                   <span className={styles.boardColTitle}>제목</span>
+                  <span className={styles.boardColCat}>카테고리</span>
+                  <span className={styles.boardColView}>조회</span>
                   <span className={styles.boardColDesc}>설명</span>
                 </div>
                 {songs.map((song, i) => (
                   <div key={song.id} className={styles.boardRow}>
                     <span className={styles.boardColNum}>{i + 1}</span>
                     <span className={styles.boardColTitle}>{song.title}</span>
+                    <span className={styles.boardColCat} style={{ color: CATEGORY_COLORS[song.category] }}>{song.category}</span>
+                    <span className={styles.boardColView}>{song.view_count || 0}</span>
                     <span className={styles.boardColDesc}>{song.description || ''}</span>
                   </div>
                 ))}

@@ -11,6 +11,7 @@ import { useIncrementView } from '../../hooks/useViewCount';
 import { useAuth } from '../../contexts/AuthContext';
 import { getSunoEmbedUrl } from '../../lib/suno';
 import { cleanLyrics } from '../../lib/cleanLyrics';
+import { CATEGORY_COLORS } from '../../lib/constants';
 import styles from './SongCard.module.css';
 
 interface Props {
@@ -38,7 +39,6 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
   const favCount = useFavoritesCount(song.id);
   const incrementView = useIncrementView('hohai_songs');
   const hasLyrics = !!song.lyrics;
-  const hasTags = song.tags && song.tags.length > 0;
   const isInPlaylist = playlist !== null;
   const isCurrentInPlaylist = isInPlaylist && currentId === song.id && currentIndex >= 0;
 
@@ -211,6 +211,11 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
       )}
 
       <div className={styles.info}>
+        {song.category && (
+          <span className={styles.categoryBadge} style={{ color: CATEGORY_COLORS[song.category] }}>
+            {song.category}
+          </span>
+        )}
         <h3 className={styles.title}>{song.title}</h3>
 
         {/* 좋아요·즐겨찾기 카운트 + 액션 버튼 */}
@@ -230,14 +235,6 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
         {/* 시인 소개글 */}
         {song.description && (
           <p className={styles.description}>{song.description}</p>
-        )}
-
-        {hasTags && (
-          <div className={styles.tags}>
-            {song.tags.map((tag) => (
-              <span key={tag} className={styles.tag}>#{tag}</span>
-            ))}
-          </div>
         )}
 
         {hasLyrics && (

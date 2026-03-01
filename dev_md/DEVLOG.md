@@ -2,6 +2,36 @@
 
 ---
 
+## 2026-03-01 — 노래 카테고리 시스템 도입 (태그 → 장르 교체)
+
+### 배경
+
+노래에 표시되던 Suno AI 스타일 태그("Authentic Argentine Tango + French Chanson Fusion" 등)를
+시(Poem)와 동일한 한국어 장르 카테고리(사랑, 자연, 인생 등)로 교체.
+
+### 변경 내용
+
+| 파일 | 변경 |
+|------|------|
+| `dev_md/migration.sql` | `category` 컬럼 추가 SQL + tags→category 자동 매핑 쿼리 |
+| `src/types/song.ts` | `Song`, `SongInsert`에 `category` 필드 추가 |
+| `src/hooks/useSongs.ts` | `useSongs`에 카테고리 필터링 파라미터 추가 |
+| `src/components/ui/SongCard.tsx` | Suno 태그 표시 제거 → 카테고리 배지 표시 |
+| `src/components/ui/SongCard.module.css` | `.categoryBadge` 스타일 추가 |
+| `src/components/ui/CategoryFilter.tsx` | title 텍스트 범용화 |
+| `src/pages/FeaturedSongsPage.tsx` | CategoryFilter + 게시판 카테고리/조회 컬럼 추가 |
+| `src/pages/FeaturedSongsPage.module.css` | 게시판 컬럼 스타일 추가 |
+| `src/pages/LatestSongsPage.tsx` | CategoryFilter + 게시판 카테고리/조회 컬럼 추가 |
+| `src/pages/LatestSongsPage.module.css` | 게시판 컬럼 스타일 추가 |
+| `src/pages/AdminPage.tsx` | 노래 폼에 카테고리 드롭다운 + 목록에 카테고리 컬럼 추가 |
+
+### 검증
+- `npx tsc --noEmit` — 에러 0건
+- `npx vite build` — 통과 (3.98s)
+- Supabase SQL 수동 실행 완료
+
+---
+
 ## 2026-03-01 — 전체 사이트 점검 + 미커밋 auth.ts 반영
 
 ### 배경

@@ -224,6 +224,14 @@
   padding: 20px;
 }
 
+.categoryBadge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
 .statsRow {
   display: flex;
   align-items: center;
