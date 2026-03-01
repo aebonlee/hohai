@@ -1,24 +1,25 @@
 # 개발일지
 
-## 2026-03-01 — 노래 카테고리 시스템 도입 (태그 → 장르 교체)
+## 2026-03-01 — 노래 카테고리 시스템 도입 (Suno 메타데이터 → 장르 교체)
 
 ### 작업 내용
-- 노래의 Suno AI 스타일 태그를 시와 동일한 한국어 장르 카테고리로 교체
+- SongCard에서 Suno AI description/tags 표시 완전 제거
+- 시와 동일한 한국어 장르 카테고리 시스템 도입 (카테고리 배지 + 필터)
 - `hohai_songs` 테이블에 `category` 컬럼 추가 (기존 tags 기반 자동 매핑)
-- SongCard에서 태그 제거, 카테고리 배지(색상 포함) 표시
 - 추천 노래·최신 노래 페이지에 CategoryFilter 추가
-- 게시판 보기에 카테고리/조회수 컬럼 추가
+- 게시판 보기: "설명" 컬럼 제거 → 카테고리/조회수 컬럼 추가
 - 관리자 페이지에 카테고리 드롭다운 추가
 
 ### 수정 파일 (11개)
-- `dev_md/migration.sql` — category 컬럼 + 매핑 SQL
+- `src/components/ui/SongCard.tsx` — description/tags 표시 제거, 카테고리 배지 추가
+- `src/components/ui/SongCard.module.css` — categoryBadge 스타일
 - `src/types/song.ts` — category 필드 추가
 - `src/hooks/useSongs.ts` — 카테고리 필터링
-- `src/components/ui/SongCard.tsx` + `.module.css` — 태그→카테고리 배지
-- `src/components/ui/CategoryFilter.tsx` — title 범용화
-- `src/pages/FeaturedSongsPage.tsx` + `.module.css` — CategoryFilter + 게시판 개선
-- `src/pages/LatestSongsPage.tsx` + `.module.css` — CategoryFilter + 게시판 개선
+- `src/pages/FeaturedSongsPage.tsx` + `.module.css` — CategoryFilter, 설명 컬럼 제거
+- `src/pages/LatestSongsPage.tsx` + `.module.css` — CategoryFilter, 설명 컬럼 제거
 - `src/pages/AdminPage.tsx` — 카테고리 드롭다운
+- `src/components/ui/CategoryFilter.tsx` — title 범용화
+- `dev_md/migration.sql` — category 컬럼 + 매핑 SQL
 
 ### 검증
 - `npx tsc --noEmit` — 통과

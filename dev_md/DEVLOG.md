@@ -2,32 +2,46 @@
 
 ---
 
-## 2026-03-01 — 노래 카테고리 시스템 도입 (태그 → 장르 교체)
+## 2026-03-01 — 노래 카테고리 시스템 도입 (Suno 메타데이터 → 장르 교체)
 
 ### 배경
 
-노래에 표시되던 Suno AI 스타일 태그("Authentic Argentine Tango + French Chanson Fusion" 등)를
+노래에 표시되던 Suno AI 메타데이터("Authentic Argentine Tango + French Chanson Fusion",
+"A gentle country folk-pop track featuring fingerpicked acoustic guitar" 등)를
 시(Poem)와 동일한 한국어 장르 카테고리(사랑, 자연, 인생 등)로 교체.
 
 ### 변경 내용
 
+**제거된 Suno 메타데이터 표시:**
+- SongCard의 `description` (Suno 스타일 설명) 표시 완전 제거
+- SongCard의 `tags` (Suno 태그) 표시 완전 제거
+- 게시판 보기의 "설명" 컬럼 제거
+- ShareButton의 description 참조 제거 (제목으로 대체)
+
+**추가된 카테고리 시스템:**
+- `hohai_songs` 테이블에 `category` 컬럼 추가
+- SongCard에 카테고리 배지 표시 (CATEGORY_COLORS 색상 적용)
+- 추천 노래·최신 노래 페이지에 CategoryFilter 추가
+- 게시판 보기에 카테고리/조회수 컬럼 추가
+- 관리자 페이지에 카테고리 드롭다운 추가
+
 | 파일 | 변경 |
 |------|------|
-| `dev_md/migration.sql` | `category` 컬럼 추가 SQL + tags→category 자동 매핑 쿼리 |
-| `src/types/song.ts` | `Song`, `SongInsert`에 `category` 필드 추가 |
-| `src/hooks/useSongs.ts` | `useSongs`에 카테고리 필터링 파라미터 추가 |
-| `src/components/ui/SongCard.tsx` | Suno 태그 표시 제거 → 카테고리 배지 표시 |
-| `src/components/ui/SongCard.module.css` | `.categoryBadge` 스타일 추가 |
-| `src/components/ui/CategoryFilter.tsx` | title 텍스트 범용화 |
-| `src/pages/FeaturedSongsPage.tsx` | CategoryFilter + 게시판 카테고리/조회 컬럼 추가 |
-| `src/pages/FeaturedSongsPage.module.css` | 게시판 컬럼 스타일 추가 |
-| `src/pages/LatestSongsPage.tsx` | CategoryFilter + 게시판 카테고리/조회 컬럼 추가 |
-| `src/pages/LatestSongsPage.module.css` | 게시판 컬럼 스타일 추가 |
-| `src/pages/AdminPage.tsx` | 노래 폼에 카테고리 드롭다운 + 목록에 카테고리 컬럼 추가 |
+| `dev_md/migration.sql` | `category` 컬럼 + tags→category 자동 매핑 SQL |
+| `src/types/song.ts` | `category` 필드 추가 |
+| `src/hooks/useSongs.ts` | 카테고리 필터링 파라미터 추가 |
+| `src/components/ui/SongCard.tsx` | description/tags 제거, 카테고리 배지 추가 |
+| `src/components/ui/SongCard.module.css` | `.categoryBadge` 스타일 |
+| `src/components/ui/CategoryFilter.tsx` | title 범용화 |
+| `src/pages/FeaturedSongsPage.tsx` | CategoryFilter + 설명 컬럼 제거 |
+| `src/pages/FeaturedSongsPage.module.css` | 게시판 컬럼 스타일 |
+| `src/pages/LatestSongsPage.tsx` | CategoryFilter + 설명 컬럼 제거 |
+| `src/pages/LatestSongsPage.module.css` | 게시판 컬럼 스타일 |
+| `src/pages/AdminPage.tsx` | 카테고리 드롭다운 + 목록 컬럼 |
 
 ### 검증
 - `npx tsc --noEmit` — 에러 0건
-- `npx vite build` — 통과 (3.98s)
+- `npx vite build` — 통과 (5.20s)
 - Supabase SQL 수동 실행 완료
 
 ---

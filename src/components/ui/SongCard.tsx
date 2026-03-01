@@ -228,14 +228,9 @@ export default function SongCard({ song, index = 0, contextPlaylist }: Props) {
           <div className={styles.actions}>
             <AddToPlaylist songId={song.id} />
             <LikeButton targetType="song" targetId={song.id} />
-            <ShareButton title={song.title} text={song.description || song.title} />
+            <ShareButton title={song.title} text={song.title} />
           </div>
         </div>
-
-        {/* 시인 소개글 */}
-        {song.description && (
-          <p className={styles.description}>{song.description}</p>
-        )}
 
         {hasLyrics && (
           <>

@@ -70,7 +70,6 @@ export default function LatestSongsPage() {
                   <span className={styles.boardColTitle}>제목</span>
                   <span className={styles.boardColCat}>카테고리</span>
                   <span className={styles.boardColView}>조회</span>
-                  <span className={styles.boardColDesc}>설명</span>
                 </div>
                 {songs.map((song, i) => (
                   <div key={song.id} className={styles.boardRow}>
@@ -78,7 +77,6 @@ export default function LatestSongsPage() {
                     <span className={styles.boardColTitle}>{song.title}</span>
                     <span className={styles.boardColCat} style={{ color: CATEGORY_COLORS[song.category] }}>{song.category}</span>
                     <span className={styles.boardColView}>{song.view_count || 0}</span>
-                    <span className={styles.boardColDesc}>{song.description || ''}</span>
                   </div>
                 ))}
               </div>
