@@ -1,5 +1,24 @@
 # 개발일지
 
+## 2026-03-01 — 전체 사이트 점검 + 미커밋 auth.ts 반영
+
+### 작업 내용
+- 전체 사이트 점검 수행 (23페이지, 14훅, 24컴포넌트 전수 검사)
+- TypeScript 에러 0건, 미사용 코드 0건, TODO 마커 0건 확인
+- 이전 커밋에서 누락된 `auth.ts` 변경사항 반영 (signUp 시 signup_domain 자동 기록)
+- 점검 보고서 `SITE_REPORT_20260301.md` 작성
+
+### 수정 파일 (3개)
+- `dev_md/SITE_REPORT_20260301.md` — **신규** 전체 사이트 점검 보고서
+- `src/lib/auth.ts` — signUp에 signup_domain 추가
+- `dev_md/DEVLOG.md`, `dev_md/DEV_LOG.md` — 개발일지 추가
+
+### 검증
+- `npx tsc --noEmit` — 통과
+- `npx vite build` — 통과
+
+---
+
 ## 2026-03-01 — 모든 콘텐츠에 조회수(view_count) 기능 추가
 
 ### 작업 내용
