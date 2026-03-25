@@ -1,5 +1,7 @@
 {
   "name": "hohai",
+  "description": "Hohai 서비스",
+  "homepage": "https://hohai.dreamitbiz.com",
   "private": true,
   "version": "1.0.0",
   "type": "module",
